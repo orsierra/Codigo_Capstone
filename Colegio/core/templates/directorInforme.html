@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe Académico - Primer Semestre</title>
+    <!-- Bootstrap 5 CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            background-color: #000;
+            min-height: 100vh;
+            padding: 15px;
+        }
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+        }
+        .sidebar a:hover {
+            color: #f0ad4e;
+        }
+        .sidebar i {
+            margin-right: 10px;
+        }
+        .main-content {
+            padding: 30px;
+        }
+        .back-arrow {
+            cursor: pointer;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+        .edit-icon {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <div class="sidebar col-md-3">
+            <div class="nav flex-column">
+                <a href="#" class="mb-3"><i class="bi bi-calendar"></i>Planificación Académica</a>
+                <a href="#" class="mb-3"><i class="bi bi-person"></i>Perfil</a>
+                <a href="#"><i class="bi bi-box-arrow-right"></i>Salir</a>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <div class="main-content col-md-9">
+            <h2 class="text-center mb-4">Informe Académico Primer Semestre</h2>
+            
+            <!-- Botón de regreso con ícono de flecha -->
+            <div class="back-arrow">
+                <i class="bi bi-arrow-left"></i> Regresar
+            </div>
+
+            <!-- Tabla de informe académico -->
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Estudiantes Inscritos</th>
+                        <th>Promedio</th>
+                        <th>% Asistencia</th>
+                        <th>Curso</th>
+                        <th>Editar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>30</td>
+                        <td>5.8</td>
+                        <td>93%</td>
+                        <td>1° Medio A</td>
+                        <!-- Ícono de edición -->
+                        <td><i class="bi bi-pencil-square edit-icon"></i></td>
+                    </tr>
+                    <tr>
+                        <td>32</td>
+                        <td>5.9</td>
+                        <td>95%</td>
+                        <td>1° Medio B</td>
+                        <!-- Ícono de edición -->
+                        <td><i class="bi bi-pencil-square edit-icon"></i></td>
+                    </tr>
+                    <tr>
+                        <td>28</td>
+                        <td>5.5</td>
+                        <td>90%</td>
+                        <td>2° Medio A</td>
+                        <!-- Ícono de edición -->
+                        <td><i class="bi bi-pencil-square edit-icon"></i></td>
+                    </tr>
+                    <tr>
+                        <td>29</td>
+                        <td>5.2</td>
+                        <td>85%</td>
+                        <td>2° Medio B</td>
+                        <!-- Ícono de edición -->
+                        <td><i class="bi bi-pencil-square edit-icon"></i></td>
+                    </tr>
+                    <tr>
+                        <td>25</td>
+                        <td>4.9</td>
+                        <td>87%</td>
+                        <td>3° Medio A</td>
+                        <!-- Ícono de edición -->
+                        <td><i class="bi bi-pencil-square edit-icon"></i></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <!-- Botón para imprimir en PDF -->
+            <button class="btn btn-primary"><i class="bi bi-printer"></i> Imprimir en PDF</button>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
