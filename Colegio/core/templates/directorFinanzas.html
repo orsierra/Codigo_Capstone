@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe Finanzas</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome para los íconos -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Bootstrap JS (Opcional, solo si vas a usar componentes interactivos como modales) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8f8;
+        }
+        .sidebar {
+            background-color: #333;
+            color: white;
+            width: 250px;
+            height: 100%;
+            position: fixed;
+            padding: 20px;
+        }
+        .sidebar a {
+            color: white;
+            display: block;
+            padding: 10px 0;
+            text-decoration: none;
+        }
+        .sidebar a:hover {
+            background-color: #575757;
+        }
+        .sidebar i {
+            margin-right: 10px;
+        }
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+            width: calc(100% - 250px);
+        }
+        .header {
+            background-color: transparent;
+            padding: 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: black; /* Cambiamos el color del título a negro */
+        }
+        .table-responsive {
+            margin-top: 20px;
+        }
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+        }
+        .actions button {
+            background-color: black;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .actions button:hover {
+            background-color: #333;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h2>Menú</h2>
+            <a href="#"><i class="fas fa-calendar-alt"></i>Planificación Académica</a>
+            <a href="#"><i class="fas fa-user"></i>Perfil</a>
+            <a href="#"><i class="fas fa-chart-line"></i>Informes y Finanzas</a>
+            <a href="#"><i class="fas fa-sign-out-alt"></i>Salir</a>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <div class="header">
+                Informe Finanzas Primer Semestre
+            </div>
+
+            <h3>Informe Finanzas</h3>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Concepto</th>
+                            <th>Monto</th>
+                            <th>Observaciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Matrículas</td>
+                            <td>$385,000,000</td>
+                            <td>Total de Estudiantes: 3,850</td>
+                        </tr>
+                        <tr>
+                            <td>Cuotas Mensuales</td>
+                            <td>$51,000,000,000</td>
+                            <td>(Enero - Junio)</td>
+                        </tr>
+                        <tr>
+                            <td>Sueldos (Personal)</td>
+                            <td>$550,000,00</td>
+                            <td>Pago total del personal</td>
+                        </tr>
+                        <tr>
+                            <td>Mantenimiento</td>
+                            <td>$90,000,000</td>
+                            <td>Obras en proceso</td>
+                        </tr>
+                        <tr>
+                            <td>Materiales</td>
+                            <td>$60,000,000</td>
+                            <td>“Necesarios”</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Actions Buttons -->
+            <div class="actions">
+                <button class="btn"><i class="fas fa-edit"></i> Editar</button>
+                <button class="btn"><i class="fas fa-print"></i> Imprimir en PDF</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
