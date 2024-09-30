@@ -48,10 +48,12 @@
             background-color: #343a40;
             color: #ffffff;
             height: 100vh;
-            width: 200px; /* Ancho reducido de nuevo a 200px */
+            width: 200px;
             position: fixed;
             top: 0;
             left: 0;
+            display: flex;
+            flex-direction: column;
         }
 
         .sidebar a {
@@ -72,13 +74,14 @@
         }
 
         .sidebar .footer {
-            padding: 10px 20px;
+            margin-top: auto;
+            padding: 10px;
             font-size: 0.9em;
         }
 
         /* Content area styles */
         .content {
-            margin-left: 200px; /* Ajuste del margen izquierdo al tamaño reducido de la barra */
+            margin-left: 200px;
             padding: 2rem;
         }
 
@@ -137,7 +140,6 @@
         <a href="#"><i class="fas fa-file-alt"></i> Notas</a>
         <a href="#"><i class="fas fa-file-signature"></i> Matrícula</a>
         <a href="#"><i class="fas fa-sign-out-alt"></i> Salir</a>
-
         <div class="footer text-center mt-auto">
             <a href="#"><i class="fas fa-lock"></i> Privacidad</a>
             <a href="#"><i class="fas fa-wheelchair"></i> Accesibilidad</a>
@@ -147,7 +149,7 @@
     <!-- Content Area -->
     <div class="content">
         <!-- Título principal -->
-        <div class="title">Notas</div> <!-- Título cambiado a "Notas" -->
+        <div class="title">Asistencia</div>
 
         <!-- Header con el nombre del alumno -->
         <div class="header">
@@ -156,28 +158,28 @@
 
         <div class="container mt-3">
             <!-- Accordion para Lenguaje -->
-            <div class="accordion mb-3" id="accordionNotas1">
+            <div class="accordion mb-3" id="accordionAsistencia1">
                 <div class="accordion-item">
-                    <h2 class="accordion-header" id="headingNotas1">
-                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNotas1" aria-expanded="true" aria-controls="collapseNotas1">
+                    <h2 class="accordion-header" id="headingAsistencia1">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAsistencia1" aria-expanded="true" aria-controls="collapseAsistencia1">
                             Lenguaje
                         </button>
                     </h2>
-                    <div id="collapseNotas1" class="accordion-collapse collapse show" aria-labelledby="headingNotas1" data-bs-parent="#accordionNotas1">
+                    <div id="collapseAsistencia1" class="accordion-collapse collapse show" aria-labelledby="headingAsistencia1" data-bs-parent="#accordionAsistencia1">
                         <div class="accordion-body">
                             <table class="table table-bordered text-center">
                                 <thead class="table-light">
                                     <tr>
                                         <th>Curso</th>
-                                        <th>Nota</th>
-                                        <th>Comentarios</th>
+                                        <th>Clases realizadas</th>
+                                        <th>Asistencia</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr class="highlight">
                                         <td>Lenguaje</td>
-                                        <td>6.5</td>
-                                        <td>Bien</td>
+                                        <td>5</td>
+                                        <td>4</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -187,28 +189,28 @@
             </div>
 
             <!-- Accordion para Matemáticas -->
-            <div class="accordion mb-3" id="accordionNotas2">
+            <div class="accordion mb-3" id="accordionAsistencia2">
                 <div class="accordion-item">
-                    <h2 class="accordion-header" id="headingNotas2">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNotas2" aria-expanded="false" aria-controls="collapseNotas2">
+                    <h2 class="accordion-header" id="headingAsistencia2">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAsistencia2" aria-expanded="false" aria-controls="collapseAsistencia2">
                             Matemáticas
                         </button>
                     </h2>
-                    <div id="collapseNotas2" class="accordion-collapse collapse" aria-labelledby="headingNotas2" data-bs-parent="#accordionNotas2">
+                    <div id="collapseAsistencia2" class="accordion-collapse collapse" aria-labelledby="headingAsistencia2" data-bs-parent="#accordionAsistencia2">
                         <div class="accordion-body">
                             <table class="table table-bordered text-center">
                                 <thead class="table-light">
                                     <tr>
                                         <th>Curso</th>
-                                        <th>Nota</th>
-                                        <th>Comentarios</th>
+                                        <th>Clases realizadas</th>
+                                        <th>Asistencia</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr class="highlight">
                                         <td>Matemáticas</td>
-                                        <td>5.8</td>
-                                        <td>Regular</td>
+                                        <td>5</td>
+                                        <td>4</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -218,28 +220,28 @@
             </div>
 
             <!-- Accordion para Biología -->
-            <div class="accordion mb-3" id="accordionNotas3">
+            <div class="accordion mb-3" id="accordionAsistencia3">
                 <div class="accordion-item">
-                    <h2 class="accordion-header" id="headingNotas3">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNotas3" aria-expanded="false" aria-controls="collapseNotas3">
+                    <h2 class="accordion-header" id="headingAsistencia3">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAsistencia3" aria-expanded="false" aria-controls="collapseAsistencia3">
                             Biología
                         </button>
                     </h2>
-                    <div id="collapseNotas3" class="accordion-collapse collapse" aria-labelledby="headingNotas3" data-bs-parent="#accordionNotas3">
+                    <div id="collapseAsistencia3" class="accordion-collapse collapse" aria-labelledby="headingAsistencia3" data-bs-parent="#accordionAsistencia3">
                         <div class="accordion-body">
                             <table class="table table-bordered text-center">
                                 <thead class="table-light">
                                     <tr>
                                         <th>Curso</th>
-                                        <th>Nota</th>
-                                        <th>Comentarios</th>
+                                        <th>Clases realizadas</th>
+                                        <th>Asistencia</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr class="highlight">
                                         <td>Biología</td>
-                                        <td>7.0</td>
-                                        <td>Excelente</td>
+                                        <td>5</td>
+                                        <td>4</td>
                                     </tr>
                                 </tbody>
                             </table>
