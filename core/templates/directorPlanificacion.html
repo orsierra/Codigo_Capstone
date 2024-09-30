@@ -9,109 +9,230 @@
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+        }
+
+        .container-fluid {
+            padding: 0;
+        }
+
+        /* Estilos para la barra lateral */
         .sidebar {
-            background-color: #000;
-            min-height: 100vh;
-            padding: 15px;
+            background-color: #343a40;
+            color: #ffffff;
+            height: 100vh;
+            width: 200px;
+            position: fixed;
+            top: 0;
+            left: 0;
         }
+
         .sidebar a {
-            color: white;
+            color: #ffffff;
             text-decoration: none;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            font-size: 1.1em;
         }
+
         .sidebar a:hover {
-            color: #f0ad4e;
+            background-color: #495057;
         }
-        .sidebar i {
+
+        .sidebar a i {
             margin-right: 10px;
         }
+
+        .sidebar .footer {
+            padding: 10px 20px;
+            font-size: 0.9em;
+        }
+
+        /* Estilos para el área de contenido */
         .main-content {
-            padding: 30px;
+            margin-left: 200px;
+            padding: 2rem;
+            background-color: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start; /* Alinea todo el contenido a la izquierda */
         }
-        .back-arrow {
-            cursor: pointer;
-            font-size: 1.5rem;
-            margin-bottom: 20px;
+
+        .subject-button {
+            width: 100%; /* Botón que ocupa todo el ancho */
+            background-color: #e0e0e0; /* Fondo gris */
+            color: black; /* Texto negro */
+            border: none;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.2em;
+            border: 2px solid black;
         }
-        .edit-icon {
-            cursor: pointer;
+
+        .subject-button:hover {
+            background-color: #5a6268;
+            color: white;
+        }
+
+        /* Botones de "Regresar" y "Imprimir" en negro */
+        .btn-back, .btn-pdf {
+            background-color: black;
+            color: white;
+            border: none;
+            font-size: 1.2em;
+            padding: 10px 20px;
+            width: auto;
+            text-align: left; /* Alinea el contenido del botón a la izquierda */
+        }
+
+        .btn-back:hover, .btn-pdf:hover {
+            background-color: #333; /* Color un poco más claro al hacer hover */
+        }
+
+        /* Estilos para la tabla */
+        .table-container {
+            width: 100%; /* Ocupa todo el ancho */
+            max-width: 1200px; /* Limita el tamaño máximo en pantallas muy grandes */
+            overflow-x: auto; /* Scroll horizontal en pantallas pequeñas */
+        }
+
+        .table {
+            background-color: white;
+            text-align: center;
+            width: 100%;
+            font-size: 1.2em; /* Aumenta el tamaño del texto en las tablas */
+        }
+
+        .table th,
+        .table td {
+            padding: 25px; /* Aumenta el padding en las celdas */
+            font-size: 1.1em; /* Aumenta el tamaño del texto en las celdas */
+        }
+
+        /* Media Queries para Responsividad */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .table th, .table td {
+                font-size: 0.9em; /* Reduce el tamaño de texto en pantallas pequeñas */
+                padding: 10px; /* Reduce el padding en pantallas pequeñas */
+            }
+
+            .table-container {
+                overflow-x: auto; /* Permite desplazamiento horizontal en pantallas pequeñas */
+            }
+        }
+
+        /* Ajustes adicionales para pantallas muy pequeñas */
+        @media (max-width: 576px) {
+            .subject-button {
+                font-size: 1em; /* Reduce el tamaño de los botones */
+                padding: 10px;
+            }
         }
     </style>
 </head>
-<body>
-    <div class="d-flex">
-        <!-- Sidebar -->
-        <div class="sidebar col-md-3">
-            <div class="nav flex-column">
-                <a href="#" class="mb-3"><i class="bi bi-calendar"></i>Planificación Académica</a>
-                <a href="#" class="mb-3"><i class="bi bi-person"></i>Perfil</a>
-                <a href="#"><i class="bi bi-box-arrow-right"></i>Salir</a>
-            </div>
-        </div>
 
-        <!-- Main content -->
-        <div class="main-content col-md-9">
-            <h2 class="text-center mb-4">Planificación Académica Primer Semestre</h2>
-            <!-- Botón de regreso con ícono de flecha -->
-            <div class="back-arrow">
-                <i class="bi bi-arrow-left" onclick="window.location.href='directorMenu.html'"></i> 
+<body>
+    <!-- Contenedor Principal -->
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Barra Lateral -->
+            <div class="sidebar d-flex flex-column">
+                <h3 class="text-center py-4">Nuevos Horizontes</h3>
+                <a href="#"><i class="bi bi-house"></i> Página de la Institución</a>
+                <a href="#"><i class="bi bi-person"></i> Director</a>
+                <a href="#"><i class="bi bi-box-arrow-right"></i> Salir</a>
+                <div class="mt-auto text-center p-3">
+                    <a href="#"><i class="bi bi-shield-lock"></i> Privacidad</a>
+                    <a href="#"><i class="bi bi-universal-access"></i> Accesibilidad</a>
+                </div>
             </div>
-            
-            <!-- Tabla de planificación académica -->
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Profesor Responsable</th>
-                        <th>Asignatura</th>
-                        <th>Horario Asignado</th>
-                        <th>Aula</th>
-                        <th>Editar</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><img src="img/teacher1.jpg" class="rounded-circle" width="40" height="40"> Susana</td>
-                        <td>Matemáticas</td>
-                        <td>Lunes y Miércoles 8:00 - 9:30</td>
-                        <td>Aula 101</td>
-                        <!-- Ícono de edición -->
-                        <td><i class="bi bi-pencil-square edit-icon"></i></td>
-                    </tr>
-                    <tr>
-                        <td><img src="img/teacher2.jpg" class="rounded-circle" width="40" height="40"> Ana</td>
-                        <td>Lenguaje</td>
-                        <td>Martes y Jueves 10:00 - 11:30</td>
-                        <td>Aula 102</td>
-                        <!-- Ícono de edición -->
-                        <td><i class="bi bi-pencil-square edit-icon"></i></td>
-                    </tr>
-                    <tr>
-                        <td><img src="img/teacher3.jpg" class="rounded-circle" width="40" height="40"> María</td>
-                        <td>Ciencias</td>
-                        <td>Lunes y Viernes 9:30 - 11:00</td>
-                        <td>Aula 103</td>
-                        <!-- Ícono de edición -->
-                        <td><i class="bi bi-pencil-square edit-icon"></i></td>
-                    </tr>
-                    <tr>
-                        <td><img src="img/teacher4.jpg" class="rounded-circle" width="40" height="40"> Alex</td>
-                        <td>Historia</td>
-                        <td>Miércoles y Viernes 11:00 - 12:30</td>
-                        <td>Aula 104</td>
-                        <!-- Ícono de edición -->
-                        <td><i class="bi bi-pencil-square edit-icon"></i></td>
-                    </tr>
-                    <tr>
-                        <td><img src="img/teacher5.jpg" class="rounded-circle" width="40" height="40"> Alan</td>
-                        <td>Inglés</td>
-                        <td>Martes y Jueves 14:00 - 15:30</td>
-                        <td>Aula 105</td>
-                        <!-- Ícono de edición -->
-                        <td><i class="bi bi-pencil-square edit-icon"></i></td>
-                    </tr>
-                </tbody>
-            </table>
-            <!-- Botón para imprimir en PDF -->
-            <button class="btn btn-primary">Imprimir en PDF</button>
+
+            <!-- Contenido Principal -->
+            <div class="main-content col-md-9">
+                <h2 class="text-center mb-4">Planificación Académica Primer Semestre</h2>
+                
+                <!-- Botón de flecha de regreso en negro alineado a la izquierda que dirige a directorMenu.html -->
+                <button class="btn-back mb-3" onclick="window.location.href='directorMenu.html'">
+                    <i class="bi bi-arrow-left"></i>
+                </button>
+                
+                <!-- Tabla de planificación académica -->
+                <div class="table-container mt-4">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Profesor Responsable</th>
+                                <th>Asignatura</th>
+                                <th>Horario Asignado</th>
+                                <th>Aula</th>
+                                <th>Editar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><img src="img/teacher1.jpg" class="rounded-circle" width="40" height="40"> Susana</td>
+                                <td>Matemáticas</td>
+                                <td>Lunes y Miércoles 8:00 - 9:30</td>
+                                <td>Aula 101</td>
+                                <!-- Ícono de edición -->
+                                <td><i class="bi bi-pencil-square edit-icon"></i></td>
+                            </tr>
+                            <tr>
+                                <td><img src="img/teacher2.jpg" class="rounded-circle" width="40" height="40"> Ana</td>
+                                <td>Lenguaje</td>
+                                <td>Martes y Jueves 10:00 - 11:30</td>
+                                <td>Aula 102</td>
+                                <!-- Ícono de edición -->
+                                <td><i class="bi bi-pencil-square edit-icon"></i></td>
+                            </tr>
+                            <tr>
+                                <td><img src="img/teacher3.jpg" class="rounded-circle" width="40" height="40"> María</td>
+                                <td>Ciencias</td>
+                                <td>Lunes y Viernes 9:30 - 11:00</td>
+                                <td>Aula 103</td>
+                                <!-- Ícono de edición -->
+                                <td><i class="bi bi-pencil-square edit-icon"></i></td>
+                            </tr>
+                            <tr>
+                                <td><img src="img/teacher4.jpg" class="rounded-circle" width="40" height="40"> Alex</td>
+                                <td>Historia</td>
+                                <td>Miércoles y Viernes 11:00 - 12:30</td>
+                                <td>Aula 104</td>
+                                <!-- Ícono de edición -->
+                                <td><i class="bi bi-pencil-square edit-icon"></i></td>
+                            </tr>
+                            <tr>
+                                <td><img src="img/teacher5.jpg" class="rounded-circle" width="40" height="40"> Alan</td>
+                                <td>Inglés</td>
+                                <td>Martes y Jueves 14:00 - 15:30</td>
+                                <td>Aula 105</td>
+                                <!-- Ícono de edición -->
+                                <td><i class="bi bi-pencil-square edit-icon"></i></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Botón para imprimir en PDF en negro alineado a la izquierda -->
+                <button class="btn-pdf mt-3">
+                    <i class="bi bi-file-earmark-pdf"></i> Imprimir en PDF
+                </button>
+            </div>
         </div>
     </div>
 
