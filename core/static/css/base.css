@@ -1,0 +1,109 @@
+/* Estilos generales */
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    font-family: Arial, sans-serif; /* Fuente por defecto */
+  }
+  
+  .container-fluid {
+    padding: 0;
+  }
+  
+  /* Estilos de la barra lateral */
+  .sidebar {
+    background-color: #343a40;
+    color: #ffffff;
+    height: 100vh;
+    width: 200px;
+    position: fixed;
+    top: 0;
+    left: 0;
+  }
+  
+  .sidebar a {
+    color: #ffffff;
+    text-decoration: none;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    font-size: 1.1em;
+  }
+  
+  .sidebar a:hover {
+    background-color: #495057;
+  }
+  
+  .sidebar a i {
+    margin-right: 10px;
+  }
+  
+  .sidebar .footer {
+    padding: 10px 20px;
+    font-size: 0.9em;
+  }
+  
+  /* Estilos del contenido principal */
+  .content {
+    margin-left: 200px; /* Ajusta este valor al ancho de la sidebar */
+    padding: 2rem;
+    background-color: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  /* Estilos de los botones de asignaturas */
+  .subject-button {
+    width: 100%;
+    background-color: #e0e0e0;
+    color: black;
+    border: none;
+    padding: 15px;
+    text-align: center;
+    font-size: 1.2em;
+    border: 2px solid black;
+    margin-bottom: 10px; /* Espacio entre botones */
+  }
+  
+  .subject-button:hover {
+    background-color: #5a6268;
+    color: white;
+  }
+  
+  /* Estilos de las tablas */
+  .table-container {
+    width: 100%;
+    max-width: 1200px;
+  }
+  
+  .table {
+    background-color: white;
+    text-align: center;
+    width: 100%;
+    font-size: 1.2em;
+  }
+  
+  .table th,
+  .table td {
+    padding: 25px;
+    font-size: 1.3em;
+  }
+  
+  .collapse.show {
+    margin-bottom: 2rem;
+  }
+  
+  /* Media Queries para Responsividad */
+  @media (max-width: 768px) {
+    .sidebar {
+      width: 100%;
+      height: auto;
+      position: relative;
+    }
+  
+    .content {
+      margin-left: 0;
+    }
+  }
