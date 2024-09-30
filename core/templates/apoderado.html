@@ -100,6 +100,33 @@
             background-color: #27408B;
         }
 
+        /* Nueva barra lateral basada en la imagen proporcionada */
+        .sidebar .menu {
+            padding: 15px;
+        }
+
+        .sidebar .menu a {
+            display: block;
+            padding: 10px;
+            text-decoration: none;
+            color: white;
+            font-size: 1em;
+        }
+
+        .sidebar .menu a:hover {
+            background-color: #495057;
+        }
+
+        .sidebar .menu i {
+            margin-right: 8px;
+        }
+
+        /* Alineación vertical de iconos e items */
+        .sidebar a {
+            display: flex;
+            align-items: center;
+        }
+
         @media (max-width: 768px) {
             .sidebar {
                 width: 100%;
@@ -118,9 +145,14 @@
     <!-- Sidebar -->
     <div class="sidebar d-flex flex-column">
         <h3 class="text-center py-4">Nuevos Horizontes</h3>
-        <a href="#"><i class="fas fa-university"></i> Página de la Institución</a>
-        <a href="#"><i class="fas fa-user"></i> Alumno</a>
-        <a href="#"><i class="fas fa-sign-out-alt"></i> Salir</a>
+        <div class="menu">
+            <a href="#"><i class="fas fa-university"></i> Página de la Institución</a>
+            <a href="#"><i class="fas fa-user"></i> Apoderado</a>
+            <a href="#"><i class="fas fa-clipboard-list"></i> Asistencia</a>
+            <a href="#"><i class="fas fa-book"></i> Notas</a>
+            <a href="#"><i class="fas fa-file-alt"></i> Matrícula</a>
+            <a href="#"><i class="fas fa-sign-out-alt"></i> Salir</a>
+        </div>
         <div class="mt-auto text-center p-3">
             <a href="#"><i class="fas fa-lock"></i> Privacidad</a>
             <a href="#"><i class="fas fa-wheelchair"></i> Accesibilidad</a>
@@ -259,18 +291,11 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Footer de la página -->
-            <div class="divider"></div>
-            <footer class="text-center">
-                <p>&copy; 2024 Nuevos Horizontes. Todos los derechos reservados.</p>
-            </footer>
         </div>
     </div>
 
-    <!-- Bootstrap JS y dependencias -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+    <!-- Bootstrap JS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
