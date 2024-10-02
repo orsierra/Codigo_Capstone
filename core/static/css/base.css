@@ -1,0 +1,38 @@
+/* Personaliza los estilos aquí */
+
+/* Estilos generales */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Estilos de la barra lateral */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 250px; /* Ajusta el ancho según tus necesidades */
+  background-color: #343a40; /* Color de fondo oscuro */
+  color: #fff; /* Color de texto blanco */
+  overflow-y: auto; /* Permite desplazar el contenido si es necesario */
+}
+
+.sidebar .nav-link {
+  color: #fff;
+  padding: 15px;
+  display: block;
+  text-decoration: none;
+}
+
+.sidebar .nav-link:hover {
+  background-color: #495057;
+}
+
+/* Estilos para el contenido principal */
+.main-content {
+  margin-left: 250px; /* Ajusta este valor según el ancho de la sidebar */
+  padding: 20px;
+  background-color: #f0f0f0;
+}
