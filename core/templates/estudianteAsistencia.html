@@ -1,41 +1,31 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asistencias</title>
+    <title>Nuevos Horizontes - Estudiante</title>
+
     <!-- Bootstrap CSS CDN -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
     <!-- Font Awesome CDN para iconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- Custom CSS -->
     <style>
-        body, html {
-            height: 100%;
+        body,
+        html {
             margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
         }
-        .container {
-            background-color: white;
-            padding: 20px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+
+        .container-fluid {
+            padding: 0;
         }
-        .title {
-            background-color: #4169E1;
-            color: white;
-            text-align: center;
-            padding: 10px;
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-        .highlight {
-            background-color: #b8e2e2;
-        }
-        .divider {
-            border-bottom: 2px solid #9DC0C8;
-            margin: 20px 0;
-        }
+
         /* Sidebar styles */
         .sidebar {
             background-color: #343a40;
@@ -46,6 +36,7 @@
             top: 0;
             left: 0;
         }
+
         .sidebar a {
             color: #ffffff;
             text-decoration: none;
@@ -54,118 +45,163 @@
             align-items: center;
             font-size: 1.1em;
         }
+
         .sidebar a:hover {
             background-color: #495057;
         }
+
         .sidebar a i {
             margin-right: 10px;
         }
+
+        .sidebar h3 {
+            font-size: 18px;
+            text-align: center;
+            padding: 20px 0;
+        }
+
         .sidebar .footer {
             padding: 10px 20px;
             font-size: 0.9em;
         }
+
         /* Content area styles */
         .content {
-            margin-left: 200px; /* Deja espacio para la barra lateral */
+            margin-left: 200px;
             padding: 2rem;
         }
+
+        /* Container */
+        .container {
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .accordion-button {
+            font-size: 1.2em;
+        }
+
+        /* Table styles */
+        .table {
+            background-color: white;
+            text-align: center;
+            width: 100%;
+        }
+
+        .table th,
+        .table td {
+            padding: 15px;
+            font-size: 1.1em;
+        }
+
+        /* Media Queries for Responsiveness */
         @media (max-width: 768px) {
             .sidebar {
                 width: 100%;
                 height: auto;
                 position: relative;
             }
+
             .content {
                 margin-left: 0;
             }
         }
     </style>
 </head>
+
 <body>
-    <!-- Sidebar -->
-    <div class="sidebar d-flex flex-column">
-        <h3 class="text-center py-4">Nuevos Horizontes</h3>
-        <a href="#"><i class="fas fa-university"></i> Página de la Institución</a>
-        <a href="#"><i class="fas fa-user"></i> Alumno</a>
-        <a href="#"><i class="fas fa-sign-out-alt"></i> Salir</a>
-        <div class="mt-auto text-center p-3">
-            <a href="#"><i class="fas fa-lock"></i> Privacidad</a>
-            <a href="#"><i class="fas fa-wheelchair"></i> Accesibilidad</a>
-        </div>
-    </div>
-
-    <!-- Content Area -->
-    <div class="content">
-        <div class="container mt-5">
-
-            <!-- Accordion para asistencias -->
-            <div class="accordion" id="asistenciaAccordion">
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="headingOne">
-                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                            Asistencias - Ingles
-                        </button>
-                    </h2>
-                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#asistenciaAccordion">
-                        <div class="accordion-body">
-                            <!-- Tabla de Asistencias -->
-                            <table class="table table-bordered text-center">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Curso</th>
-                                        <th>N de Clases Registradas</th>
-                                        <th>Asistencia</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr class="highlight">
-                                        <td>Asignatura</td>
-                                        <td>5</td>
-                                        <td>4</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+    <!-- Main Container -->
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="sidebar d-flex flex-column">
+                <h3>Nuevos Horizontes</h3>
+                <a href="#"><i class="fas fa-university"></i> Página de la Institución</a>
+                <a href="#"><i class="fas fa-user"></i> Alumno</a>
+                <a href="#"><i class="fas fa-check"></i> Asistencia</a>
+                <a href="#"><i class="fas fa-clipboard-list"></i> Notas</a>
+                <a href="#"><i class="fas fa-sign-out-alt"></i> Salir</a>
+                <div class="footer mt-auto text-center">
+                    <a href="#"><i class="fas fa-shield-alt"></i> Privacidad</a>
+                    <a href="#"><i class="fas fa-universal-access"></i> Accesibilidad</a>
                 </div>
             </div>
 
-            <!-- Segundo Accordion para otras asistencias -->
-            <div class="accordion mt-4" id="asistenciaAccordion2">
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="headingTwo">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                            Asistencias - Lenguaje
-                        </button>
-                    </h2>
-                    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#asistenciaAccordion2">
-                        <div class="accordion-body">
-                            <!-- Segunda Tabla de Asistencias -->
-                            <table class="table table-bordered text-center">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Curso</th>
-                                        <th>N de Clases Registradas</th>
-                                        <th>Asistencia</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr class="highlight">
-                                        <td>Asignatura</td>
-                                        <td>5</td>
-                                        <td>4</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+            <!-- Content Area -->
+            <div class="content col">
+                <div class="container mt-5">
+                    <!-- Accordion para asistencias -->
+                    <div class="accordion" id="asistenciaAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingOne">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                    Asistencias - Inglés
+                                </button>
+                            </h2>
+                            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#asistenciaAccordion">
+                                <div class="accordion-body">
+                                    <!-- Tabla de Asistencias -->
+                                    <table class="table table-bordered text-center">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Curso</th>
+                                                <th>N de Clases Registradas</th>
+                                                <th>Asistencia</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="highlight">
+                                                <td>Asignatura</td>
+                                                <td>5</td>
+                                                <td>4</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
+
+                    <!-- Segundo Accordion para otras asistencias -->
+                    <div class="accordion mt-4" id="asistenciaAccordion2">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingTwo">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                    Asistencias - Lenguaje
+                                </button>
+                            </h2>
+                            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#asistenciaAccordion2">
+                                <div class="accordion-body">
+                                    <!-- Segunda Tabla de Asistencias -->
+                                    <table class="table table-bordered text-center">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Curso</th>
+                                                <th>N de Clases Registradas</th>
+                                                <th>Asistencia</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="highlight">
+                                                <td>Asignatura</td>
+                                                <td>5</td>
+                                                <td>4</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
-
         </div>
     </div>
 
     <!-- Bootstrap JS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
