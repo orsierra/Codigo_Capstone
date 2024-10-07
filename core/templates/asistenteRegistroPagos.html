@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Pagos</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+        }
+
+        /* Sidebar styles */
+        .sidebar {
+            background-color: #343a40;
+            color: #ffffff;
+            height: 100vh;
+            width: 200px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding-top: 20px;
+        }
+
+        .sidebar a {
+            color: #ffffff;
+            text-decoration: none;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            font-size: 1.1em;
+        }
+
+        .sidebar a:hover {
+            background-color: #495057;
+        }
+
+        .sidebar a i {
+            margin-right: 10px;
+        }
+
+        .sidebar .mt-auto a {
+            margin-bottom: 10px;
+        }
+
+        /* Content area styles */
+        .main-content {
+            margin-left: 200px;
+            padding: 2rem;
+            background-color: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .btn-back {
+            background-color: transparent;
+            color: black;
+            border: none;
+            font-size: 2em;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+
+        .payment-record {
+            width: 100%;
+            max-width: 800px;
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .payment-record h4 {
+            font-size: 1.2em;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .payment-record .student-info,
+        .payment-record .payment-info {
+            margin-bottom: 20px;
+        }
+
+        .payment-record p {
+            margin: 5px 0;
+            font-size: 1.1em;
+        }
+
+        /* Pencil Icon for editing */
+        .edit-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #000;
+        }
+
+        .btn-save {
+            background-color: #000;
+            color: white;
+            border: none;
+            font-size: 1.1em;
+            padding: 10px;
+            margin-right: 10px;
+        }
+
+        .btn-save:hover {
+            background-color: #333;
+        }
+
+        .btn-print {
+            background-color: #000;
+            color: white;
+            border: none;
+            font-size: 1.1em;
+            padding: 10px;
+        }
+
+        .btn-print:hover {
+            background-color: #333;
+        }
+
+        .table-list {
+            list-style-type: disc;
+            padding-left: 20px;
+            font-size: 1.1em;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .payment-record {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Main Container -->
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="sidebar d-flex flex-column">
+                <h3 class="text-center py-4">Nuevos Horizontes</h3>
+                <a href="#"><i class="bi bi-house"></i> Página de la Institución</a>
+                <a href="#"><i class="bi bi-person"></i> Perfil</a>
+                <a href="#"><i class="bi bi-box-arrow-right"></i> Salir</a>
+                <div class="mt-auto text-center p-3">
+                    <a href="#"><i class="bi bi-shield-lock"></i> Privacidad</a>
+                    <a href="#"><i class="bi bi-universal-access"></i> Accesibilidad</a>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content col">
+                <h1>Registro de Pagos</h1>
+                <!-- Botón de regresar -->
+                <button class="btn-back" onclick="window.location.href='asistenteAdmisiónFinanzas.html'">
+                    <i class="bi bi-arrow-left"></i>
+                </button>
+
+                
+
+                <!-- Registro de pagos -->
+                <div class="payment-record">
+                    <h4>Estudiante en Admisión</h4>
+                    <!-- Ícono de lápiz para editar -->
+                    <i class="bi bi-pencil-square edit-icon" title="Editar detalles"></i>
+
+                    <div class="student-info">
+                        <p><strong>Estudiante:</strong> Alberto Vera</p>
+                        <p><strong>Apoderado:</strong> Cristóbal Meneses</p>
+                        <p><strong>Asignar curso:</strong> Tercero Medio</p>
+                        <p><strong>Estado de matrícula:</strong> Activa</p>
+                        <p><strong>Estado matrícula:</strong> No pagada</p>
+                    </div>
+
+                    <div class="payment-info">
+                        <p><strong>Historial de Pagos:</strong></p>
+                        <ul class="table-list">
+                            <li>Enero 2024: $150,000 - Pagado el 5 de Enero 2024</li>
+                            <li>Febrero 2024: $150,000 CLP - Pendiente</li>
+                            <li>Marzo 2024: $150,000 CLP - Pendiente</li>
+                        </ul>
+                    </div>
+
+                    <div class="observations">
+                        <p><strong>Observaciones:</strong></p>
+                        <ul class="table-list">
+                            <li><strong>Método de Pago:</strong> Transferencia Bancaria</li>
+                            <li><strong>Fecha del Pago:</strong> 1 de Febrero 2024</li>
+                            <li><strong>Referencia de Pago:</strong> TBF-1234567</li>
+                            <li><strong>Monto Pagado:</strong> $150,000 CLP</li>
+                        </ul>
+                    </div>
+
+                    <!-- Botones de acciones -->
+                    <button class="btn-save"><i class="bi bi-save"></i> Guardar Cambios</button>
+                    <button class="btn-print"><i class="bi bi-printer"></i> Imprimir en PDF</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
