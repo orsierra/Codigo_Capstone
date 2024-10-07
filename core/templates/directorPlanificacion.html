@@ -60,58 +60,76 @@
             background-color: #f8f9fa;
             display: flex;
             flex-direction: column;
-            align-items: flex-start; /* Alinea todo el contenido a la izquierda */
+            align-items: center; /* Alinea el contenido al centro */
         }
 
-        .subject-button {
-            width: 100%; /* Botón que ocupa todo el ancho */
-            background-color: #e0e0e0; /* Fondo gris */
-            color: black; /* Texto negro */
-            border: none;
-            padding: 15px;
+        /* Ajuste del título */
+        h2 {
             text-align: center;
-            font-size: 1.2em;
-            border: 2px solid black;
+            margin-bottom: 2rem;
         }
 
-        .subject-button:hover {
-            background-color: #5a6268;
-            color: white;
+        /* Botón de flecha sin borde */
+        .btn-back {
+            background-color: transparent;
+            color: black;
+            border: none;
+            font-size: 1.5em;
+            padding: 10px 20px;
+            width: auto;
+            text-align: left; /* Alinea a la izquierda */
         }
 
-        /* Botones de "Regresar" y "Imprimir" en negro */
-        .btn-back, .btn-pdf {
+        .btn-back i {
+            font-size: 1.5em;
+        }
+
+        .btn-back:hover {
+            background-color: #f0f0f0;
+        }
+
+        /* Botón de imprimir PDF al final del cuerpo */
+        .btn-pdf {
             background-color: black;
             color: white;
             border: none;
             font-size: 1.2em;
             padding: 10px 20px;
+            margin-top: 2rem;
+            margin-left: 200px; /* Alinea el botón con el contenido principal */
             width: auto;
-            text-align: left; /* Alinea el contenido del botón a la izquierda */
         }
 
-        .btn-back:hover, .btn-pdf:hover {
+        .btn-pdf:hover {
             background-color: #333; /* Color un poco más claro al hacer hover */
+        }
+
+        /* Contenedor para alinear botones a la izquierda */
+        .button-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start; /* Alinea todo al borde izquierdo */
         }
 
         /* Estilos para la tabla */
         .table-container {
-            width: 100%; /* Ocupa todo el ancho */
-            max-width: 1200px; /* Limita el tamaño máximo en pantallas muy grandes */
-            overflow-x: auto; /* Scroll horizontal en pantallas pequeñas */
+            width: 100%;
+            max-width: 1200px;
+            overflow-x: auto;
         }
 
         .table {
             background-color: white;
             text-align: center;
             width: 100%;
-            font-size: 1.2em; /* Aumenta el tamaño del texto en las tablas */
+            font-size: 1.2em;
         }
 
         .table th,
         .table td {
-            padding: 25px; /* Aumenta el padding en las celdas */
-            font-size: 1.1em; /* Aumenta el tamaño del texto en las celdas */
+            padding: 25px;
+            font-size: 1.1em;
         }
 
         /* Media Queries para Responsividad */
@@ -127,20 +145,24 @@
             }
 
             .table th, .table td {
-                font-size: 0.9em; /* Reduce el tamaño de texto en pantallas pequeñas */
-                padding: 10px; /* Reduce el padding en pantallas pequeñas */
+                font-size: 0.9em;
+                padding: 10px;
             }
 
             .table-container {
-                overflow-x: auto; /* Permite desplazamiento horizontal en pantallas pequeñas */
+                overflow-x: auto;
             }
         }
 
-        /* Ajustes adicionales para pantallas muy pequeñas */
         @media (max-width: 576px) {
             .subject-button {
-                font-size: 1em; /* Reduce el tamaño de los botones */
+                font-size: 1em;
                 padding: 10px;
+            }
+
+            /* Asegura que el botón PDF se alinee correctamente en pantallas pequeñas */
+            .btn-pdf {
+                margin-left: 0;
             }
         }
     </style>
@@ -164,13 +186,16 @@
 
             <!-- Contenido Principal -->
             <div class="main-content col-md-9">
-                <h2 class="text-center mb-4">Planificación Académica Primer Semestre</h2>
-                
-                <!-- Botón de flecha de regreso en negro alineado a la izquierda que dirige a directorMenu.html -->
-                <button class="btn-back mb-3" onclick="window.location.href='directorMenu.html'">
-                    <i class="bi bi-arrow-left"></i>
-                </button>
-                
+                <h2>Planificación Académica Primer Semestre</h2>
+
+                <!-- Contenedor de botones alineados a la izquierda -->
+                <div class="button-container">
+                    <!-- Botón de flecha sin borde negro -->
+                    <button class="btn-back mb-3" onclick="window.location.href='directorMenu.html'">
+                        <i class="bi bi-arrow-left"></i>
+                    </button>
+                </div>
+
                 <!-- Tabla de planificación académica -->
                 <div class="table-container mt-4">
                     <table class="table">
@@ -189,7 +214,6 @@
                                 <td>Matemáticas</td>
                                 <td>Lunes y Miércoles 8:00 - 9:30</td>
                                 <td>Aula 101</td>
-                                <!-- Ícono de edición -->
                                 <td><i class="bi bi-pencil-square edit-icon"></i></td>
                             </tr>
                             <tr>
@@ -197,7 +221,6 @@
                                 <td>Lenguaje</td>
                                 <td>Martes y Jueves 10:00 - 11:30</td>
                                 <td>Aula 102</td>
-                                <!-- Ícono de edición -->
                                 <td><i class="bi bi-pencil-square edit-icon"></i></td>
                             </tr>
                             <tr>
@@ -205,7 +228,6 @@
                                 <td>Ciencias</td>
                                 <td>Lunes y Viernes 9:30 - 11:00</td>
                                 <td>Aula 103</td>
-                                <!-- Ícono de edición -->
                                 <td><i class="bi bi-pencil-square edit-icon"></i></td>
                             </tr>
                             <tr>
@@ -213,7 +235,6 @@
                                 <td>Historia</td>
                                 <td>Miércoles y Viernes 11:00 - 12:30</td>
                                 <td>Aula 104</td>
-                                <!-- Ícono de edición -->
                                 <td><i class="bi bi-pencil-square edit-icon"></i></td>
                             </tr>
                             <tr>
@@ -221,20 +242,19 @@
                                 <td>Inglés</td>
                                 <td>Martes y Jueves 14:00 - 15:30</td>
                                 <td>Aula 105</td>
-                                <!-- Ícono de edición -->
                                 <td><i class="bi bi-pencil-square edit-icon"></i></td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                
-                <!-- Botón para imprimir en PDF en negro alineado a la izquierda -->
-                <button class="btn-pdf mt-3">
-                    <i class="bi bi-file-earmark-pdf"></i> Imprimir en PDF
-                </button>
             </div>
         </div>
     </div>
+
+    <!-- Botón para imprimir en PDF fuera del cuerpo principal -->
+    <button class="btn-pdf">
+        <i class="bi bi-file-earmark-pdf"></i> Imprimir en PDF
+    </button>
 
     <!-- Bootstrap JS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>

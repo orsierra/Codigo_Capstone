@@ -6,61 +6,125 @@
     <title>Planificación Académica</title>
     <!-- Bootstrap 5 CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        body {
-            background-color: #f5f5f5;
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
         }
+
+        .container-fluid {
+            padding: 0;
+        }
+
+        /* Estilos para la barra lateral */
         .sidebar {
-            background-color: #000;
-            min-height: 100vh;
-            padding: 15px;
+            background-color: #343a40;
+            color: #ffffff;
+            height: 100vh;
+            width: 200px;
+            position: fixed;
+            top: 0;
+            left: 0;
         }
+
         .sidebar a {
-            color: white;
+            color: #ffffff;
             text-decoration: none;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            font-size: 1.1em;
         }
+
         .sidebar a:hover {
-            color: #f0ad4e;
+            background-color: #495057;
         }
-        .sidebar i {
+
+        .sidebar a i {
             margin-right: 10px;
         }
-        .main-content {
-            padding: 30px;
+
+        .sidebar .footer {
+            padding: 10px 20px;
+            font-size: 0.9em;
         }
+
+        /* Estilos para el área de contenido */
+        .main-content {
+            margin-left: 200px;
+            padding: 2rem;
+            background-color: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .button-group {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
         .button-group .btn {
-            width: 100%;
             font-size: 1.2rem;
             margin-bottom: 20px;
+            width: 100%;
             border-radius: 25px;
+        }
+
+        /* Botón de imprimir PDF */
+        .btn-pdf {
+            background-color: black;
+            color: white;
+            border: none;
+            font-size: 1.2em;
+            padding: 10px 20px;
+            margin-left: 200px;
+            width: auto;
+        }
+
+        .btn-pdf:hover {
+            background-color: #333;
         }
     </style>
 </head>
+
 <body>
-    <div class="d-flex">
-        <!-- Sidebar -->
-        <div class="sidebar col-md-3">
-            <div class="nav flex-column">
-                <a href="#" class="mb-3"><i class="bi bi-building"></i>Página de la Institución</a>
-                <a href="#" class="mb-3"><i class="bi bi-person"></i>Perfil</a>
-                <a href="#"><i class="bi bi-box-arrow-right"></i>Salir</a>
+    <!-- Contenedor Principal -->
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Barra Lateral -->
+            <div class="sidebar d-flex flex-column">
+                <h3 class="text-center py-4">Nuevos Horizontes</h3>
+                <a href="#"><i class="bi bi-house"></i> Página de la Institución</a>
+                <a href="#"><i class="bi bi-person"></i> Director</a>
+                <a href="#"><i class="bi bi-box-arrow-right"></i> Salir</a>
+                <div class="mt-auto text-center p-3">
+                    <a href="#"><i class="bi bi-shield-lock"></i> Privacidad</a>
+                    <a href="#"><i class="bi bi-universal-access"></i> Accesibilidad</a>
+                </div>
             </div>
-            <div class="mt-auto">
-                <a href="#" class="d-block text-white">Privacidad</a>
-                <a href="#" class="d-block text-white">Accesibilidad</a>
-            </div>
-        </div>
-        
-        <!-- Main content -->
-        <div class="main-content col-md-9">
-            <h1 class="text-center">Planificación Académica</h1>
-            <div class="button-group text-center mt-5">
-                <button class="btn btn-secondary btn-lg " onclick="window.location.href='directorPlanificacion.html'">Planificación Académica</button>
-                <button class="btn btn-secondary btn-lg" onclick="window.location.href='directorInforme.html'">Informes Académicos </button>
-                <button class="btn btn-secondary btn-lg" onclick="window.location.href='directorFinanzas.html'">Informes  Finanzas</button>
+
+            <!-- Contenido Principal -->
+            <div class="main-content col-md-9">
+                <h1>Planificación Académica</h1>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary btn-lg" onclick="window.location.href='directorPlanificacion.html'">Planificación Académica</button>
+                    <button class="btn btn-secondary btn-lg" onclick="window.location.href='directorInforme.html'">Informes Académicos</button>
+                    <button class="btn btn-secondary btn-lg" onclick="window.location.href='directorFinanzas.html'">Informes Finanzas</button>
+                </div>
             </div>
         </div>
     </div>
+
 
     <!-- Bootstrap JS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
