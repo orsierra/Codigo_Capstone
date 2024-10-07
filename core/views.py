@@ -17,7 +17,7 @@ def directorFinanzas_view(request):
     return render(request, 'directorFinanzas.html')
 
 def directorInforme_view(request):
-    return render(request, 'directorInforme.html')
+    return render(request, 'directorInforme.html') 
 
 def directorMenu_view(request):
     return render(request, 'directorMenu.html')
