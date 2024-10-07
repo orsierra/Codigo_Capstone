@@ -1,0 +1,21 @@
+<!-- templates/asistencia.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Asistencia</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Selecciona un Curso</h2>
+        <ul class="list-group">
+            {% for curso in cursos %}
+                <li class="list-group-item">
+                    <a href="{% url 'registrar_asistencia' curso.id %}">{{ curso.nombre }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>
