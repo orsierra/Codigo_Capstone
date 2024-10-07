@@ -128,7 +128,11 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'  # For production
 #STATICFILES_DIRS = [
+<<<<<<< HEAD
   #  BASE_DIR / "static",
+=======
+#    BASE_DIR / "static",
+>>>>>>> 03e57dd1d35b43a62a4b527033980d5ec52bbe28
 #]
 
 # Default primary key field type
