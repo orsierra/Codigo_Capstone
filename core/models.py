@@ -18,7 +18,7 @@ class Apoderado(models.Model):
     contrasena = models.CharField(max_length=20)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'apoderado'
 
 
@@ -30,7 +30,7 @@ class Asignatura(models.Model):
     area = models.CharField(max_length=40)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'asignatura'
 
 
@@ -41,7 +41,7 @@ class Asistencia(models.Model):
     clase_id_clase = models.ForeignKey('Clase', models.DO_NOTHING, db_column='clase_id_clase')
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'asistencia'
 
 
@@ -49,7 +49,7 @@ class AuthGroup(models.Model):
     name = models.CharField(unique=True, max_length=150)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'auth_group'
 
 
@@ -59,7 +59,7 @@ class AuthGroupPermissions(models.Model):
     permission = models.ForeignKey('AuthPermission', models.DO_NOTHING)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'auth_group_permissions'
         unique_together = (('group', 'permission'),)
 
@@ -70,7 +70,7 @@ class AuthPermission(models.Model):
     codename = models.CharField(max_length=100)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'auth_permission'
         unique_together = (('content_type', 'codename'),)
 
@@ -88,7 +88,7 @@ class AuthUser(models.Model):
     date_joined = models.DateTimeField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'auth_user'
 
 
@@ -98,7 +98,7 @@ class AuthUserGroups(models.Model):
     group = models.ForeignKey(AuthGroup, models.DO_NOTHING)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'auth_user_groups'
         unique_together = (('user', 'group'),)
 
@@ -109,7 +109,7 @@ class AuthUserUserPermissions(models.Model):
     permission = models.ForeignKey(AuthPermission, models.DO_NOTHING)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'auth_user_user_permissions'
         unique_together = (('user', 'permission'),)
 
@@ -120,7 +120,7 @@ class Cargaacademica(models.Model):
     profesor_id_profesor = models.OneToOneField('Profesor', models.DO_NOTHING, db_column='profesor_id_profesor')
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'cargaacademica'
 
 
@@ -133,7 +133,7 @@ class Clase(models.Model):
     observacion = models.CharField(max_length=300)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'clase'
 
 
@@ -147,7 +147,7 @@ class Contrato(models.Model):
     apoderado_id_apoderado = models.ForeignKey(Apoderado, models.DO_NOTHING, db_column='apoderado_id_apoderado')
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'contrato'
 
 
@@ -160,7 +160,7 @@ class Curso(models.Model):
     estudiante_id_estudiante = models.OneToOneField('Estudiante', models.DO_NOTHING, db_column='estudiante_id_estudiante')
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'curso'
 
 
@@ -174,7 +174,7 @@ class Director(models.Model):
     contrasena = models.CharField(max_length=20)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'director'
 
 
@@ -188,7 +188,7 @@ class DjangoAdminLog(models.Model):
     user = models.ForeignKey(AuthUser, models.DO_NOTHING)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'django_admin_log'
 
 
@@ -197,7 +197,7 @@ class DjangoContentType(models.Model):
     model = models.CharField(max_length=100)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'django_content_type'
         unique_together = (('app_label', 'model'),)
 
@@ -209,7 +209,7 @@ class DjangoMigrations(models.Model):
     applied = models.DateTimeField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'django_migrations'
 
 
@@ -219,7 +219,7 @@ class DjangoSession(models.Model):
     expire_date = models.DateTimeField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'django_session'
 
 
@@ -234,7 +234,7 @@ class Empleado(models.Model):
     contrasena = models.CharField(max_length=20)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'empleado'
 
 
@@ -248,7 +248,7 @@ class Establecimiento(models.Model):
     director_id_director = models.OneToOneField(Director, models.DO_NOTHING, db_column='director_id_director')
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'establecimiento'
 
 
@@ -267,7 +267,7 @@ class Estudiante(models.Model):
     apoderado_id_apoderado = models.ForeignKey(Apoderado, models.DO_NOTHING, db_column='apoderado_id_apoderado')
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'estudiante'
 
 
@@ -278,7 +278,7 @@ class Evaluacion(models.Model):
     asignatura_id_asignatura = models.ForeignKey(Asignatura, models.DO_NOTHING, db_column='asignatura_id_asignatura')
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'evaluacion'
 
 
@@ -289,7 +289,7 @@ class ExamenInicial(models.Model):
     estudiante_id_estudiante = models.OneToOneField(Estudiante, models.DO_NOTHING, db_column='estudiante_id_estudiante')
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'examen_inicial'
 
 
@@ -303,7 +303,7 @@ class Informeacademico(models.Model):
     periodoacademico_id_periodo_academico = models.ForeignKey('Periodoacademico', models.DO_NOTHING, db_column='periodoacademico_id_periodo_academico') 
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'informeacademico'
 
 
@@ -316,7 +316,7 @@ class Informefinanza(models.Model):
     apoderado_id_apoderado = models.ForeignKey(Apoderado, models.DO_NOTHING, db_column='apoderado_id_apoderado')
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'informefinanza'
 
 
@@ -329,7 +329,7 @@ class Matricula(models.Model):
     estudiante_id_estudiante = models.ForeignKey(Estudiante, models.DO_NOTHING, db_column='estudiante_id_estudiante')
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'matricula'
 
 
@@ -339,7 +339,7 @@ class Observacion(models.Model):
     estudiante_id_estudiante = models.ForeignKey(Estudiante, models.DO_NOTHING, db_column='estudiante_id_estudiante')
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'observacion'
 
 
@@ -350,7 +350,7 @@ class Periodoacademico(models.Model):
     estado = models.CharField(max_length=15)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'periodoacademico'
 
 
@@ -366,7 +366,7 @@ class Profesor(models.Model):
     contrasena = models.CharField(max_length=20)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'profesor'
 
 
@@ -375,7 +375,7 @@ class Relation10(models.Model):
     asignatura_id_asignatura = models.ForeignKey(Asignatura, models.DO_NOTHING, db_column='asignatura_id_asignatura')
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'relation_10'
         unique_together = (('curso_id_curso', 'asignatura_id_asignatura'),)
 
@@ -385,7 +385,7 @@ class Relation28(models.Model):
     clase_id_clase = models.ForeignKey(Clase, models.DO_NOTHING, db_column='clase_id_clase')
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'relation_28'
         unique_together = (('curso_id_curso', 'clase_id_clase'),)
 
@@ -395,7 +395,7 @@ class Relation8(models.Model):
     profesor_id_profesor = models.ForeignKey(Profesor, models.DO_NOTHING, db_column='profesor_id_profesor')
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'relation_8'
         unique_together = (('curso_id_curso', 'profesor_id_profesor'),)
 
@@ -405,7 +405,7 @@ class Relation9(models.Model):
     sala_id_sala = models.ForeignKey('Sala', models.DO_NOTHING, db_column='sala_id_sala')
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'relation_9'
         unique_together = (('curso_id_curso', 'sala_id_sala'),)
 
@@ -417,7 +417,7 @@ class Respaldoacademico(models.Model):
     periodoacademico_id_periodo_academico = models.ForeignKey(Periodoacademico, models.DO_NOTHING, db_column='periodoacademico_id_periodo_academico')   
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'respaldoacademico'
 
 
@@ -429,7 +429,7 @@ class Sala(models.Model):
     establecimiento_id_establecimiento = models.ForeignKey(Establecimiento, models.DO_NOTHING, db_column='establecimiento_id_establecimiento')
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'sala'
 
 
@@ -440,5 +440,5 @@ class Tarea(models.Model):
     clase_id_clase = models.ForeignKey(Clase, models.DO_NOTHING, db_column='clase_id_clase')
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'tarea'
