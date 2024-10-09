@@ -8,20 +8,6 @@ from django.db import models
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
 
-<<<<<<< HEAD
-class Curso(models.Model):
-    nombre = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.nombre
-
-class Alumno(models.Model):
-    nombre = models.CharField(max_length=100)
-    curso = models.ForeignKey(Curso, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.nombre
-=======
 class Apoderado(models.Model):
     id_apoderado = models.IntegerField(primary_key=True)
     nombre = models.CharField(max_length=30)
