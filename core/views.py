@@ -50,27 +50,3 @@ def apoderadoMatricula_view(request):
     return render(request, 'apoderadoMatricula.html')
 
 #PROFESOR
-
-def profesor_asistencia_view(request):
-    # Lógica para mostrar el formulario de agregar alumnos y la tabla de asistencia
-    if request.method == 'POST':
-        form = AlumnoForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('profesor_asistencia')  # Cambia a tu URL correspondiente
-    else:
-        form = AlumnoForm()
-
-    alumnos = Alumno.objects.all()
-    return render(request, 'profesorAsistencia.html', {'form': form, 'alumnos': alumnos})
-
-def registrar_asistencia_view(request, curso_id):
-    # Aquí puedes agregar la lógica para registrar la asistencia de los alumnos de un curso específico.
-    # Puedes usar el curso_id para filtrar los alumnos.
-    if request.method == 'POST':
-        # Lógica para guardar la asistencia
-        pass  # Implementa la lógica aquí
-
-    # Filtra los alumnos del curso
-    alumnos = Alumno.objects.filter(curso_id=curso_id)
-    return render(request, 'registrar_asistencia.html', {'alumnos': alumnos})
