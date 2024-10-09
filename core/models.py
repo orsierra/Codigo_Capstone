@@ -443,4 +443,4 @@ class Tarea(models.Model):
     class Meta:
         managed = True
         db_table = 'tarea'
->>>>>>> 10d64ad77fcc8720a605f042f9b965c023ef5465
+

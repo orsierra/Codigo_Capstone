@@ -1,6 +1,5 @@
 from django.urls import path
 from . import views
-from .views import profesor_asistencia_view, registrar_asistencia_view
 
 
 urlpatterns = [
