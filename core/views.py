@@ -1,7 +1,12 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
-from .models import Curso, Estudiante, Asistencia
+from .models import Curso, Estudiante, Asistencia, Profesor
 from .forms import AsistenciaForm
+from .models import Profesor 
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from weasyprint import HTML
+
 #Páginas
 def home(request):
     return render(request, 'core/home.html')
@@ -120,5 +125,19 @@ def agregar_nota(request):
     return render(request, 'calificaciones/profesorCalificacion.html', {'estudiantes': estudiantes})
 
 
-#PROFESOR
+#DIRECTOR
 
+def planificacion_academica(request):
+    profesores = Profesor.objects.all()  # Obtén todos los profesores desde la base de datos
+    return render(request, 'directorPlanificacion.html', {'profesores': profesores})
+
+
+# Imprimir PDF
+
+def imprimir_pdf(request):
+    profesores = Profesor.objects.all()  # Obtener todos los profesores
+    html_string = render_to_string('planificacion_pdf.html', {'profesores': profesores})
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="planificacion_academica.pdf"'
+    HTML(string=html_string).write_pdf(response)
+    return response

@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import AsistenciaCursoView
+from .views import AsistenciaCursoView, planificacion_academica, imprimir_pdf
 
 urlpatterns = [
     path('', views.home, name='login'),
@@ -10,7 +10,10 @@ urlpatterns = [
     path('directorFinanzas/',views.directorFinanzas_view, name='directorFinanzas'),
     path('directorInforme/',views.directorInforme_view, name='directorInforme'),
     path('directorMenu/',views.directorMenu_view, name='directorMenu'),
-    path('directorPlanificacion/',views.directorPlanificacion_view, name='directorPlanificacion'),    
+    path('directorPlanificacion/',views.directorPlanificacion_view, name='directorPlanificacion'),  
+    #Planificacion Academica
+    path('planificacion/', planificacion_academica, name='planificacion_academica'),  
+    path('planificacion/pdf/', imprimir_pdf, name='imprimir_pdf'),
     #PROFESOR
     
     path('asistencia/<int:curso_id>/', AsistenciaCursoView.as_view(), name='asistencia'),
