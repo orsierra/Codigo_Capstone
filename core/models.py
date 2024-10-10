@@ -13,7 +13,7 @@ class Apoderado(models.Model):
     nombre = models.CharField(max_length=30)
     apellido = models.CharField(max_length=50)
     direccion = models.CharField(max_length=70)
-    corrreo = models.CharField(max_length=60)
+    correo = models.CharField(max_length=60)
     telefono = models.CharField(max_length=15)
     relacion_con_estudiante = models.CharField(max_length=15)
     contrasena = models.CharField(max_length=20)

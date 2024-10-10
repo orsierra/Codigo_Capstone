@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calificaciones - 1ero Medio</title>
+    <title>Calificaciones - 1ero Medio A</title>
 
     <!-- Bootstrap CSS CDN -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
@@ -142,18 +142,16 @@
             <div class="sidebar d-flex flex-column">
                 <h3>Nuevos Horizontes</h3>
                 <a href="#"><i class="fas fa-university"></i> Página de la Institución</a>
-                <a href="#"><i class="fas fa-user"></i> Apoderado</a>
+                <a href="#"><i class="fas fa-user"></i> Profesor</a>
                 <a href="#"><i class="fas fa-check"></i> Asistencia</a>
                 <a href="#"><i class="fas fa-book"></i> Notas</a>
                 <a href="#"><i class="fas fa-sign-out-alt"></i> Salir</a>
-            <!-- Parte de la barra lateral actualizada -->
-<div class="mt-auto text-center p-3">
-    <a href="#" class="d-block mb-3"><i class="fas fa-shield-alt"></i> Privacidad</a>
-    <a href="#"><i class="fas fa-universal-access"></i> Accesibilidad</a>
-</div>
-
+                <!-- Parte de la barra lateral actualizada -->
+                <div class="mt-auto text-center p-3">
+                    <a href="#" class="d-block mb-3"><i class="fas fa-shield-alt"></i> Privacidad</a>
+                    <a href="#"><i class="fas fa-universal-access"></i> Accesibilidad</a>
+                </div>
             </div>
-
 
             <!-- Content Area -->
             <div class="content col">
@@ -163,42 +161,31 @@
                 </div>
 
                 <!-- Grades Table -->
-                <table class="grades-table">
-                    <thead>
-                        <tr>
-                            <th>Alumno</th>
-                            <th>Nota</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Alberto Vera</td>
-                            <td>7.0</td>
-                        </tr>
-                        <tr>
-                            <td>Juan Lopez</td>
-                            <td>7.0</td>
-                        </tr>
-                        <tr>
-                            <td>Millaray Sierra</td>
-                            <td>7.0</td>
-                        </tr>
-                        <tr>
-                            <td>Jorge Pérez</td>
-                            <td>7.0</td>
-                        </tr>
-                        <tr>
-                            <td>Carla Berrios</td>
-                            <td>7.0</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <!-- Action Buttons -->
-                <div class="mt-4">
-                    <button class="btn btn-custom">Modificar</button>
-                    <button class="btn btn-primary">Guardar</button>
-                </div>
+                <form method="POST" action="">
+                    {% csrf_token %}
+                    <table class="grades-table">
+                        <thead>
+                            <tr>
+                                <th>Alumno</th>
+                                <th>Nota</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for estudiante in estudiantes %}
+                            <tr>
+                                <td>{{ estudiante.nombre }} {{ estudiante.apellido }}</td>
+                                <td>
+                                    <input type="number" name="nota_{{ estudiante.id }}" value="{{ estudiante.nota }}" class="form-control">
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                        <button type="button" class="btn btn-warning">Modificar</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
