@@ -1,6 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Alumno
-from .forms import AlumnoForm
+
 
 #Páginas
 def home(request):
