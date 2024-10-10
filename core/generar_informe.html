@@ -1,0 +1,198 @@
+<!-- informes/templates/informes/generar_informe.html -->
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generar Informe - {{ curso.nombre }}</title>
+
+    <!-- Bootstrap CSS CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+    <!-- Font Awesome CDN (para iconos) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            background-color: #f8f9fa;
+        }
+
+        .container-fluid {
+            padding: 0;
+        }
+
+        /* Sidebar styles */
+        .sidebar {
+            background-color: #343a40;
+            color: #ffffff;
+            height: 100vh;
+            width: 200px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar h3 {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.5em;
+            color: #ffffff;
+        }
+
+        .sidebar a {
+            color: #ffffff;
+            text-decoration: none;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            font-size: 1.1em;
+            border-bottom: 1px solid #495057;
+        }
+
+        .sidebar a:hover {
+            background-color: #495057;
+        }
+
+        .sidebar a i {
+            margin-right: 10px;
+        }
+
+        /* Content area styles */
+        .content {
+            margin-left: 200px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Title */
+        .title-box {
+            background-color: #000000;
+            color: #ffffff;
+            padding: 10px;
+            width: calc(100% - 220px); /* Ajusta para el ancho de la barra lateral */
+            text-align: center;
+            font-size: 2em;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        /* Students Table */
+        .students-table {
+            width: 100%;
+            max-width: 800px;
+            border-collapse: collapse;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+
+        .students-table th,
+        .students-table td {
+            border: 1px solid #dee2e6;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .students-table th {
+            background-color: #007bff;
+            color: #ffffff;
+        }
+
+        /* Button styles */
+        .btn-generate {
+            background-color: #ffc107;
+            color: #000;
+            margin: 5px;
+        }
+
+        .btn-generate:hover {
+            background-color: #e0a800;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+
+            .title-box {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Main Container -->
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="sidebar d-flex flex-column">
+                <h3>Nuevos Horizontes</h3>
+                <a href="#"><i class="fas fa-university"></i> Página de la Institución</a>
+                <a href="#"><i class="fas fa-user"></i> Profesor</a>
+                <a href="#"><i class="fas fa-check"></i> Asistencia</a>
+                <a href="#"><i class="fas fa-book"></i> Notas</a>
+                <a href="#"><i class="fas fa-file-pdf"></i> Informes</a>
+                <a href="#"><i class="fas fa-sign-out-alt"></i> Salir</a>
+                <div class="mt-auto text-center p-3">
+                    <a href="#" class="d-block mb-3"><i class="fas fa-shield-alt"></i> Privacidad</a>
+                    <a href="#"><i class="fas fa-universal-access"></i> Accesibilidad</a>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content col">
+                <!-- Title Section -->
+                <div class="title-box">
+                    Generar informe de {{ curso.nombre }}
+                </div>
+
+                <!-- Students Table -->
+                <table class="students-table">
+                    <thead>
+                        <tr>
+                            <th>Alumnos</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for alumno in alumnos %}
+                        <tr>
+                            <td>{{ alumno.nombre }} {{ alumno.apellido }}</td>
+                            <td>
+                                <a href="?pdf=1" class="btn btn-generate">IMPRIMIR EN PDF</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="2">No hay alumnos en este curso.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

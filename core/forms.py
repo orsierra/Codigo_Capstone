@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 from django import forms
 from .models import Evaluacion, Estudiante, Asignatura
 
@@ -12,8 +11,15 @@ class EvaluacionForm(forms.ModelForm):
             'estudiante': forms.Select(attrs={'class': 'form-control'}),
             'asignatura': forms.Select(attrs={'class': 'form-control'}),
         }
-=======
-# core/forms.py
 from django import forms
-from .models import Apoderado
->>>>>>> e1f7bcd9eaa9abdcbc74941e153ff435464758bd
+from .models import Observacion
+
+class ObservacionForm(forms.ModelForm):
+    class Meta:
+        model = Observacion
+        fields = ['observacion', 'estudiante_id_estudiante']
+        labels = {
+            'observacion': 'Observación',
+            'estudiante_id_estudiante': 'Estudiante'
+        }
+

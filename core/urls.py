@@ -10,7 +10,10 @@ urlpatterns = [
     path('directorFinanzas/',views.directorFinanzas_view, name='directorFinanzas'),
     path('directorInforme/',views.directorInforme_view, name='directorInforme'),
     path('directorMenu/',views.directorMenu_view, name='directorMenu'),
-    path('directorPlanificacion/',views.directorPlanificacion_view, name='directorPlanificacion'),    
+    path('directorPlanificacion/',views.directorPlanificacion_view, name='directorPlanificacion'),  
+    path('registro_academico/<int:id_estudiante>/', views.registro_academico, name='registro_academico'),
+    path('generar_informe/<int:curso_id>/', views.generar_informe, name='generar_informe'),
+    
     #PROFESOR
     #path('asistencia/', profesor_asistencia_view, name='profesor_asistencia'),
     #path('asistencia/<int:curso_id>/', registrar_asistencia_view, name='registrar_asistencia'),  # Asegúrate de que esto esté correcto
@@ -26,4 +29,12 @@ urlpatterns = [
     path('apoderado/',views.apoderado_view, name ='apoderado'),
     path('apoderadoAsistencia/', views.apoderadoAsistencia_view, name='apoderadoAsistencia'),
     path('apoderadoMatricula/', views.apoderadoMatricula_view, name='apoderadoMatricula'),
+    #SOSTENEDOR
+    path('', views.sostenedor_menu, name='sostenedor_menu'),
+    path('?id=<int:id>', views.sostenedor_menu, name='sostenedor_menu'),  # Para editar con ID
+]
+
+    
+    
+    
 ]

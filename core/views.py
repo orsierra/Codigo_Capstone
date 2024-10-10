@@ -48,7 +48,6 @@ def apoderadoAsistencia_view(request):
 def apoderadoMatricula_view(request):
     return render(request, 'apoderadoMatricula.html')
 
-<<<<<<< HEAD
 #PROFESOR
 
 def profesorAsistencia_view(request):
@@ -98,6 +97,145 @@ def agregar_nota(request):
     return render(request, 'calificaciones/profesorCalificacion.html', {'estudiantes': estudiantes})
 
 
-=======
-#PROFESOR
->>>>>>> e1f7bcd9eaa9abdcbc74941e153ff435464758bd
+# views.py
+
+from django.shortcuts import render
+from .models import Estudiante, Observacion
+
+def observaciones_view(request):
+    if request.method == 'POST':
+        # Recoger los datos enviados desde el formulario
+        observaciones = request.POST.getlist('observacion')
+        estudiantes = request.POST.getlist('estudiante')
+
+        # Guardar las observaciones
+        for i, estudiante_id in enumerate(estudiantes):
+            if observaciones[i]:
+                # Guardar la observación en la base de datos
+                observacion = Observacion(
+                    estudiante_id_estudiante_id=estudiante_id,
+                    observacion=observaciones[i]
+                )
+                observacion.save()
+
+        # Mensaje de éxito
+        return render(request, 'profesorObservacion.html', {'success': True})
+
+    # Obtener estudiantes y concatenar nombre y apellido
+    estudiantes = Estudiante.objects.all()
+
+    return render(request, 'profesorObservacion.html', {
+        'estudiantes': estudiantes
+    })
+# views.py
+from django.shortcuts import render
+from .models import Estudiante, Evaluacion, Asistencia
+
+def registro_academico(request, estudiante_id):
+    estudiante = Estudiante.objects.get(id=estudiante_id)
+    evaluaciones = Evaluacion.objects.filter(estudiante=estudiante)
+    asistencias = Asistencia.objects.filter(estudiante=estudiante)
+
+    return render(request, 'registro_academico.html', {
+        'estudiante': estudiante,
+        'evaluaciones': evaluaciones,
+        'asistencias': asistencias,
+    })
+# informes/views.py
+from django.shortcuts import render, get_object_or_404
+from .models import Alumno, Curso
+from django.http import HttpResponse
+from xhtml2pdf import pisa
+from django.template.loader import get_template
+
+def generar_informe(request, curso_id):
+    # Obtener el curso basado en el id
+    curso = get_object_or_404(Curso, id=curso_id)
+    # Obtener todos los alumnos de ese curso
+    alumnos = curso.alumnos.all()
+    return render(request, 'informes/generar_informe.html', {'alumnos': alumnos, 'curso': curso})
+
+# informes/views.py
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse
+from .models import Curso, Alumno
+from xhtml2pdf import pisa
+from django.template.loader import get_template
+
+def generar_informe(request, curso_id):
+    # Obtener el curso y los alumnos
+    curso = get_object_or_404(Curso, id=curso_id)
+    alumnos = Alumno.objects.filter(curso=curso)
+
+    # Para generar el PDF
+    if request.GET.get('pdf'):
+        return generar_pdf_informe(curso, alumnos)
+
+    # Renderizar la página de informe
+    context = {
+        'curso': curso,
+        'alumnos': alumnos,
+    }
+    return render(request, 'informes/generar_informe.html', context)
+
+
+def generar_pdf_informe(curso, alumnos):
+    # Puedes calcular el promedio y la asistencia si tienes esos datos en tu modelo.
+    promedio = sum(alumno.nota for alumno in alumnos) / len(alumnos) if alumnos else 0
+    total_asistencia = sum(alumno.asistencia for alumno in alumnos)  # Ajusta el campo si es necesario.
+
+    context = {
+        'curso': curso,
+        'alumnos': alumnos,
+        'promedio': promedio,
+        'total_asistencia': total_asistencia,
+    }
+
+    # Renderizar el template PDF
+    template = get_template('informes/pdf_template.html')
+    html = template.render(context)
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="informe_curso_{curso.id}.pdf"'
+
+    # Crear el PDF
+    pisa_status = pisa.CreatePDF(html, dest=response)
+
+    if pisa_status.err:
+        return HttpResponse('Error al generar el PDF')
+    return response
+#SOSTENEDOR
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Establecimiento
+from .forms import EstablecimientoForm
+
+def sostenedor_menu(request, id=None):
+    establecimientos = Establecimiento.objects.all()  # Todos los establecimientos
+
+    if id:
+        # Si hay un ID, entonces es una edición
+        establecimiento = get_object_or_404(Establecimiento, id=id)
+    else:
+        # Si no hay ID, estamos creando un nuevo establecimiento
+        establecimiento = None
+
+    if request.method == 'POST':
+        form = EstablecimientoForm(request.POST, instance=establecimiento)
+        if form.is_valid():
+            form.save()
+            return redirect('sostenedor_menu')  # Redirigir después de guardar
+    else:
+        form = EstablecimientoForm(instance=establecimiento)
+
+    # Renderizar el HTML con los datos de los establecimientos y el formulario
+    return render(request, 'sostenedorMenu.html', {
+        'establecimientos': establecimientos,
+        'form': form,
+        'edit_mode': bool(id),  # True si es edición
+        'edit_id': id  # El ID del establecimiento que estamos editando (si es edición)
+    })
+
+
+
+
+
