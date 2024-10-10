@@ -1,7 +1,7 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
-from .models import Curso, Asistencia
-
+from .models import Curso, Estudiante, Asistencia
+from .forms import AsistenciaForm
 #Páginas
 def home(request):
     return render(request, 'core/home.html')
@@ -53,13 +53,28 @@ def apoderadoMatricula_view(request):
 class AsistenciaCursoView(View):
     def get(self, request, curso_id):
         curso = get_object_or_404(Curso, id=curso_id)
-        asistencia = Asistencia.objects.filter(curso=curso).order_by('estudiante__nombre')
-        return render(request, 'asistencia/curso.html', {'curso': curso, 'asistencia': asistencia})
+        estudiantes = curso.estudiantes.all()
+        asistencia_forms = [AsistenciaForm(initial={'estudiante': estudiante, 'curso': curso}) for estudiante in estudiantes]
+        return render(request, 'asistencia_curso.html', {'curso': curso, 'asistencia_forms': asistencia_forms})
+
+    def post(self, request, curso_id):
+        curso = get_object_or_404(Curso, id=curso_id)
+        for form in request.POST.getlist('form'):
+            form_data = {**request.POST, **form}
+            asistencia_form = AsistenciaForm(data=form_data)
+            if asistencia_form.is_valid():
+                asistencia_form.save()
+        return redirect('asistencia_curso', curso_id=curso_id)
 
 #PROFESOR
 
-def profesorAsistencia_view(request):
-    return render(request, 'profesorAsistencia.html')
+
+from .models import Curso, Asistencia
+class AsistenciaCursoView(View):
+    def get(self, request, curso_id):
+        curso = get_object_or_404(Curso, id=curso_id)
+        asistencia = Asistencia.objects.filter(curso=curso)
+        return render(request, 'asistencia_curso.html', {'curso': curso, 'asistencia': asistencia})
 
 def profesorCalificacion_view(request):
     return render(request, 'profesorCalificacion.html')
