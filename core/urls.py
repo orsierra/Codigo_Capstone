@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 
+
 urlpatterns = [
     path('', views.home, name='login'),
     path('login/', views.login_view, name='login'),
@@ -11,12 +12,12 @@ urlpatterns = [
     path('directorMenu/',views.directorMenu_view, name='directorMenu'),
     path('directorPlanificacion/',views.directorPlanificacion_view, name='directorPlanificacion'),    
     #PROFESOR
-    path('profesorAsistencia/', views.profesorAsistencia_view, name='profesorAsistencia'),
-    path('profesorCalificacion/', views.profesorCalificacion_view, name='profesorCalificacion'),
-    path('profesorMisCursos/', views.profesorMisCursos_view, name='profesorMisCursos'),
-    path('profesorObservacion/', views.profesorObservacion_view, name='profesorObservacion'),
-      
-      
+    #path('asistencia/', profesor_asistencia_view, name='profesor_asistencia'),
+    #path('asistencia/<int:curso_id>/', registrar_asistencia_view, name='registrar_asistencia'),  # Asegúrate de que esto esté correcto
+
+    #path('asistencia/<int:curso_id>/', registrar_asistencia_view, name='registrar_asistencia'),
+    #path('asistencia/', profesor_asistencia_view, name='profesor_asistencia'),
+    
     path('estudiante/', views.estudiante_view, name='estudiante'),
     path('sostenedor/', views.sostenedor_view, name='sostenedor'),
     path('estudiante_pru_base/', views.estudiante_pru_base, name='estudiante_pru_base'), 

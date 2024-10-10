@@ -1,5 +1,5 @@
+from django.shortcuts import render, redirect
 
-from django.shortcuts import render
 
 #Páginas
 def home(request):
@@ -48,6 +48,7 @@ def apoderadoAsistencia_view(request):
 def apoderadoMatricula_view(request):
     return render(request, 'apoderadoMatricula.html')
 
+<<<<<<< HEAD
 #PROFESOR
 
 def profesorAsistencia_view(request):
@@ -97,3 +98,6 @@ def agregar_nota(request):
     return render(request, 'calificaciones/profesorCalificacion.html', {'estudiantes': estudiantes})
 
 
+=======
+#PROFESOR
+>>>>>>> e1f7bcd9eaa9abdcbc74941e153ff435464758bd
