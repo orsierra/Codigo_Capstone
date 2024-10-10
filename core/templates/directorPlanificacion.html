@@ -1,5 +1,7 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -175,9 +177,9 @@
             <!-- Barra Lateral -->
             <div class="sidebar d-flex flex-column">
                 <h3 class="text-center py-4">Nuevos Horizontes</h3>
-                <a href="#"><i class="bi bi-house"></i> Página de la Institución</a>
-                <a href="#"><i class="bi bi-person"></i> Director</a>
-                <a href="#"><i class="bi bi-box-arrow-right"></i> Salir</a>
+                <a href="{% url 'pagina_institucion' %}"><i class="bi bi-house"></i> Página de la Institución</a>
+                <a href="{% url 'director' %}"><i class="bi bi-person"></i> Director</a>
+                <a href="{% url 'salir' %}"><i class="bi bi-box-arrow-right"></i> Salir</a>
                 <div class="mt-auto text-center p-3">
                     <a href="#"><i class="bi bi-shield-lock"></i> Privacidad</a>
                     <a href="#"><i class="bi bi-universal-access"></i> Accesibilidad</a>
@@ -190,10 +192,10 @@
 
                 <!-- Contenedor de botones alineados a la izquierda -->
                 <div class="button-container">
-                    <!-- Botón de flecha sin borde negro -->
-                    <button class="btn-back mb-3" onclick="window.location.href='directorMenu.html'">
-                        <i class="bi bi-arrow-left"></i>
-                    </button>
+                    <!-- Botón de flecha para volver al menú -->
+                    <a href="{% url 'director_menu' %}" class="btn btn-back mb-3">
+                        <i class="bi bi-arrow-left"></i> 
+                    </a>
                 </div>
 
                 <!-- Tabla de planificación académica -->
@@ -209,41 +211,15 @@
                             </tr>
                         </thead>
                         <tbody>
+                            {% for profesor in profesores %}
                             <tr>
-                                <td><img src="img/teacher1.jpg" class="rounded-circle" width="40" height="40"> Susana</td>
-                                <td>Matemáticas</td>
-                                <td>Lunes y Miércoles 8:00 - 9:30</td>
-                                <td>Aula 101</td>
-                                <td><i class="bi bi-pencil-square edit-icon"></i></td>
+                                <td><img src="{{ profesor.imagen.url }}" class="rounded-circle" width="40" height="40"> {{ profesor.nombre }}</td>
+                                <td>{{ profesor.asignatura }}</td>
+                                <td>{{ profesor.horario }}</td>
+                                <td>{{ profesor.aula }}</td>
+                                <td><a href="{% url 'editar_asignatura' profesor.id %}"><i class="bi bi-pencil-square edit-icon"></i></a></td>
                             </tr>
-                            <tr>
-                                <td><img src="img/teacher2.jpg" class="rounded-circle" width="40" height="40"> Ana</td>
-                                <td>Lenguaje</td>
-                                <td>Martes y Jueves 10:00 - 11:30</td>
-                                <td>Aula 102</td>
-                                <td><i class="bi bi-pencil-square edit-icon"></i></td>
-                            </tr>
-                            <tr>
-                                <td><img src="img/teacher3.jpg" class="rounded-circle" width="40" height="40"> María</td>
-                                <td>Ciencias</td>
-                                <td>Lunes y Viernes 9:30 - 11:00</td>
-                                <td>Aula 103</td>
-                                <td><i class="bi bi-pencil-square edit-icon"></i></td>
-                            </tr>
-                            <tr>
-                                <td><img src="img/teacher4.jpg" class="rounded-circle" width="40" height="40"> Alex</td>
-                                <td>Historia</td>
-                                <td>Miércoles y Viernes 11:00 - 12:30</td>
-                                <td>Aula 104</td>
-                                <td><i class="bi bi-pencil-square edit-icon"></i></td>
-                            </tr>
-                            <tr>
-                                <td><img src="img/teacher5.jpg" class="rounded-circle" width="40" height="40"> Alan</td>
-                                <td>Inglés</td>
-                                <td>Martes y Jueves 14:00 - 15:30</td>
-                                <td>Aula 105</td>
-                                <td><i class="bi bi-pencil-square edit-icon"></i></td>
-                            </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
@@ -252,9 +228,9 @@
     </div>
 
     <!-- Botón para imprimir en PDF fuera del cuerpo principal -->
-    <button class="btn-pdf">
+    <a href="{% url 'imprimir_pdf' %}" class="btn-pdf">
         <i class="bi bi-file-earmark-pdf"></i> Imprimir en PDF
-    </button>
+    </a>
 
     <!-- Bootstrap JS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>

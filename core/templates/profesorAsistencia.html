@@ -149,35 +149,34 @@
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
-            <div class="sidebar d-flex flex-column">
-                <h3>Nuevos Horizontes</h3>
-                <a href="#"><i class="fas fa-university"></i> Página de la Institución</a>
-                <a href="#"><i class="fas fa-user"></i> Apoderado</a>
-                <a href="#"><i class="fas fa-check"></i> Asistencia</a>
-                <a href="#"><i class="fas fa-book"></i> Notas</a>
-                <a href="#"><i class="fas fa-file-alt"></i> Matrícula</a>
-                <a href="#"><i class="fas fa-sign-out-alt"></i> Salir</a>
-
-<!-- Parte de la barra lateral actualizada -->
-<div class="mt-auto text-center p-3">
-    <a href="#" class="d-block mb-3"><i class="fas fa-shield-alt"></i> Privacidad</a>
-    <a href="#"><i class="fas fa-universal-access"></i> Accesibilidad</a>
-</div>
-
+            <div class="sidebar col-2">
+                <div>
+                    <h3>Nuevos Horizontes</h3>
+                    <a href="{% url 'pagina_institucion' %}"><i class="fas fa-university"></i> Página de la Institución</a>
+                    <a href="{% url 'apoderado' %}"><i class="fas fa-user"></i> Apoderado</a>
+                    <a href="{% url 'asistencia' curso.id %}" class="active"><i class="fas fa-check"></i> Asistencia</a>
+                    <a href="{% url 'notas' %}"><i class="fas fa-book"></i> Notas</a>
+                    <a href="{% url 'matricula' %}"><i class="fas fa-file-alt"></i> Matrícula</a>
+                    <a href="{% url 'salir' %}"><i class="fas fa-sign-out-alt"></i> Salir</a>
+                </div>
+                <div class="mt-auto text-center p-3">
+                    <a href="#" class="d-block mb-3"><i class="fas fa-shield-alt"></i> Privacidad</a>
+                    <a href="#"><i class="fas fa-universal-access"></i> Accesibilidad</a>
+                </div>
             </div>
 
             <!-- Content Area -->
-            <div class="content col">
+            <div class="content col-10">
                 <!-- Title Section -->
                 <div class="title-box">
                     <a class="link-regresar" href="javascript:history.back()">
                         <i class="fas fa-arrow-left"></i>
                     </a>
-                    Asistencia 1ero Medio
+                    Asistencia - {{ curso.nombre }}
                 </div>
 
                 <!-- Attendance Table -->
-                <table class="attendance-table">
+                <table class="attendance-table table table-bordered">
                     <thead>
                         <tr>
                             <th>Alumnos</th>
@@ -187,43 +186,21 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {% for registro in asistencia %}
                         <tr>
-                            <td>Alberto Vera</td>
-                            <td><input type="radio" name="alumno1" value="ausente"></td>
-                            <td><input type="radio" name="alumno1" value="presente" checked></td>
-                            <td><input type="radio" name="alumno1" value="justificado"></td>
+                            <td>{{ registro.estudiante.nombre }}</td>
+                            <td><input type="radio" name="estado_{{ registro.id }}" value="ausente" {% if not registro.presente and not registro.justificado %}checked{% endif %}></td>
+                            <td><input type="radio" name="estado_{{ registro.id }}" value="presente" {% if registro.presente %}checked{% endif %}></td>
+                            <td><input type="radio" name="estado_{{ registro.id }}" value="justificado" {% if registro.justificado %}checked{% endif %}></td>
                         </tr>
-                        <tr>
-                            <td>Juan Lopez</td>
-                            <td><input type="radio" name="alumno2" value="ausente"></td>
-                            <td><input type="radio" name="alumno2" value="presente"></td>
-                            <td><input type="radio" name="alumno2" value="justificado" checked></td>
-                        </tr>
-                        <tr>
-                            <td>Millaray Sierra</td>
-                            <td><input type="radio" name="alumno3" value="ausente"></td>
-                            <td><input type="radio" name="alumno3" value="presente" checked></td>
-                            <td><input type="radio" name="alumno3" value="justificado"></td>
-                        </tr>
-                        <tr>
-                            <td>Jorge Pérez</td>
-                            <td><input type="radio" name="alumno4" value="ausente"></td>
-                            <td><input type="radio" name="alumno4" value="presente" checked></td>
-                            <td><input type="radio" name="alumno4" value="justificado"></td>
-                        </tr>
-                        <tr>
-                            <td>Carla Berrios</td>
-                            <td><input type="radio" name="alumno5" value="ausente"></td>
-                            <td><input type="radio" name="alumno5" value="presente"></td>
-                            <td><input type="radio" name="alumno5" value="justificado" checked></td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
 
                 <!-- Action Buttons -->
                 <div class="mt-4">
-                    <button class="btn btn-custom">Modificar</button>
-                    <button class="btn btn-custom">Guardar</button>
+                    <button type="submit" name="accion" value="modificar" class="btn btn-warning">Modificar</button>
+                    <button type="submit" name="accion" value="guardar" class="btn btn-success">Guardar</button>
                 </div>
             </div>
         </div>

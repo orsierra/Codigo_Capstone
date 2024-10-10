@@ -1,5 +1,11 @@
-from django.shortcuts import render, redirect
-
+from django.shortcuts import render, get_object_or_404, redirect
+from django.views import View
+from .models import Curso, Estudiante, Asistencia, Profesor
+from .forms import AsistenciaForm
+from .models import Profesor 
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from weasyprint import HTML
 
 #Páginas
 def home(request):
@@ -48,10 +54,35 @@ def apoderadoAsistencia_view(request):
 def apoderadoMatricula_view(request):
     return render(request, 'apoderadoMatricula.html')
 
+<<<<<<< HEAD
+=======
+#PROFESOR
+class AsistenciaCursoView(View):
+    def get(self, request, curso_id):
+        curso = get_object_or_404(Curso, id=curso_id)
+        estudiantes = curso.estudiantes.all()
+        asistencia_forms = [AsistenciaForm(initial={'estudiante': estudiante, 'curso': curso}) for estudiante in estudiantes]
+        return render(request, 'asistencia_curso.html', {'curso': curso, 'asistencia_forms': asistencia_forms})
+
+    def post(self, request, curso_id):
+        curso = get_object_or_404(Curso, id=curso_id)
+        for form in request.POST.getlist('form'):
+            form_data = {**request.POST, **form}
+            asistencia_form = AsistenciaForm(data=form_data)
+            if asistencia_form.is_valid():
+                asistencia_form.save()
+        return redirect('asistencia_curso', curso_id=curso_id)
+
+>>>>>>> 193cd135283bed76ae4b17e6c842b72372a0b62d
 #PROFESOR
 
-def profesorAsistencia_view(request):
-    return render(request, 'profesorAsistencia.html')
+
+from .models import Curso, Asistencia
+class AsistenciaCursoView(View):
+    def get(self, request, curso_id):
+        curso = get_object_or_404(Curso, id=curso_id)
+        asistencia = Asistencia.objects.filter(curso=curso)
+        return render(request, 'asistencia_curso.html', {'curso': curso, 'asistencia': asistencia})
 
 def profesorCalificacion_view(request):
     return render(request, 'profesorCalificacion.html')
@@ -97,6 +128,7 @@ def agregar_nota(request):
     return render(request, 'calificaciones/profesorCalificacion.html', {'estudiantes': estudiantes})
 
 
+<<<<<<< HEAD
 # views.py
 
 from django.shortcuts import render
@@ -239,3 +271,21 @@ def sostenedor_menu(request, id=None):
 
 
 
+=======
+#DIRECTOR
+
+def planificacion_academica(request):
+    profesores = Profesor.objects.all()  # Obtén todos los profesores desde la base de datos
+    return render(request, 'directorPlanificacion.html', {'profesores': profesores})
+
+
+# Imprimir PDF
+
+def imprimir_pdf(request):
+    profesores = Profesor.objects.all()  # Obtener todos los profesores
+    html_string = render_to_string('planificacion_pdf.html', {'profesores': profesores})
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="planificacion_academica.pdf"'
+    HTML(string=html_string).write_pdf(response)
+    return response
+>>>>>>> 193cd135283bed76ae4b17e6c842b72372a0b62d
