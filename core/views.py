@@ -54,26 +54,6 @@ def apoderadoAsistencia_view(request):
 def apoderadoMatricula_view(request):
     return render(request, 'apoderadoMatricula.html')
 
-<<<<<<< HEAD
-=======
-#PROFESOR
-class AsistenciaCursoView(View):
-    def get(self, request, curso_id):
-        curso = get_object_or_404(Curso, id=curso_id)
-        estudiantes = curso.estudiantes.all()
-        asistencia_forms = [AsistenciaForm(initial={'estudiante': estudiante, 'curso': curso}) for estudiante in estudiantes]
-        return render(request, 'asistencia_curso.html', {'curso': curso, 'asistencia_forms': asistencia_forms})
-
-    def post(self, request, curso_id):
-        curso = get_object_or_404(Curso, id=curso_id)
-        for form in request.POST.getlist('form'):
-            form_data = {**request.POST, **form}
-            asistencia_form = AsistenciaForm(data=form_data)
-            if asistencia_form.is_valid():
-                asistencia_form.save()
-        return redirect('asistencia_curso', curso_id=curso_id)
-
->>>>>>> 193cd135283bed76ae4b17e6c842b72372a0b62d
 #PROFESOR
 
 
@@ -128,7 +108,6 @@ def agregar_nota(request):
     return render(request, 'calificaciones/profesorCalificacion.html', {'estudiantes': estudiantes})
 
 
-<<<<<<< HEAD
 # views.py
 
 from django.shortcuts import render
@@ -266,26 +245,16 @@ def sostenedor_menu(request, id=None):
         'edit_mode': bool(id),  # True si es edición
         'edit_id': id  # El ID del establecimiento que estamos editando (si es edición)
     })
+    from django.shortcuts import render
+from .models import Curso
+
+def consulta_informes(request):
+    # Obtener todos los cursos para mostrarlos
+    cursos = Curso.objects.all()  # Aquí puedes filtrar según los requisitos
+    return render(request, 'subdireConsu.html', {'cursos': cursos})
 
 
 
 
 
-=======
-#DIRECTOR
 
-def planificacion_academica(request):
-    profesores = Profesor.objects.all()  # Obtén todos los profesores desde la base de datos
-    return render(request, 'directorPlanificacion.html', {'profesores': profesores})
-
-
-# Imprimir PDF
-
-def imprimir_pdf(request):
-    profesores = Profesor.objects.all()  # Obtener todos los profesores
-    html_string = render_to_string('planificacion_pdf.html', {'profesores': profesores})
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="planificacion_academica.pdf"'
-    HTML(string=html_string).write_pdf(response)
-    return response
->>>>>>> 193cd135283bed76ae4b17e6c842b72372a0b62d

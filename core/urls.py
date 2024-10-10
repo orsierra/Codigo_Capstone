@@ -11,15 +11,9 @@ urlpatterns = [
     path('directorInforme/',views.directorInforme_view, name='directorInforme'),
     path('directorMenu/',views.directorMenu_view, name='directorMenu'),
     path('directorPlanificacion/',views.directorPlanificacion_view, name='directorPlanificacion'),  
-<<<<<<< HEAD
     path('registro_academico/<int:id_estudiante>/', views.registro_academico, name='registro_academico'),
     path('generar_informe/<int:curso_id>/', views.generar_informe, name='generar_informe'),
     
-=======
-    #Planificacion Academica
-    path('planificacion/', planificacion_academica, name='planificacion_academica'),  
-    path('planificacion/pdf/', imprimir_pdf, name='imprimir_pdf'),
->>>>>>> 193cd135283bed76ae4b17e6c842b72372a0b62d
     #PROFESOR
     
     path('asistencia/<int:curso_id>/', AsistenciaCursoView.as_view(), name='asistencia'),
