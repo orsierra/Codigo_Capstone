@@ -1,5 +1,6 @@
-from django.shortcuts import render, redirect
-
+from django.shortcuts import render, get_object_or_404
+from django.views import View
+from .models import Curso, Asistencia
 
 #Páginas
 def home(request):
@@ -49,3 +50,8 @@ def apoderadoMatricula_view(request):
     return render(request, 'apoderadoMatricula.html')
 
 #PROFESOR
+class AsistenciaCursoView(View):
+    def get(self, request, curso_id):
+        curso = get_object_or_404(Curso, id=curso_id)
+        asistencia = Asistencia.objects.filter(curso=curso).order_by('estudiante__nombre')
+        return render(request, 'asistencia/curso.html', {'curso': curso, 'asistencia': asistencia})
