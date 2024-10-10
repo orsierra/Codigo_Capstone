@@ -12,7 +12,9 @@ urlpatterns = [
     path('directorMenu/',views.directorMenu_view, name='directorMenu'),
     path('directorPlanificacion/',views.directorPlanificacion_view, name='directorPlanificacion'),    
     #PROFESOR
+    
     path('asistencia/<int:curso_id>/', AsistenciaCursoView.as_view(), name='asistencia'),
+
     path('estudiante/', views.estudiante_view, name='estudiante'),
     path('sostenedor/', views.sostenedor_view, name='sostenedor'),
     path('estudiante_pru_base/', views.estudiante_pru_base, name='estudiante_pru_base'), 
