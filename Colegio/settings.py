@@ -79,7 +79,7 @@ WSGI_APPLICATION = 'Colegio.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
+        'NAME': 'school',
         'USER': 'admin',
         'PASSWORD': '123456',
         'HOST': 'localhost',
@@ -149,4 +149,8 @@ TEMPLATES = [
             ],
         },
     },
+    
 ]
+# settings.py
+LOGIN_URL = '/login/'  # Aquí defines la ruta que llevará al login
+
