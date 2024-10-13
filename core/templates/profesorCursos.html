@@ -20,7 +20,7 @@
         
         .sidebar h2 {
             text-align: center;
-        }
+        } 
         
         .sidebar ul {
             list-style: none;
@@ -53,6 +53,19 @@
             border-radius: 5px;
         }
         
+        .curso button {
+            margin-top: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .curso button:hover {
+            background-color: #45a049;
+        }
+        
         footer {
             position: fixed;
             bottom: 10px;
@@ -69,7 +82,6 @@
         <ul>
             <li><a href="{% url 'profesor' %}">Profesor</a></li>
             <li><a href="{% url 'profesor_cursos' %}">Mis cursos</a></li>
-
         </ul>
         <div class="footer">
             <a href="#">Privacidad</a>
@@ -86,7 +98,12 @@
                     <div class="curso">
                         <strong>{{ curso.nombre }}</strong><br>
                         {{ curso.asignatura }}<br>
-                        <span>{{ curso.hora|time:"h:i A" }}</span>
+                        <span>{{ curso.dias }} - {{ curso.hora|time:"h:i A" }}</span><br>
+
+                        <!-- Botón para ver el libro de clases -->
+                        <a href="{% url 'profesor_libro' curso.id %}">
+                            <button>Ver Libro de Clases</button>
+                        </a>
                     </div>
                 {% endfor %}
             </div>
