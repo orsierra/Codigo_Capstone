@@ -38,7 +38,7 @@ class Curso(models.Model):
 
 from django.db import models
 
-class Curso(models.Model):
+class CursoProfesor(models.Model):
     nombre = models.CharField(max_length=100)
     asignatura = models.CharField(max_length=100)  # Campo para la asignatura
     profesor = models.ForeignKey('Profesor', on_delete=models.CASCADE)
@@ -96,3 +96,4 @@ class Observacion(models.Model):
 
     def __str__(self):
         return f"Observación de {self.alumno} en {self.curso} el {self.fecha}"
+#===============================================================================================
