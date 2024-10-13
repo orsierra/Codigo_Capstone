@@ -1,54 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mis Cursos - Profesor</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f0f0f0;
-        }
-        .courses-container {
-            width: 80%;
-            max-width: 900px;
-            background-color: white;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        ul li {
-            background-color: #e0e0e0;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-        }
-    </style>
+    <title>Cursos de {{ profesor.nombre }}</title>
 </head>
 <body>
-    <div class="courses-container">
-        <h1>Mis Cursos</h1>
+    <h1>Cursos de {{ profesor.nombre }} {{ profesor.apellido }}</h1>
+
+    {% if cursos %}
         <ul>
-            {% for curso in cursos %}
-                <li>{{ curso.nombre }}</li>
-            {% empty %}
-                <li>No tienes cursos asignados.</li>
-            {% endfor %}
+        {% for curso in cursos %}
+            <li>
+                <strong>Asignatura: {{ curso.asignatura }}</strong><br>
+                Nombre del curso: {{ curso.nombre }}<br>
+                Días: {{ curso.dias }}<br>
+                Hora: {{ curso.hora }}<br>
+            </li>
+        {% endfor %}
         </ul>
-    </div>
+    {% else %}
+        <p>No tienes cursos asignados.</p>
+    {% endif %}
 </body>
 </html>

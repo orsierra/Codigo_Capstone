@@ -12,6 +12,7 @@ class Profesor(models.Model):
         return f"{self.nombre} {self.apellido}"
 
 class Alumno(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
@@ -21,8 +22,11 @@ class Alumno(models.Model):
 
 class Curso(models.Model):
     nombre = models.CharField(max_length=100)
+    asignatura = models.CharField(max_length=100)  # Campo para la asignatura
     profesor = models.ForeignKey(Profesor, on_delete=models.CASCADE)
-    alumnos = models.ManyToManyField(Alumno, blank=True)
+    alumnos = models.ManyToManyField('Alumno', blank=True)
+    dias = models.CharField(max_length=100)  # Días en que se imparte el curso
+    hora = models.TimeField()  # Hora del curso
 
     def __str__(self):
         return self.nombre

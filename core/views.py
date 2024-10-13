@@ -32,8 +32,13 @@ def profesor_dashboard(request):
 # views.py
 @login_required
 def profesor_cursos(request):
-    cursos = Curso.objects.filter(profesor=request.user.profesor)  # Asumiendo que has relacionado el usuario con el profesor
-    return render(request, 'profesorCursos.html', {'cursos': cursos})
+    profesor = Profesor.objects.get(user=request.user)  # Obtener el profesor basado en el usuario logueado
+    cursos = Curso.objects.filter(profesor=profesor)  # Obtener los cursos asociados a ese profesor
+    context = {
+        'profesor': profesor,
+        'cursos': cursos,
+    }
+    return render(request, 'profesorCursos.html', context)
 
 def crear_usuario_db(request):
     # Crear un usuario si no existe
@@ -42,6 +47,8 @@ def crear_usuario_db(request):
 # Crear un profesor
     profesor = Profesor.objects.create(user=user, nombre='Orly', apellido='Tapia', email='orlandone@gmail.com')
     return redirect(login)
+
+
 
 
 
