@@ -1,7 +1,7 @@
 # urls.py
 from django.urls import path
 from .views import login_view,profesor_dashboard,profesor_cursos,crear_usuario_db
-from .views import registrar_asistencia, registrar_calificaciones, registro_academico, generar_informes, observaciones
+from .views import registrar_asistencia, registrar_calificaciones, registro_academico, generar_informes, observaciones, profesor_libro
 
 
 urlpatterns = [
@@ -16,5 +16,7 @@ urlpatterns = [
     path('curso/<int:curso_id>/registro_academico/', registro_academico, name='registro_academico'),
     path('curso/<int:curso_id>/informes/', generar_informes, name='generar_informes'),
     path('curso/<int:curso_id>/observaciones/', observaciones, name='observaciones'),
+    # URL DE LIBRO
+    path('profesor/libro/<int:curso_id>/', profesor_libro, name='profesor_libro'),
 ]
 
