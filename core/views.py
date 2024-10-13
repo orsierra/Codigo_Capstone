@@ -52,9 +52,17 @@ def crear_usuario_db(request):
 
 # VIEWS PROFESOR LIBRO
 
-def profesor_libro(request, curso_id):
+def libro_clases(request, curso_id):
+    # Obtener el curso específico con el ID proporcionado
     curso = get_object_or_404(Curso, id=curso_id)
-    return render(request, 'profesorLibro.html', {'curso': curso})
+    
+    # Pasar los datos del curso a la plantilla
+    context = {
+        'curso': curso,
+    }
+
+    # Renderizar la plantilla 'profesorLibro.html'
+    return render(request, 'profesorLibro.html', context)
 # VISTAS DE PROFESOR MIS CURSOS
 
 @login_required
