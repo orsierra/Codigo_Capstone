@@ -4,23 +4,95 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cursos de {{ profesor.nombre }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            display: flex;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: #222;
+            color: white;
+            padding: 20px;
+        }
+        
+        .sidebar h2 {
+            text-align: center;
+        }
+        
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .sidebar ul li {
+            margin: 15px 0;
+        }
+        
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+        }
+        
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        
+        .cursos-list {
+            margin-top: 20px;
+        }
+        
+        .curso {
+            background-color: #e0e0e0;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        
+        footer {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            text-align: center;
+        }
+        
+    </style>
 </head>
 <body>
-    <h1>Cursos de {{ profesor.nombre }} {{ profesor.apellido }}</h1>
-
-    {% if cursos %}
+    <div class="sidebar">
+        <h2>Página de la Institución</h2>
         <ul>
-        {% for curso in cursos %}
-            <li>
-                <strong>Asignatura: {{ curso.asignatura }}</strong><br>
-                Nombre del curso: {{ curso.nombre }}<br>
-                Días: {{ curso.dias }}<br>
-                Hora: {{ curso.hora }}<br>
-            </li>
-        {% endfor %}
+            <li><a href="{% url 'profesor' %}">Profesor</a></li>
+            <li><a href="{% url 'profesor_cursos' %}">Mis cursos</a></li>
+
         </ul>
-    {% else %}
-        <p>No tienes cursos asignados.</p>
-    {% endif %}
+        <div class="footer">
+            <a href="#">Privacidad</a>
+            <a href="#">Accesibilidad</a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <h1>Mis cursos</h1>
+
+        {% if cursos %}
+            <div class="cursos-list">
+                {% for curso in cursos %}
+                    <div class="curso">
+                        <strong>{{ curso.nombre }}</strong><br>
+                        {{ curso.asignatura }}<br>
+                        <span>{{ curso.hora|time:"h:i A" }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No tienes cursos asignados.</p>
+        {% endif %}
+    </div>
 </body>
 </html>
