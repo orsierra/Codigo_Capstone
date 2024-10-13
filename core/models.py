@@ -2,6 +2,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+
 # MODELOS DE PROFESOR Y ALUMNO
 
 class Profesor(models.Model):
@@ -32,24 +33,10 @@ class Curso(models.Model):
 
     def __str__(self):
         return self.nombre
+
 #===============================================================================================
 
 # MODELOS LIBRO DE CLASE DE PROFESOR
-
-from django.db import models
-
-class CursoProfesor(models.Model):
-    nombre = models.CharField(max_length=100)
-    asignatura = models.CharField(max_length=100)  # Campo para la asignatura
-    profesor = models.ForeignKey('Profesor', on_delete=models.CASCADE)
-    alumnos = models.ManyToManyField('Alumno', blank=True)
-    dias = models.CharField(max_length=100)  # Días en que se imparte el curso
-    hora = models.TimeField()  # Hora del curso
-
-    def __str__(self):
-        return self.nombre
-
-
 class Asistencia(models.Model):
     curso = models.ForeignKey(Curso, on_delete=models.CASCADE)
     fecha = models.DateField()

@@ -3,9 +3,11 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Curso,Profesor
+from .models import Curso, Profesor
 from django.contrib.auth.models import User
 
+from .models import Asistencia, Calificacion, RegistroAcademico, Informe, Observacion
+from django.shortcuts import render, get_object_or_404
 
 def login_view(request):
     if request.method == "POST":
@@ -48,7 +50,47 @@ def crear_usuario_db(request):
     profesor = Profesor.objects.create(user=user, nombre='Orly', apellido='Tapia', email='orlandone@gmail.com')
     return redirect(login)
 
+# VIEWS PROFESOR LIBRO
 
+def profesor_libro(request, curso_id):
+    curso = get_object_or_404(Curso, id=curso_id)
+    return render(request, 'profesorLibro.html', {'curso': curso})
+# VISTAS DE PROFESOR MIS CURSOS
 
+@login_required
+def registrar_asistencia(request, curso_id):
+    curso = Curso.objects.get(id=curso_id)
+    if request.method == "POST":
+        # Lógica para registrar asistencia
+        pass
+    return render(request, 'registrar_asistencia.html', {'curso': curso})
+
+@login_required
+def registrar_calificaciones(request, curso_id):
+    curso = Curso.objects.get(id=curso_id)
+    if request.method == "POST":
+        # Lógica para registrar calificaciones
+        pass
+    return render(request, 'registrar_calificaciones.html', {'curso': curso})
+
+@login_required
+def registro_academico(request, curso_id):
+    curso = Curso.objects.get(id=curso_id)
+    registros = RegistroAcademico.objects.filter(curso=curso)
+    return render(request, 'registro_academico.html', {'curso': curso, 'registros': registros})
+
+@login_required
+def generar_informes(request, curso_id):
+    curso = Curso.objects.get(id=curso_id)
+    informes = Informe.objects.filter(curso=curso)
+    return render(request, 'generar_informes.html', {'curso': curso, 'informes': informes})
+
+@login_required
+def observaciones(request, curso_id):
+    curso = Curso.objects.get(id=curso_id)
+    observaciones = Observacion.objects.filter(curso=curso)
+    return render(request, 'observaciones.html', {'curso': curso, 'observaciones': observaciones})
+
+#====================================================================================================================================================
 
 
