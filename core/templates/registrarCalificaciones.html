@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registrar Calificaciones - {{ curso.nombre }}</title>
+    <title>Registro Académico - {{ curso.nombre }}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -69,18 +69,22 @@
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
 
-        .alumno-row {
-            margin-bottom: 15px; /* Espacio entre cada fila de alumno */
-            padding: 10px; /* Espaciado interno */
-            border: 1px solid #ccc; /* Borde alrededor de cada fila */
-            border-radius: 5px; /* Bordes redondeados */
-            background-color: #fafafa; /* Color de fondo de la fila */
+        .dropdown {
+            margin-bottom: 20px;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
         }
 
         .buttons {
             margin-top: 20px;
             display: flex;
-            justify-content: flex-end; /* Alinea los botones a la derecha */
+            justify-content: space-between; /* Espacio entre botones */
         }
 
         .buttons button {
@@ -93,8 +97,12 @@
             color: white;
         }
 
-        .buttons button:hover {
-            background-color: #218838;
+        .buttons .btn-back {
+            background-color: #007bff; /* Color para el botón de regresar */
+        }
+
+        .buttons .btn-back:hover {
+            background-color: #0056b3; /* Color al pasar el mouse */
         }
 
         .error {
@@ -129,7 +137,7 @@
     </div>
 
     <div class="main-content">
-        <h1>Registrar Calificaciones - {{ curso.nombre }}</h1>
+        <h1>Registro Académico - {{ curso.nombre }}</h1>
         <div class="container">
             {% if messages %}
                 {% for message in messages %}
@@ -139,15 +147,27 @@
 
             <form method="POST">
                 {% csrf_token %}
-                {% for alumno, form in form_list.items %}
-                    <div class="alumno-row">
-                        <strong>{{ alumno.nombre }} {{ alumno.apellido }}</strong>
-                        <p><strong>Curso:</strong> {{ alumno.curso.nombre }}</p> <!-- Muestra el curso del alumno -->
-                        <p><strong>Nota:</strong> {{ form.nota }}</p>  <!-- Renderiza el campo del formulario para la nota -->
-                    </div>
-                {% endfor %}
+                <div class="dropdown">
+                    <label for="calificaciones">Calificaciones:</label>
+                    <select id="calificaciones">
+                        {% for calificacion in calificaciones %}
+                            <option value="{{ calificacion.id }}">{{ calificacion.fecha }} - {{ calificacion.nota }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="dropdown">
+                    <label for="asistencias">Asistencias:</label>
+                    <select id="asistencias">
+                        {% for asistencia in asistencias %}
+                            <option value="{{ asistencia.id }}">{{ asistencia.fecha }} - {{ asistencia.alumnos_presentes.count }} alumnos presentes</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
                 <div class="buttons">
-                    <button type="submit">Guardar Calificaciones</button>
+                    <button type="submit">Guardar Cambios</button>
+                    <button type="button" class="btn-back" onclick="window.location.href='{% url 'profesor_cursos' %}'">Regresar</button>
                 </div>
             </form>
 

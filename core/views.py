@@ -54,7 +54,7 @@ def crear_usuario_db(request):
     profesor = Profesor.objects.create(user=user, nombre='Orly', apellido='Tapia', email='orlandone@gmail.com')
     return redirect(login)
 
-# VIEWS PROFESOR LIBRO
+# ======================================================= VIEWS PROFESOR LIBRO =============================================================================
 
 def libro_clases(request, curso_id):
     # Obtener el curso específico con el ID proporcionado
@@ -67,6 +67,8 @@ def libro_clases(request, curso_id):
 
     # Renderizar la plantilla 'profesorLibro.html'
     return render(request, 'profesorLibro.html', context)
+# ==========================================================================================================================================================
+
 # VISTAS DE PROFESOR MIS CURSOS
 
 #registrar asistencia
@@ -138,11 +140,33 @@ def registrar_calificaciones(request, curso_id):
 
 #=============================================================================================================================================================
 
+# =================================================== REGISTRO ACADEMICO =====================================================================================
+
 @login_required
 def registro_academico(request, curso_id):
-    curso = Curso.objects.get(id=curso_id)
-    registros = RegistroAcademico.objects.filter(curso=curso)
-    return render(request, 'registro_academico.html', {'curso': curso, 'registros': registros})
+    curso = get_object_or_404(Curso, id=curso_id)
+    
+    # Obtener las calificaciones y asistencias para el curso
+    calificaciones = Calificacion.objects.filter(curso=curso)
+    asistencias = Asistencia.objects.filter(curso=curso)
+
+    # Crear un diccionario para mostrar las calificaciones y asistencias
+    form_list = {}
+    for alumno in curso.alumnos.all():  # Obtener todos los alumnos en el curso
+        # Crear un formulario para cada alumno (puedes modificar esto según tu necesidad)
+        form_list[alumno] = {
+            'calificacion': calificaciones.filter(alumno=alumno).first(),
+            'asistencia': asistencias.filter(alumnos_presentes=alumno).first()
+        }
+
+    context = {
+        'curso': curso,
+        'form_list': form_list,
+        'calificaciones': calificaciones,
+        'asistencias': asistencias,
+    }
+    return render(request, 'registroAcademico.html', context)
+# ===============================================================================================================================================================
 
 @login_required
 def generar_informes(request, curso_id):
