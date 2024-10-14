@@ -3,12 +3,13 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Curso, Profesor,Asistencia, Calificacion, RegistroAcademico, Informe, Observacion, Alumno
+from .models import Curso, Profesor,Asistencia, Calificacion, RegistroAcademico, Informe, Observacion, Alumno, Apoderado
 from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404
 from datetime import date
 from django.utils import timezone
 from .forms import CalificacionForm
+from core.models import Apoderado  # Asegúrate de importar tu modelo de apoderado
 
 
 def login_view(request):
@@ -19,12 +20,14 @@ def login_view(request):
         if user is not None:
             login(request, user)
             # Redireccionar según el rol del usuario
-            if hasattr(user, 'alumno'):  # Comprobar si el usuario tiene un perfil de alumno
+            if hasattr(user, 'alumno'):  # Verifica si el usuario tiene un perfil de alumno
                 return redirect('alumno_home')  # Redirigir al alumno
-            elif hasattr(user, 'profesor'):  # Comprobar si el usuario tiene un perfil de profesor
+            elif hasattr(user, 'profesor'):  # Verifica si el usuario tiene un perfil de profesor
                 return redirect('profesor')  # Redirigir al profesor
+            elif hasattr(user, 'apoderado'):  # Verifica si el usuario tiene un perfil de apoderado
+                return redirect('apoderado_home')  # Redirigir al apoderado
             else:
-                return redirect('default')  # O redirigir a una página predeterminada
+                return redirect('default')  # Redirigir a una página predeterminada
         else:
             messages.error(request, 'Invalid username or password')
     return render(request, 'login.html')
@@ -202,4 +205,24 @@ def alumno_home(request):
         'alumno': alumno
     }
     return render(request, 'alumno.html', context)
+
+# views.py APODERADO
+def apoderado_view(request):
+    # Aquí podrías agregar lógica para obtener datos relevantes para el apoderado si es necesario
+    return render(request, 'apoderado.html')
+
+def apoderadoConsuAsis(request):
+    # Filtra las asistencias según el apoderado
+    asistencias_data = Asistencia.objects.filter(alumno__apoderado=request.user.apoderado)  # Ajusta según tu modelo
+
+    return render(request, 'apoderado_consulta_asistencia.html', {
+        'asistencias_data': asistencias_data,
+        'nombre_apoderado': request.user.apoderado.nombre
+    })
+
+def apoderadoConsuNotas(request):
+    return render(request, 'apoderadoConsuNotas.html')
+
+def apoderadoMatri(request):
+    return render(request, 'apoderadoMatri.html')
 
