@@ -7,6 +7,9 @@ from .models import Curso, Profesor,Asistencia, Calificacion, RegistroAcademico,
 from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404
 from datetime import date
+from django.utils import timezone
+from .forms import CalificacionForm
+
 
 
 def login_view(request):
@@ -101,11 +104,26 @@ def registrar_asistencia(request, curso_id):
 
 @login_required
 def registrar_calificaciones(request, curso_id):
-    curso = Curso.objects.get(id=curso_id)
+    curso = get_object_or_404(Curso, id=curso_id)
+    calificaciones = Calificacion.objects.filter(curso=curso)
+
     if request.method == "POST":
-        # Lógica para registrar calificaciones
-        pass
-    return render(request, 'registrar_calificaciones.html', {'curso': curso})
+        for calificacion in calificaciones:
+            form = CalificacionForm(request.POST, instance=calificacion)
+            if form.is_valid():
+                form.save()
+        return redirect('ruta_a_donde_redirigir')  # Redirige después de guardar
+
+    # Crear un diccionario con los formularios para cada calificación
+    calificaciones_forms = []
+    for calificacion in calificaciones:
+        form = CalificacionForm(instance=calificacion)
+        calificaciones_forms.append({'alumno': calificacion.alumno, 'form': form})
+
+    return render(request, 'registrar_calificaciones.html', {
+        'curso': curso,
+        'calificaciones_forms': calificaciones_forms
+    })
 
 @login_required
 def registro_academico(request, curso_id):

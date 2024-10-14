@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asistencia {{ curso.nombre }}</title>
+    <title>Calificaciones {{ curso.nombre }}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -82,10 +82,9 @@
             background-color: #f9f9f9; /* Color de fondo para filas pares */
         }
 
-        .attendance-option {
-            display: flex; /* Flexbox para opciones de asistencia */
-            justify-content: center; /* Centrar opciones */
-            gap: 10px; /* Espaciado entre opciones */
+        input {
+            width: 60px;
+            text-align: center;
         }
 
         .buttons {
@@ -127,7 +126,7 @@
     </div>
 
     <div class="main-content">
-        <h1>Asistencia {{ curso.nombre }}</h1>
+        <h1>Calificaciones {{ curso.nombre }}</h1>
 
         <div class="container">
             <form method="post">
@@ -135,26 +134,16 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>Alumnos</th>
-                            <th>Ausente</th>
-                            <th>Presente</th>
-                            <th>Justificado</th>
+                            <th>Alumno</th>
+                            <th>Nota</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for alumno in curso.alumnos.all %}
-                            <tr>
-                                <td>{{ alumno.nombre }} {{ alumno.apellido }}</td>
-                                <td>
-                                    <input type="radio" name="asistencia_{{ alumno.id }}" value="ausente">
-                                </td>
-                                <td>
-                                    <input type="radio" name="asistencia_{{ alumno.id }}" value="presente" checked>
-                                </td>
-                                <td>
-                                    <input type="radio" name="asistencia_{{ alumno.id }}" value="justificado">
-                                </td>
-                            </tr>
+                        {% for item in calificaciones_forms %}
+                        <tr>
+                            <td>{{ item.alumno }}</td>
+                            <td>{{ item.form.nota }}</td>
+                        </tr>
                         {% endfor %}
                     </tbody>
                 </table>
