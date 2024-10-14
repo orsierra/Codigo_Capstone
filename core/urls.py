@@ -18,6 +18,7 @@ urlpatterns = [
     path('registro-academico/', views.registro_academico, name='registro_academico'),
     path('generar-informes/', views.generar_informes, name='generar_informes'),
     path('observaciones/', views.observaciones, name='observaciones'),
+    
     # URL DE LIBRO
     #path('profesor/libro/<int:curso_id>/', profesor_libro, name='profesor_libro'),
 ]
