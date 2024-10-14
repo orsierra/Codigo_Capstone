@@ -1,6 +1,6 @@
 from django import forms
 from .models import Asistencia, Alumno, Calificacion
-
+from django.core.exceptions import ValidationError
 class AsistenciaForm(forms.ModelForm):
     class Meta:
         model = Asistencia
@@ -21,7 +21,13 @@ class CalificacionForm(forms.ModelForm):
         model = Calificacion
         fields = ['nota']  # Solo vamos a editar la nota
 
-    # Personalización para que el formulario se muestre más bonito
     def __init__(self, *args, **kwargs):
         super(CalificacionForm, self).__init__(*args, **kwargs)
         self.fields['nota'].widget.attrs.update({'class': 'form-control'})
+
+
+    def clean_nota(self):
+        nota = self.cleaned_data.get('nota')
+        if nota < 0 or nota > 7:
+            raise ValidationError('La nota debe estar entre 0 y 7.')
+        return nota
