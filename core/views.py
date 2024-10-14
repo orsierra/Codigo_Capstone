@@ -19,14 +19,16 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect('profesor')  # Redirige a la página principal del rol correspondiente
+            # Redireccionar según el rol del usuario
+            if hasattr(user, 'alumno'):  # Comprobar si el usuario tiene un perfil de alumno
+                return redirect('alumno_home')  # Redirigir al alumno
+            elif hasattr(user, 'profesor'):  # Comprobar si el usuario tiene un perfil de profesor
+                return redirect('profesor')  # Redirigir al profesor
+            else:
+                return redirect('default')  # O redirigir a una página predeterminada
         else:
             messages.error(request, 'Invalid username or password')
     return render(request, 'login.html')
-# Esta vista está protegida, solo accesible si el usuario ha iniciado sesión
-@login_required
-def dashboard_view(request):
-    return render(request, 'dashboard.html')
 
 # views.py
 
@@ -142,5 +144,49 @@ def observaciones(request, curso_id):
     return render(request, 'observaciones.html', {'curso': curso, 'observaciones': observaciones})
 
 #====================================================================================================================================================
+#alumno consulta asitencia y notas
+# Vista para el panel del alumno
+def alumno_dashboard(request):
+    return render(request, 'alumno.html')
 
+# Vista para la consulta de asistencia
+@login_required
+def alumno_consulta_asistencia(request):
+    alumno = get_object_or_404(Alumno, user=request.user)
+    cursos = Curso.objects.filter(alumnos=alumno)  # Obtener los cursos del alumno
+    asistencias_data = []
+
+    # Recorremos los cursos del alumno para obtener la información de asistencia
+    for curso in cursos:
+        total_clases = Asistencia.objects.filter(curso=curso).count()  # Total de clases (días)
+        asistencias_presente = Asistencia.objects.filter(curso=curso, alumnos_presentes=alumno).count()  # Total de asistencias
+        asistencias_justificado = Asistencia.objects.filter(curso=curso, alumnos_justificados=alumno).count()  # Total de justificados
+
+        # Se suma el presente con el justificado para obtener el total de asistencia válida
+        total_asistencia = asistencias_presente + asistencias_justificado
+        porcentaje_asistencia = (total_asistencia / total_clases * 100) if total_clases > 0 else 0
+
+        asistencias_data.append({
+            'curso': curso.nombre,
+            'asignatura': curso.asignatura,
+            'total_clases': total_clases,
+            'asistencia': total_asistencia,
+            'porcentaje_asistencia': round(porcentaje_asistencia, 2)
+        })
+
+    return render(request, 'alumnoConsuAsis.html', {'asistencias_data': asistencias_data})
+
+# Vista para la consulta de notas
+def alumno_consulta_notas(request):
+    return render(request, 'alumnoConsuNotas.html')
+#alumno home
+@login_required
+def alumno_home(request):
+    # Aquí puedes obtener más información del alumno si es necesario
+    alumno = request.user.alumno  # Si tienes un modelo 'Alumno' relacionado con 'User'
+    
+    context = {
+        'alumno': alumno
+    }
+    return render(request, 'alumno.html', context)
 

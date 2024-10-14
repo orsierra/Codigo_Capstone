@@ -25,13 +25,12 @@ class Alumno(models.Model):
 
 class Curso(models.Model): 
     nombre = models.CharField(max_length=100)
-    asignatura = models.CharField(max_length=100)  # Campo para la asignatura
-    profesor = models.ForeignKey(Profesor, on_delete=models.CASCADE)
-    alumnos = models.ManyToManyField('Alumno', blank=True)
-    dias = models.CharField(max_length=100)  # Días en que se imparte el curso
-    hora = models.TimeField()  # Hora del curso
-    sala = models.CharField(max_length=50, default='Sala por asignar')  # Valor predeterminado
- # Nueva columna para las salas
+    asignatura = models.CharField(max_length=100)
+    profesor = models.ForeignKey('Profesor', on_delete=models.CASCADE)  # Asegúrate de que el modelo Profesor esté definido
+    alumnos = models.ManyToManyField(Alumno, blank=True)  # Relación ManyToMany con Alumno
+    dias = models.CharField(max_length=100)
+    hora = models.TimeField()
+    sala = models.CharField(max_length=50, default='Sala por asignar')
 
     def __str__(self):
         return self.nombre

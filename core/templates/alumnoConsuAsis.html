@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta de Asistencia</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+        }
+
+        .back-link {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            text-decoration: none;
+            color: #4CAF50;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .back-link svg {
+            margin-right: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f4f4f4;
+        }
+
+        .total-row {
+            font-weight: bold;
+            background-color: #d9edf7;
+        }
+
+        .summary {
+            margin-top: 20px;
+        }
+
+        .summary p {
+            font-size: 18px;
+            margin: 5px 0;
+        }
+
+        .percentage {
+            font-size: 20px;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Flecha para volver a la página alumno.html -->
+    <a href="{% url 'alumno_home' %}" class="back-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Volver a Alumno
+    </a>
+
+    <h1>Consulta de Asistencia</h1>
+
+    <div class="container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Curso</th>
+                    <th>Asignatura</th>
+                    <th>Total de Clases</th>
+                    <th>Asistencia</th>
+                    <th>Porcentaje</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for asistencia in asistencias_data %}
+                    <tr>
+                        <td>{{ asistencia.curso }}</td>
+                        <td>{{ asistencia.asignatura }}</td>
+                        <td>{{ asistencia.total_clases }}</td>
+                        <td>{{ asistencia.asistencia }}</td>
+                        <td>{{ asistencia.porcentaje_asistencia }}%</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if asistencias_data|length > 0 %}
+            <div class="summary">
+                <p>Has asistido a {{ asistencia.asistencia }} de {{ asistencia.total_clases }} clases.</p>
+                <p class="percentage">Porcentaje de asistencia: {{ asistencia.porcentaje_asistencia }}%</p>
+            </div>
+        {% else %}
+            <p>No se han registrado asistencias aún.</p>
+        {% endif %}
+    </div>
+
+</body>
+</html>
