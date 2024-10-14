@@ -68,10 +68,7 @@ def libro_clases(request, curso_id):
     return render(request, 'profesorLibro.html', context)
 # VISTAS DE PROFESOR MIS CURSOS
 
-from django.shortcuts import render, get_object_or_404, redirect
-from django.utils import timezone
-from .models import Curso, Asistencia, Alumno  # Asegúrate de importar tus modelos
-
+#registrar asistencia
 @login_required
 def registrar_asistencia(request, curso_id):
     curso = get_object_or_404(Curso, id=curso_id)
