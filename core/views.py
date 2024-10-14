@@ -3,11 +3,14 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Curso, Profesor
+from .models import Curso, Profesor,Asistencia, Calificacion, RegistroAcademico, Informe, Observacion, Alumno
 from django.contrib.auth.models import User
-
-from .models import Asistencia, Calificacion, RegistroAcademico, Informe, Observacion
 from django.shortcuts import render, get_object_or_404
+from datetime import date
+from django.utils import timezone
+from .forms import CalificacionForm
+
+
 
 def login_view(request):
     if request.method == "POST":
@@ -65,21 +68,63 @@ def libro_clases(request, curso_id):
     return render(request, 'profesorLibro.html', context)
 # VISTAS DE PROFESOR MIS CURSOS
 
+from django.shortcuts import render, get_object_or_404, redirect
+from django.utils import timezone
+from .models import Curso, Asistencia, Alumno  # Asegúrate de importar tus modelos
+
 @login_required
 def registrar_asistencia(request, curso_id):
-    curso = Curso.objects.get(id=curso_id)
-    if request.method == "POST":
-        # Lógica para registrar asistencia
-        pass
-    return render(request, 'registrar_asistencia.html', {'curso': curso})
+    curso = get_object_or_404(Curso, id=curso_id)
+    alumnos = curso.alumnos.all()  # Obtener los alumnos del curso
+
+    if request.method == 'POST':
+        # Crear o obtener la asistencia para la fecha actual
+        asistencia, created = Asistencia.objects.get_or_create(curso=curso, fecha=timezone.now().date())
+
+        # Limpiar las listas existentes para evitar duplicados
+        asistencia.alumnos_presentes.clear()
+        asistencia.alumnos_ausentes.clear()
+        asistencia.alumnos_justificados.clear()
+
+        # Procesar los estados de asistencia
+        for alumno in alumnos:
+            asistencia_value = request.POST.get(f'asistencia_{alumno.id}')
+            if asistencia_value == 'presente':
+                asistencia.alumnos_presentes.add(alumno)
+            elif asistencia_value == 'ausente':
+                asistencia.alumnos_ausentes.add(alumno)
+            elif asistencia_value == 'justificado':
+                asistencia.alumnos_justificados.add(alumno)
+        
+        asistencia.save()
+        return redirect('profesor_cursos')  # Redirigir a la lista de cursos
+    
+
+    return render(request, 'registrarAsistencia.html', {'curso': curso, 'alumnos': alumnos})
+
 
 @login_required
 def registrar_calificaciones(request, curso_id):
-    curso = Curso.objects.get(id=curso_id)
+    curso = get_object_or_404(Curso, id=curso_id)
+    calificaciones = Calificacion.objects.filter(curso=curso)
+
     if request.method == "POST":
-        # Lógica para registrar calificaciones
-        pass
-    return render(request, 'registrar_calificaciones.html', {'curso': curso})
+        for calificacion in calificaciones:
+            form = CalificacionForm(request.POST, instance=calificacion)
+            if form.is_valid():
+                form.save()
+        return redirect('ruta_a_donde_redirigir')  # Redirige después de guardar
+
+    # Crear un diccionario con los formularios para cada calificación
+    calificaciones_forms = []
+    for calificacion in calificaciones:
+        form = CalificacionForm(instance=calificacion)
+        calificaciones_forms.append({'alumno': calificacion.alumno, 'form': form})
+
+    return render(request, 'registrarCalificaciones.html', {
+        'curso': curso,
+        'calificaciones_forms': calificaciones_forms
+    })
 
 @login_required
 def registro_academico(request, curso_id):

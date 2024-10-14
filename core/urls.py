@@ -13,11 +13,12 @@ urlpatterns = [
     path('crear_db_usuarios', crear_usuario_db, name='crear_usuarios'),
     #Profesor mis cursos
     path('libro-clases/<int:curso_id>/', libro_clases, name='profesor_libro'),
-    path('registrar-asistencia/', views.registrar_asistencia, name='registrar_asistencia'),
-    path('registrar-calificaciones/', views.registrar_calificaciones, name='registrar_calificaciones'),
+    path('registrar-asistencia/<int:curso_id>/', views.registrar_asistencia, name='registrar_asistencia'),
+    path('registrar-calificaciones/<int:curso_id>/', views.registrar_calificaciones, name='registrar_calificaciones'),
     path('registro-academico/', views.registro_academico, name='registro_academico'),
     path('generar-informes/', views.generar_informes, name='generar_informes'),
     path('observaciones/', views.observaciones, name='observaciones'),
+    
     # URL DE LIBRO
 
 ]

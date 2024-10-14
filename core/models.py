@@ -23,16 +23,19 @@ class Alumno(models.Model):
     def __str__(self):
         return f"{self.nombre} {self.apellido}"
 
-class Curso(models.Model):
+class Curso(models.Model): 
     nombre = models.CharField(max_length=100)
     asignatura = models.CharField(max_length=100)  # Campo para la asignatura
     profesor = models.ForeignKey(Profesor, on_delete=models.CASCADE)
     alumnos = models.ManyToManyField('Alumno', blank=True)
     dias = models.CharField(max_length=100)  # Días en que se imparte el curso
     hora = models.TimeField()  # Hora del curso
+    sala = models.CharField(max_length=50, default='Sala por asignar')  # Valor predeterminado
+ # Nueva columna para las salas
 
     def __str__(self):
         return self.nombre
+
 
 #===============================================================================================
 
@@ -40,10 +43,14 @@ class Curso(models.Model):
 class Asistencia(models.Model):
     curso = models.ForeignKey(Curso, on_delete=models.CASCADE)
     fecha = models.DateField()
-    alumnos_presentes = models.ManyToManyField('Alumno', related_name='asistencias', blank=True)
+    alumnos_presentes = models.ManyToManyField('Alumno', related_name='asistencias_presentes', blank=True)
+    alumnos_ausentes = models.ManyToManyField('Alumno', related_name='asistencias_ausentes', blank=True)
+    alumnos_justificados = models.ManyToManyField('Alumno', related_name='asistencias_justificados', blank=True)
 
     def __str__(self):
         return f"Asistencia para {self.curso} el {self.fecha}"
+
+
 
 
 class Calificacion(models.Model):
