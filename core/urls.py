@@ -14,7 +14,8 @@ urlpatterns = [
     #Profesor mis cursos
     path('libro-clases/<int:curso_id>/', libro_clases, name='profesor_libro'),
     path('registrar-asistencia/<int:curso_id>/', views.registrar_asistencia, name='registrar_asistencia'),
-    path('registrar-calificaciones/<int:curso_id>/', views.registrar_calificaciones, name='registrar_calificaciones'),
+    path('registrar-calificaciones/<int:curso_id>/', registrar_calificaciones, name='registrar_calificaciones'),  # Asegúrate de usar curso_id
+    #path('registrar_calificacion/', registrar_calificaciones, name='registrar_calificacion'),
     path('registro-academico/', views.registro_academico, name='registro_academico'),
     path('generar-informes/', views.generar_informes, name='generar_informes'),
     path('observaciones/', views.observaciones, name='observaciones'),

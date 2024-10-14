@@ -1,7 +1,7 @@
 # models.py
 from django.db import models
 from django.contrib.auth.models import User
-
+from django.utils import timezone
 
 # MODELOS DE PROFESOR Y ALUMNO
 
@@ -52,16 +52,20 @@ class Asistencia(models.Model):
 
 
 
-
+#========================================= CALIFICACION ==============================================================
 class Calificacion(models.Model):
     curso = models.ForeignKey(Curso, on_delete=models.CASCADE)
     alumno = models.ForeignKey('Alumno', on_delete=models.CASCADE)
-    fecha = models.DateField()
+    fecha = models.DateField(default=timezone.now)
     nota = models.DecimalField(max_digits=5, decimal_places=2)
 
     def __str__(self):
         return f"Calificación de {self.alumno} en {self.curso}: {self.nota}"
 
+    def is_valid_nota(self):
+        return 0 <= self.nota <= 7  # Asumiendo un rango de 0 a 7 para las calificaciones
+
+#=====================================================================================================================
 
 class RegistroAcademico(models.Model):
     curso = models.ForeignKey(Curso, on_delete=models.CASCADE)

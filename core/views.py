@@ -11,7 +11,6 @@ from django.utils import timezone
 from .forms import CalificacionForm
 
 
-
 def login_view(request):
     if request.method == "POST":
         username = request.POST['username']
@@ -102,29 +101,43 @@ def registrar_asistencia(request, curso_id):
 
     return render(request, 'registrarAsistencia.html', {'curso': curso, 'alumnos': alumnos})
 
+#=============================================================== REGISTRAR CALIFICACIONES ====================================================================
 
-@login_required
+from django.contrib import messages
+
 def registrar_calificaciones(request, curso_id):
     curso = get_object_or_404(Curso, id=curso_id)
-    calificaciones = Calificacion.objects.filter(curso=curso)
+    errores = {}
+    form_list = {}
 
-    if request.method == "POST":
-        for calificacion in calificaciones:
-            form = CalificacionForm(request.POST, instance=calificacion)
+    if request.method == 'POST':
+        for alumno in Alumno.objects.filter(curso=curso):
+            form = CalificacionForm(request.POST, prefix=str(alumno.id))
             if form.is_valid():
-                form.save()
-        return redirect('ruta_a_donde_redirigir')  # Redirige después de guardar
+                # Guarda la calificación usando el alumno y curso correcto
+                calificacion = form.save(commit=False)  # No guarda aún en la base de datos
+                calificacion.alumno = alumno  # Asocia el alumno
+                calificacion.curso = curso  # Asocia el curso
+                calificacion.save()  # Guarda en la base de datos
+            else:
+                errores[alumno] = form.errors  # Guarda los errores
 
-    # Crear un diccionario con los formularios para cada calificación
-    calificaciones_forms = []
-    for calificacion in calificaciones:
-        form = CalificacionForm(instance=calificacion)
-        calificaciones_forms.append({'alumno': calificacion.alumno, 'form': form})
+        if not errores:
+            messages.success(request, "Se han guardado los cambios exitosamente.")
+            return redirect('registrar_calificaciones', curso_id=curso.id)
+
+    else:
+        # Crea formularios para cada alumno
+        form_list = {alumno: CalificacionForm(prefix=str(alumno.id)) for alumno in Alumno.objects.filter(curso=curso)}
 
     return render(request, 'registrarCalificaciones.html', {
         'curso': curso,
-        'calificaciones_forms': calificaciones_forms
+        'form_list': form_list,
+        'errores': errores
     })
+
+
+#=============================================================================================================================================================
 
 @login_required
 def registro_academico(request, curso_id):
