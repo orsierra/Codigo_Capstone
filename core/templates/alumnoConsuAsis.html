@@ -115,12 +115,7 @@
             </tbody>
         </table>
 
-        {% if asistencias_data|length > 0 %}
-            <div class="summary">
-                <p>Has asistido a {{ asistencia.asistencia }} de {{ asistencia.total_clases }} clases.</p>
-                <p class="percentage">Porcentaje de asistencia: {{ asistencia.porcentaje_asistencia }}%</p>
-            </div>
-        {% else %}
+        {% if asistencias_data|length == 0 %}
             <p>No se han registrado asistencias aún.</p>
         {% endif %}
     </div>
