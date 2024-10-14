@@ -22,4 +22,3 @@ urlpatterns = [
     # URL DE LIBRO
 
 ]
-
