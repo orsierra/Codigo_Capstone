@@ -20,6 +20,6 @@ urlpatterns = [
     path('observaciones/', views.observaciones, name='observaciones'),
     
     # URL DE LIBRO
-    #path('profesor/libro/<int:curso_id>/', profesor_libro, name='profesor_libro'),
+
 ]
 
