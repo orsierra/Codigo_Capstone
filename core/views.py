@@ -98,8 +98,9 @@ def registrar_asistencia(request, curso_id):
         
         asistencia.save()
         return redirect('profesor_cursos')  # Redirigir a la lista de cursos
+    
 
-    return render(request, 'registrar_asistencia.html', {'curso': curso, 'alumnos': alumnos})
+    return render(request, 'registrarAsistencia.html', {'curso': curso, 'alumnos': alumnos})
 
 
 @login_required
@@ -120,7 +121,7 @@ def registrar_calificaciones(request, curso_id):
         form = CalificacionForm(instance=calificacion)
         calificaciones_forms.append({'alumno': calificacion.alumno, 'form': form})
 
-    return render(request, 'registrar_calificaciones.html', {
+    return render(request, 'registrarCalificaciones.html', {
         'curso': curso,
         'calificaciones_forms': calificaciones_forms
     })
