@@ -1,6 +1,10 @@
 # urls.py
 from django.urls import path
+<<<<<<< HEAD
 from .views import login_view,profesor_dashboard,profesor_cursos,crear_usuario_db,registrar_asistencia, registrar_calificaciones, registro_academico, generar_informes, observaciones,libro_clases,alumno_consulta_asistencia,alumno_dashboard,alumno_consulta_notas,alumno_home,apoderadoConsuAsis,apoderadoConsuNotas,apoderadoMatri,apoderado_view
+=======
+from .views import login_view,profesor_dashboard,profesor_cursos,crear_usuario_db, registrar_asistencia, registrar_calificaciones, registro_academico, generar_informes, observaciones,libro_clases,alumno_consulta_asistencia,alumno_dashboard,alumno_consulta_notas,alumno_home
+>>>>>>> 051dde2fc045532662734f041e23bab2c3ca77c2
 from core import views
 
 
@@ -14,8 +18,7 @@ urlpatterns = [
     path('libro-clases/<int:curso_id>/', libro_clases, name='profesor_libro'),
     path('registrar-asistencia/<int:curso_id>/', views.registrar_asistencia, name='registrar_asistencia'),
     path('registrar-calificaciones/<int:curso_id>/', registrar_calificaciones, name='registrar_calificaciones'),  # Asegúrate de usar curso_id
-    #path('registrar_calificacion/', registrar_calificaciones, name='registrar_calificacion'),
-    path('registro-academico/', views.registro_academico, name='registro_academico'),
+    path('registro-academico/<int:curso_id>/', registro_academico, name='registro_academico'),
     path('generar-informes/', views.generar_informes, name='generar_informes'),
     path('observaciones/', views.observaciones, name='observaciones'),
     #alumno
