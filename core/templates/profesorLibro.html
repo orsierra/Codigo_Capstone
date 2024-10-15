@@ -88,7 +88,7 @@
             <a href="{% url 'registrar_asistencia' curso.id %}"><button>Registrar asistencia</button></a>
             <a href="{% url 'registrar_calificaciones' curso.id %}"><button>Registrar calificaciones</button></a>
             <a href="{% url 'registro_academico' curso.id %}"><button>Registro Academico</button></a>
-            <a href="{% url 'generar_informes' %}"><button>Generar informes</button></a>
+            <a href="{% url 'generar_informes' curso.id %}"><button>Generar Informe</button></a>
             <a href="{% url 'observaciones' %}"><button>Observaciones</button></a>
         </div>
     </div>
