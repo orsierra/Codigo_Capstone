@@ -1,115 +1,148 @@
+{% load custom_filters %}
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <a href="{% url 'registro_academico' curso.id %}">Ver Registro Académico</a>
-
     <title>Registro Académico - {{ curso.nombre }}</title>
     <style>
-        /* Aquí puedes incluir el estilo CSS como en ejemplos anteriores */
         body {
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
             margin: 0;
-            display: flex;
-        }
-        .sidebar {
-            width: 250px;
-            background-color: #222;
-            color: white;
-            padding: 20px;
-            height: 100vh;
-            position: fixed;
-        }
-        .main-content {
-            margin-left: 250px;
-            flex-grow: 1;
             padding: 20px;
         }
-        .container {
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .accordion {
             max-width: 800px;
             margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
-        .buttons {
-            margin-top: 20px;
-            display: flex;
-            justify-content: flex-end;
-        }
-        .buttons button {
-            padding: 10px 20px;
-            cursor: pointer;
-            border: none;
+
+        .panel {
+            border: 1px solid #ccc;
+            margin: 10px 0;
             border-radius: 5px;
-            transition: background-color 0.3s;
+            overflow: hidden;
+        }
+
+        .panel-heading {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            padding: 10px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-heading:hover {
+            background-color: #0056b3;
+        }
+
+        .panel-content {
+            display: none;
+            padding: 10px;
+            border-top: 1px solid #ccc;
+            background-color: #fff;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f4f4f4;
+        }
+
+        .buttons {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .btn {
             background-color: #28a745;
             color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
         }
+
+        .btn:hover {
+            background-color: #218838;
+        }
+
         .btn-back {
             background-color: #007bff;
         }
+
         .btn-back:hover {
             background-color: #0056b3;
         }
     </style>
+    <script>
+        function togglePanel(panelId) {
+            var panel = document.getElementById(panelId);
+            panel.style.display = (panel.style.display === 'block') ? 'none' : 'block';
+        }
+    </script>
 </head>
 <body>
-    <div class="sidebar">
-        <h2>Menú</h2>
-        <ul>
-            <li><a href="#">Inicio</a></li>
-            <li><a href="#">Registrar Asistencia</a></li>
-            <li><a href="#">Ver Calificaciones</a></li>
-            <li><a href="#">Generar Informes</a></li>
-            <li><a href="#">Cerrar Sesión</a></li>
-        </ul>
+    <h1>Registro Académico para {{ curso.nombre }}</h1>
+
+    <div class="accordion">
+        {% for alumno, calificaciones in calificaciones_por_alumno.items %}
+        <div class="panel">
+            <div class="panel-heading" onclick="togglePanel('panel-content-{{ alumno.id }}')">
+                <span>{{ alumno.nombre }} {{ alumno.apellido }}</span>
+                <span>&#x25BC;</span> <!-- Icono para indicar que se puede expandir -->
+            </div>
+            <div id="panel-content-{{ alumno.id }}" class="panel-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Nota</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for calificacion in calificaciones %}
+                        <tr>
+                            <td>{{ calificacion.fecha }}</td>
+                            <td>{{ calificacion.nota }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="2">No hay calificaciones registradas.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <p><strong>Promedio de Notas:</strong> {{ promedios_por_alumno|get_item:alumno }}</p>
+            </div>
+        </div>
+        {% endfor %}
     </div>
 
-    <div class="main-content">
-        <h1>Registro Académico - {{ curso.nombre }}</h1>
-        <div class="container">
-            <form method="POST">
-                {% csrf_token %}
-                {% for alumno, data in form_list.items %}
-                    <div class="alumno-row">
-                        <strong>{{ alumno.nombre }} {{ alumno.apellido }}</strong>
-                        
-                        <p><strong>Calificación:</strong>
-                            {% if data.calificacion %}
-                                <select>
-                                    <option value="{{ data.calificacion.nota }}">{{ data.calificacion.nota }}</option>
-                                </select>
-                            {% else %}
-                                <select>
-                                    <option value="">No hay calificación</option>
-                                </select>
-                            {% endif %}
-                        </p>
-
-                        <p><strong>Asistencia:</strong>
-                            {% if data.asistencia %}
-                                <select>
-                                    <option value="presentes">Presentes</option>
-                                    <option value="ausentes">Ausentes</option>
-                                </select>
-                            {% else %}
-                                <select>
-                                    <option value="">No hay asistencia registrada</option>
-                                </select>
-                            {% endif %}
-                        </p>
-                    </div>
-                {% endfor %}
-                <div class="buttons">
-                    <button type="submit">Guardar Cambios</button>
-                    <button type="button" class="btn-back" onclick="window.location.href='{% url 'profesor_cursos' %}'">Regresar</button>
-                </div>
-            </form>
-        </div>
+    <div class="buttons">
+        <button class="btn" onclick="window.location.href='{% url 'profesor_cursos' %}'">Regresar</button>
     </div>
 </body>
 </html>

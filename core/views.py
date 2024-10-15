@@ -9,8 +9,8 @@ from django.shortcuts import render, get_object_or_404
 from datetime import date
 from django.utils import timezone
 from .forms import CalificacionForm
-from core.models import Apoderado  # Asegúrate de importar tu modelo de apoderado
-
+from django.contrib import messages
+from django.db.models import Avg
 
 def login_view(request):
     if request.method == "POST":
@@ -107,8 +107,6 @@ def registrar_asistencia(request, curso_id):
 
 #=============================================================== REGISTRAR CALIFICACIONES ====================================================================
 
-from django.contrib import messages
-
 def registrar_calificaciones(request, curso_id):
     curso = get_object_or_404(Curso, id=curso_id)
     errores = {}
@@ -128,7 +126,7 @@ def registrar_calificaciones(request, curso_id):
 
         if not errores:
             messages.success(request, "Se han guardado los cambios exitosamente.")
-            return redirect('registrar_calificaciones', curso_id=curso.id)
+            return redirect('registrar_calificaciones', curso_id=curso_id)  # Cambia aquí
 
     else:
         # Crea formularios para cada alumno
@@ -148,25 +146,25 @@ def registrar_calificaciones(request, curso_id):
 @login_required
 def registro_academico(request, curso_id):
     curso = get_object_or_404(Curso, id=curso_id)
-    
-    # Obtener las calificaciones y asistencias para el curso
+    alumnos = curso.alumnos.all()
     calificaciones = Calificacion.objects.filter(curso=curso)
-    asistencias = Asistencia.objects.filter(curso=curso)
 
-    # Crear un diccionario para mostrar las calificaciones y asistencias
-    form_list = {}
-    for alumno in curso.alumnos.all():  # Obtener todos los alumnos en el curso
-        # Crear un formulario para cada alumno (puedes modificar esto según tu necesidad)
-        form_list[alumno] = {
-            'calificacion': calificaciones.filter(alumno=alumno).first(),
-            'asistencia': asistencias.filter(alumnos_presentes=alumno).first()
-        }
+    # Construir un diccionario para mapear alumnos a sus calificaciones
+    calificaciones_por_alumno = {}
+    promedios_por_alumno = {}
+
+    for alumno in alumnos:
+        calificaciones_alumno = calificaciones.filter(alumno=alumno)
+        calificaciones_por_alumno[alumno] = calificaciones_alumno
+
+        # Calcular el promedio de calificaciones
+        promedio = calificaciones_alumno.aggregate(Avg('nota'))['nota__avg'] or 0
+        promedios_por_alumno[alumno] = promedio
 
     context = {
         'curso': curso,
-        'form_list': form_list,
-        'calificaciones': calificaciones,
-        'asistencias': asistencias,
+        'calificaciones_por_alumno': calificaciones_por_alumno,
+        'promedios_por_alumno': promedios_por_alumno,
     }
     return render(request, 'registroAcademico.html', context)
 # ===============================================================================================================================================================
