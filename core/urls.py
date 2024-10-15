@@ -1,6 +1,10 @@
 # urls.py
 from django.urls import path
+<<<<<<< HEAD
+from .views import login_view,profesor_dashboard,profesor_cursos,crear_usuario_db,registrar_asistencia, registrar_calificaciones, registro_academico, generar_informes, observaciones,libro_clases,alumno_consulta_asistencia,alumno_dashboard,alumno_consulta_notas,alumno_home,apoderadoConsuAsis,apoderadoConsuNotas,apoderadoMatri,apoderado_view
+=======
 from .views import login_view,profesor_dashboard,profesor_cursos,crear_usuario_db, registrar_asistencia, registrar_calificaciones, registro_academico, generar_informes, observaciones,libro_clases,alumno_consulta_asistencia,alumno_dashboard,alumno_consulta_notas,alumno_home
+>>>>>>> 051dde2fc045532662734f041e23bab2c3ca77c2
 from core import views
 
 
@@ -22,6 +26,11 @@ urlpatterns = [
     path('alumno/asistencia/', views.alumno_consulta_asistencia, name='alumnoConsuAsis'),
     path('alumno/notas/', views.alumno_consulta_notas, name='alumnoConsuNotas'),
     path('alumno/', views.alumno_home, name='alumno_home'),
+    #Apoderado
+    path('apoderado/', apoderado_view, name='apoderado_home'),
+    path('apoderado/consulta-asistencia/', views.apoderadoConsuAsis, name='apoderadoConsuAsis'),
+    path('apoderado/consulta-notas/', views.apoderadoConsuNotas, name='apoderadoConsuNotas'),
+    path('apoderado/matricular/', views.apoderadoMatri, name='apoderadoMatri'),
     
     
     # URL DE LIBRO

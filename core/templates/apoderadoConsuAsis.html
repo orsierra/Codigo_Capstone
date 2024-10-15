@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta de Asistencia - Apoderado</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            display: flex;
+        }
+        .sidebar {
+            width: 200px;
+            background-color: #333;
+            color: white;
+            padding: 20px;
+        }
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 10px;
+        }
+        .sidebar a:hover {
+            background-color: #575757;
+        }
+        .content {
+            flex: 1;
+            padding: 20px;
+            background-color: white;
+        }
+        h1 {
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+        .profile {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .profile h2 {
+            margin: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #e0f7fa;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>Página de la Institución</h2>
+        <a href="{% url 'apoderado' %}">Apoderado</a>
+        <a href="{% url 'apoderadoConsuAsis' %}">Asistencia</a>
+        <a href="{% url 'apoderadoConsuNotas' %}">Notas</a>
+        <a href="{% url 'apoderadoMatri' %}">Matrícula</a>
+        <a href="{% url 'logout' %}">Salir</a>
+    </div>
+
+    <div class="content">
+        <div class="profile">
+            <h2>Asistencia de {{ nombre_apoderado }}</h2>
+            <div>
+                <span>👤</span>  <!-- Puedes cambiar esto por un ícono de usuario más adecuado -->
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Curso</th>
+                    <th>Clases Realizadas</th>
+                    <th>Asistencia</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for asistencia in asistencias_data %}
+                    <tr>
+                        <td>{{ asistencia.curso }}</td>
+                        <td>{{ asistencia.clases_realizadas }}</td>
+                        <td>{{ asistencia.asistencia }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="3">No hay datos de asistencia disponibles.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>

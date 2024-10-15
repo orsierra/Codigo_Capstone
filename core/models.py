@@ -3,7 +3,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 
-# MODELOS DE PROFESOR Y ALUMNO
+# MODELOS DE PROFESOR Y ALUMNO, APODERADO
 
 class Profesor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)  # Relación uno a uno con User
@@ -14,11 +14,22 @@ class Profesor(models.Model):
     def __str__(self):
         return f"{self.nombre} {self.apellido}"
 
+class Apoderado(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    nombre = models.CharField(max_length=100)
+    apellido = models.CharField(max_length=200, default='Sin apellido')
+    email = models.EmailField(unique=True)
+    telefono = models.CharField(max_length=15, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.nombre} {self.apellido}"
+
 class Alumno(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=200, default='Sin apellido')
     email = models.EmailField(unique=True)
+    apoderado = models.ForeignKey(Apoderado, related_name='alumnos', on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return f"{self.nombre} {self.apellido}"
