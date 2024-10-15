@@ -36,18 +36,10 @@
             font-size: 36px;
             margin-bottom: 20px;
         }
-        .profile {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .profile h2 {
-            margin: 0;
-        }
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 20px;
         }
         th, td {
             border: 1px solid #ccc;
@@ -60,49 +52,54 @@
         tr:nth-child(even) {
             background-color: #f9f9f9;
         }
+        .no-data {
+            text-align: center;
+            font-weight: bold;
+            color: #ff0000; /* Red color for no data message */
+        }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
         <h2>Página de la Institución</h2>
-        <a href="{% url 'apoderado' %}">Apoderado</a>
+        <a href="{% url 'apoderado_view' %}">Apoderado</a>
         <a href="{% url 'apoderadoConsuAsis' %}">Asistencia</a>
         <a href="{% url 'apoderadoConsuNotas' %}">Notas</a>
         <a href="{% url 'apoderadoMatri' %}">Matrícula</a>
-        <a href="{% url 'logout' %}">Salir</a>
     </div>
 
     <div class="content">
-        <div class="profile">
-            <h2>Asistencia de {{ nombre_apoderado }}</h2>
-            <div>
-                <span>👤</span>  <!-- Puedes cambiar esto por un ícono de usuario más adecuado -->
-            </div>
-        </div>
+        <h1>Consulta de Asistencia</h1>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Curso</th>
-                    <th>Clases Realizadas</th>
-                    <th>Asistencia</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for asistencia in asistencias_data %}
+        {% if asistencias_data %}
+            <table>
+                <thead>
                     <tr>
-                        <td>{{ asistencia.curso }}</td>
-                        <td>{{ asistencia.clases_realizadas }}</td>
-                        <td>{{ asistencia.asistencia }}</td>
+                        <th>Nombre del Alumno</th>
+                        <th>Curso</th>
+                        <th>Asignatura</th>
+                        <th>Total de Clases</th>
+                        <th>Asistencia</th>
+                        <th>Porcentaje</th>
                     </tr>
-                {% empty %}
-                    <tr>
-                        <td colspan="3">No hay datos de asistencia disponibles.</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for asistencia in asistencias_data %}
+                        <tr>
+                            <td>{{ asistencia.nombre_alumno }}</td>
+                            <td>{{ asistencia.curso }}</td>
+                            <td>{{ asistencia.asignatura }}</td>
+                            <td>{{ asistencia.total_clases }}</td>
+                            <td>{{ asistencia.asistencia }}</td>
+                            <td>{{ asistencia.porcentaje_asistencia }}%</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="no-data">No hay datos de asistencia disponibles.</p>
+        {% endif %}
     </div>
 
 </body>

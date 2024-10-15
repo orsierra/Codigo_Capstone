@@ -23,10 +23,11 @@ urlpatterns = [
     path('alumno/notas/', views.alumno_consulta_notas, name='alumnoConsuNotas'),
     path('alumno/', views.alumno_home, name='alumno_home'),
     #Apoderado
-    path('apoderado/', apoderado_view, name='apoderado_home'),
-    path('apoderado/consulta-asistencia/', views.apoderadoConsuAsis, name='apoderadoConsuAsis'),
-    path('apoderado/consulta-notas/', views.apoderadoConsuNotas, name='apoderadoConsuNotas'),
-    path('apoderado/matricular/', views.apoderadoMatri, name='apoderadoMatri'),
+    path('apoderado/', apoderado_view, name='apoderado_view'),  # Dashboard del apoderado
+    path('consulta-asistencia/', apoderadoConsuAsis, name='apoderadoConsuAsis'),  # Consulta de asistencia
+    path('apoderado/consulta-notas/', apoderadoConsuNotas, name='apoderadoConsuNotas'),  # Consulta de notas
+    path('apoderado/matricula/', apoderadoMatri, name='apoderadoMatri'),
+
     
     
     # URL DE LIBRO

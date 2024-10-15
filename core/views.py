@@ -11,6 +11,7 @@ from django.utils import timezone
 from .forms import CalificacionForm
 from django.contrib import messages
 from django.db.models import Avg
+from django.db.models import Q  # Agrega esta línea
 
 def login_view(request):
     if request.method == "POST":
@@ -25,7 +26,7 @@ def login_view(request):
             elif hasattr(user, 'profesor'):  # Verifica si el usuario tiene un perfil de profesor
                 return redirect('profesor')  # Redirigir al profesor
             elif hasattr(user, 'apoderado'):  # Verifica si el usuario tiene un perfil de apoderado
-                return redirect('apoderado_home')  # Redirigir al apoderado
+                return redirect('apoderado_view')  # Redirigir al apoderado
             else:
                 return redirect('default')  # Redirigir a una página predeterminada
         else:
@@ -233,14 +234,37 @@ def apoderado_view(request):
     # Aquí podrías agregar lógica para obtener datos relevantes para el apoderado si es necesario
     return render(request, 'apoderado.html')
 
+@login_required
 def apoderadoConsuAsis(request):
-    # Filtra las asistencias según el apoderado
-    asistencias_data = Asistencia.objects.filter(alumno__apoderado=request.user.apoderado)  # Ajusta según tu modelo
+    apoderado = get_object_or_404(Apoderado, user=request.user)
+    alumnos = Alumno.objects.filter(apoderado=apoderado)  # Obtener los alumnos del apoderado
+    asistencias_data = []
 
-    return render(request, 'apoderado_consulta_asistencia.html', {
-        'asistencias_data': asistencias_data,
-        'nombre_apoderado': request.user.apoderado.nombre
-    })
+    # Recorremos los alumnos para obtener la información de asistencia
+    for alumno in alumnos:
+        cursos = Curso.objects.filter(alumnos=alumno)  # Obtener los cursos del alumno
+        
+        for curso in cursos:
+            total_clases = Asistencia.objects.filter(curso=curso).count()  # Total de clases (días)
+            asistencias_presente = Asistencia.objects.filter(curso=curso, alumnos_presentes=alumno).count()  # Total de asistencias
+            asistencias_justificado = Asistencia.objects.filter(curso=curso, alumnos_justificados=alumno).count()  # Total de justificados
+
+            # Se suma el presente con el justificado para obtener el total de asistencia válida
+            total_asistencia = asistencias_presente + asistencias_justificado
+            porcentaje_asistencia = (total_asistencia / total_clases * 100) if total_clases > 0 else 0
+
+            asistencias_data.append({
+                'nombre_alumno': alumno.nombre,  # Asegúrate de que el modelo Alumno tenga este campo
+                'curso': curso.nombre,
+                'asignatura': curso.asignatura,
+                'total_clases': total_clases,
+                'asistencia': total_asistencia,
+                'porcentaje_asistencia': round(porcentaje_asistencia, 2)
+            })
+
+    return render(request, 'apoderadoConsuAsis.html', {'asistencias_data': asistencias_data})
+
+
 
 def apoderadoConsuNotas(request):
     return render(request, 'apoderadoConsuNotas.html')
