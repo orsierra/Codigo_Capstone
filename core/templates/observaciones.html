@@ -1,0 +1,144 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Observaciones - {{ curso.nombre }}</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}"> <!-- Si tienes un archivo CSS externo -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box; /* Asegura que el padding se incluya en el ancho total */
+        }
+
+        .btn {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 20px;
+            display: block;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background-color: #218838;
+        }
+
+        .observaciones-list {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+            border-top: 2px solid #007bff;
+            padding-top: 20px;
+        }
+
+        .observaciones-list li {
+            background-color: #e9ecef;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+            border-left: 5px solid #007bff; /* Color a la izquierda para resaltar */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Observaciones para {{ curso.nombre }}</h1>
+
+        {% if form.errors %}
+            <div class="error">
+                <p>Errores en el formulario:</p>
+                <ul>
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+            <label for="{{ form.alumno.id_for_label }}">Alumno:</label>
+            {{ form.alumno }}  <!-- Campo para seleccionar el alumno filtrado -->
+            <script>
+                document.getElementById("{{ form.alumno.id_for_label }}").className += " form-control"; // Agregar clase
+            </script>
+
+            <label for="{{ form.fecha.id_for_label }}">Fecha:</label>
+            {{ form.fecha }}   <!-- Campo para la fecha -->
+            <script>
+                document.getElementById("{{ form.fecha.id_for_label }}").className += " form-control"; // Agregar clase
+            </script>
+
+            <label for="{{ form.contenido.id_for_label }}">Contenido de la Observación:</label>
+            {{ form.contenido }}  <!-- Campo para el contenido -->
+            <script>
+                document.getElementById("{{ form.contenido.id_for_label }}").className += " form-control"; // Agregar clase
+            </script>
+        
+            <button type="submit" class="btn">Agregar Observación</button>
+        </form>
+
+        <h2>Observaciones Existentes:</h2>
+        <ul class="observaciones-list">
+            {% for observacion in observaciones %}
+                <li>{{ observacion.fecha }}: {{ observacion.contenido }}</li>
+            {% empty %}
+                <li>No hay observaciones registradas.</li>
+            {% endfor %}
+        </ul>
+
+        <button class="btn" onclick="window.location.href='{% url 'profesor_libro' curso.id%}'">Regresar</button>
+    </div>
+</body>
+</html>

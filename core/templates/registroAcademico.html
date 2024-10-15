@@ -110,11 +110,11 @@
     <div class="accordion">
         {% for alumno, calificaciones in calificaciones_por_alumno.items %}
         <div class="panel">
-            <div class="panel-heading" onclick="togglePanel('panel-content-{{ alumno.id }}')">
-                <span>{{ alumno.nombre }} {{ alumno.apellido }}</span>
-                <span>&#x25BC;</span> <!-- Icono para indicar que se puede expandir -->
+            <div class="panel-heading" onclick="togglePanel('calificaciones-{{ alumno.id }}')">
+                <span>{{ alumno.nombre }} {{ alumno.apellido }} - Calificaciones</span>
+                <span>&#x25BC;</span>
             </div>
-            <div id="panel-content-{{ alumno.id }}" class="panel-content">
+            <div id="calificaciones-{{ alumno.id }}" class="panel-content">
                 <table>
                     <thead>
                         <tr>
@@ -135,14 +135,49 @@
                         {% endfor %}
                     </tbody>
                 </table>
-                <p><strong>Promedio de Notas:</strong> {{ promedios_por_alumno|get_item:alumno }}</p>
+                <p><strong>Promedio:</strong> {{ promedios_por_alumno|get_item:alumno }}</p>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-heading" onclick="togglePanel('asistencias-{{ alumno.id }}')">
+                <span>{{ alumno.nombre }} {{ alumno.apellido }} - Asistencia</span>
+                <span>&#x25BC;</span>
+            </div>
+            <div id="asistencias-{{ alumno.id }}" class="panel-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for asistencia in asistencias_por_alumno|get_item:alumno %}
+                        <tr>
+                            <td>{{ asistencia.fecha }}</td>
+                            <td>
+                                {% if alumno in asistencia.alumnos_presentes.all %}
+                                    Presente
+                                {% else %}
+                                    Ausente
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="2">No hay asistencia registrada.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
         {% endfor %}
     </div>
 
     <div class="buttons">
-        <button class="btn" onclick="window.location.href='{% url 'profesor_cursos' %}'">Regresar</button>
+        <button class="btn" onclick="window.location.href='{% url 'profesor_libro' curso.id %}'">Regresar</button>
     </div>
 </body>
 </html>

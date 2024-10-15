@@ -3,12 +3,12 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Curso, Profesor,Asistencia, Calificacion, RegistroAcademico, Informe, Observacion, Alumno, Apoderado
+from .models import Curso, Profesor,Asistencia, Calificacion, Informe, Observacion, Alumno
 from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404
 from datetime import date
 from django.utils import timezone
-from .forms import CalificacionForm
+from .forms import CalificacionForm, ObservacionForm 
 from django.contrib import messages
 from django.db.models import Avg
 from django.db.models import Q  # Agrega esta línea
@@ -73,9 +73,8 @@ def libro_clases(request, curso_id):
     return render(request, 'profesorLibro.html', context)
 # ==========================================================================================================================================================
 
-# VISTAS DE PROFESOR MIS CURSOS
+# ================================================================= REGISTRAR ASISTENCIA ==================================================================
 
-#registrar asistencia
 @login_required
 def registrar_asistencia(request, curso_id):
     curso = get_object_or_404(Curso, id=curso_id)
@@ -101,13 +100,16 @@ def registrar_asistencia(request, curso_id):
                 asistencia.alumnos_justificados.add(alumno)
         
         asistencia.save()
-        return redirect('profesor_cursos')  # Redirigir a la lista de cursos
-    
+        messages.success(request, "Los cambios se han guardado exitosamente.")
+        return redirect('registrar_asistencia', curso_id=curso.id)  # Cambia aquí a la vista de registrar asistencia
 
     return render(request, 'registrarAsistencia.html', {'curso': curso, 'alumnos': alumnos})
 
+
+
 #=============================================================== REGISTRAR CALIFICACIONES ====================================================================
 
+@login_required
 def registrar_calificaciones(request, curso_id):
     curso = get_object_or_404(Curso, id=curso_id)
     errores = {}
@@ -140,8 +142,6 @@ def registrar_calificaciones(request, curso_id):
     })
 
 
-#=============================================================================================================================================================
-
 # =================================================== REGISTRO ACADEMICO =====================================================================================
 
 @login_required
@@ -149,10 +149,12 @@ def registro_academico(request, curso_id):
     curso = get_object_or_404(Curso, id=curso_id)
     alumnos = curso.alumnos.all()
     calificaciones = Calificacion.objects.filter(curso=curso)
+    asistencias = Asistencia.objects.filter(curso=curso)
 
     # Construir un diccionario para mapear alumnos a sus calificaciones
     calificaciones_por_alumno = {}
     promedios_por_alumno = {}
+    asistencias_por_alumno = {}
 
     for alumno in alumnos:
         calificaciones_alumno = calificaciones.filter(alumno=alumno)
@@ -162,10 +164,15 @@ def registro_academico(request, curso_id):
         promedio = calificaciones_alumno.aggregate(Avg('nota'))['nota__avg'] or 0
         promedios_por_alumno[alumno] = promedio
 
+        # Obtener asistencias para cada alumno
+        asistencias_alumno = asistencias.filter(alumnos_presentes=alumno) | asistencias.filter(alumnos_ausentes=alumno)
+        asistencias_por_alumno[alumno] = asistencias_alumno
+
     context = {
         'curso': curso,
         'calificaciones_por_alumno': calificaciones_por_alumno,
         'promedios_por_alumno': promedios_por_alumno,
+        'asistencias_por_alumno': asistencias_por_alumno,
     }
     return render(request, 'registroAcademico.html', context)
 # ===============================================================================================================================================================
@@ -176,13 +183,33 @@ def generar_informes(request, curso_id):
     informes = Informe.objects.filter(curso=curso)
     return render(request, 'generar_informes.html', {'curso': curso, 'informes': informes})
 
+# =============================================================== OBSERVACIONES =========================================================================
+
 @login_required
 def observaciones(request, curso_id):
-    curso = Curso.objects.get(id=curso_id)
+    curso = get_object_or_404(Curso, id=curso_id)
     observaciones = Observacion.objects.filter(curso=curso)
-    return render(request, 'observaciones.html', {'curso': curso, 'observaciones': observaciones})
 
-#====================================================================================================================================================
+    if request.method == 'POST':
+        form = ObservacionForm(request.POST)
+        if form.is_valid():
+            observacion = form.save(commit=False)
+            observacion.curso = curso  # Asociar la observación al curso
+            # Aquí no necesitas asignar el alumno, ya que el formulario tendrá el campo de selección
+            observacion.save()
+            return redirect('observaciones', curso_id=curso.id)  # Redirigir después de guardar
+    else:
+        # Al crear el formulario, solo incluir alumnos del curso actual
+        form = ObservacionForm()
+        form.fields['alumno'].queryset = curso.alumnos.all()  # Filtrar alumnos
+
+    return render(request, 'observaciones.html', {
+        'curso': curso,
+        'observaciones': observaciones,
+        'form': form,
+    })
+
+#========================================================================================================================================================
 #alumno consulta asitencia y notas
 # Vista para el panel del alumno
 def alumno_dashboard(request):
