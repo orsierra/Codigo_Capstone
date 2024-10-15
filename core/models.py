@@ -3,6 +3,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 
+
 # MODELOS DE PROFESOR Y ALUMNO, APODERADO
 
 class Profesor(models.Model):
