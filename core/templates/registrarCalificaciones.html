@@ -1,66 +1,40 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrar Calificaciones - {{ curso.nombre }}</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             background-color: #f0f0f0;
             margin: 0;
-            display: flex;
+            padding: 20px;
         }
-        .sidebar {
-            width: 250px;
-            background-color: #222;
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #007bff;
             color: white;
-            padding: 20px;
-            height: 100vh;
-            position: fixed;
+            border-radius: 5px;
         }
-        .main-content {
-            margin-left: 250px;
-            flex-grow: 1;
-            padding: 20px;
-        }
+
         .container {
             max-width: 800px;
             margin: 0 auto;
             background-color: white;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        h1 {
-            text-align: center; /* Centrar el título */
-            margin-bottom: 20px; /* Espaciado inferior */
-            font-size: 24px; /* Tamaño de fuente */
-            color: #333; /* Color del texto */
-        }
-        .buttons {
-            margin-top: 20px;
-            display: flex;
-            justify-content: flex-end;
-        }
-        .buttons button {
-            padding: 10px 20px;
-            cursor: pointer;
-            border: none;
-            border-radius: 5px;
-            transition: background-color 0.3s;
-            background-color: #28a745;
-            color: white;
-            font-size: 16px; /* Tamaño de fuente */
-            margin-left: 10px; /* Espacio entre botones */
-        }
-        .btn-back {
-            background-color: #007bff; /* Color para el botón de regresar */
-        }
-        .btn-back:hover {
-            background-color: #0056b3;
-        }
-        .error, .success {
+
+        .error {
             background-color: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
@@ -68,76 +42,85 @@
             border-radius: 5px;
             margin-bottom: 20px;
         }
+
         .success {
             background-color: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
-        }
-        .alumno-row {
-            margin: 10px 0; /* Espacio entre filas de alumnos */
             padding: 10px;
-            border: 1px solid #ccc; /* Borde alrededor de cada fila */
-            border-radius: 5px; /* Bordes redondeados */
-            background-color: #fafafa; /* Color de fondo de la fila */
+            border-radius: 5px;
+            margin-bottom: 20px;
         }
-        .alumno-row strong {
-            display: block; /* Hacer que el nombre del alumno esté en una línea separada */
-            margin-bottom: 5px; /* Espacio debajo del nombre */
+
+        .buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
         }
-        select {
-            width: 100%; /* Ancho completo para el campo de notas */
-            padding: 5px; /* Espaciado interno */
-            border-radius: 5px; /* Bordes redondeados */
-            border: 1px solid #ccc; /* Borde */
-            background-color: #fff; /* Color de fondo del select */
+
+        .buttons button {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .btn-save {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-save:hover {
+            background-color: #218838;
+        }
+
+        .btn-back {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .btn-back:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <h2>Menú</h2>
-        <ul>
-            <li><a href="#">Inicio</a></li>
-            <li><a href="#">Registrar Asistencia</a></li>
-            <li><a href="#">Ver Calificaciones</a></li>
-            <li><a href="#">Generar Informes</a></li>
-            <li><a href="#">Cerrar Sesión</a></li>
-        </ul>
-    </div>
-
-    <div class="main-content">
+    <div class="container">
         <h1>Registrar Calificaciones - {{ curso.nombre }}</h1>
-        <div class="container">
-            {% if messages %}
-            {% for message in messages %}
-                <div class="success">{{ message }}</div>  <!-- Asegúrate de usar 'messages' -->
-            {% endfor %}
-        {% endif %}
-            <form method="POST">
-                {% csrf_token %}
-                {% for alumno, form in form_list.items %}
-                    <div class="alumno-row">
-                        <strong>{{ alumno.nombre }} {{ alumno.apellido }}</strong>
-                        <p><strong>Nota:</strong> {{ form.nota }}</p>
-                    </div>
-                {% endfor %}
-                <div class="buttons">
-                    <button type="submit">Guardar Calificaciones</button>
-                    <button type="button" class="btn-back" onclick="window.location.href='{% url 'profesor_libro' curso.id %}'">Regresar</button>
-                </div>
-            </form>
 
-            {% if errores %}
-                <div class="error">
-                    <p>Errores encontrados:</p>
-                    <ul>
-                        {% for alumno, error in errores.items %}
-                            <li>Errores para {{ alumno.nombre }}: {{ error }}</li>
-                        {% endfor %}
-                    </ul>
+        {% if messages %}
+        {% for message in messages %}
+            <div class="success">
+                <p>{{ message }}</p>
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+        <form method="POST">
+            {% csrf_token %}
+            {% for alumno, form in form_list.items %}
+                <div>
+                    <strong>{{ alumno.nombre }} {{ alumno.apellido }}</strong>
+                    <p><strong>Nota:</strong> {{ form.nota }}</p>
                 </div>
-            {% endif %}
-        </div>
+            {% endfor %}
+            <div class="buttons">
+                <button type="submit" class="btn-save">Guardar Calificaciones</button>
+                <button type="button" class="btn-back" onclick="window.location.href='{% url 'profesor_libro' curso.id %}'">Regresar</button>
+            </div>
+        </form>
+
+        {% if errores %}
+            <div class="error">
+                <p>Errores encontrados:</p>
+                <ul>
+                    {% for alumno, error in errores.items %}
+                        <li>Errores para {{ alumno.nombre }}: {{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
     </div>
 </body>
 </html>
