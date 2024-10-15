@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro Académico - {{ curso.nombre }}</title>
+    <title>Registrar Calificaciones - {{ curso.nombre }}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -11,7 +11,6 @@
             margin: 0;
             display: flex;
         }
-
         .sidebar {
             width: 250px;
             background-color: #222;
@@ -20,46 +19,11 @@
             height: 100vh;
             position: fixed;
         }
-
-        .sidebar h2 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .sidebar ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .sidebar ul li {
-            margin: 15px 0;
-        }
-
-        .sidebar ul li a {
-            color: white;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .sidebar ul li a:hover {
-            color: #ffc107;
-        }
-
         .main-content {
             margin-left: 250px;
             flex-grow: 1;
             padding: 20px;
         }
-
-        h1 {
-            text-align: center;
-            color: #fff;
-            background-color: #000;
-            padding: 10px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-        }
-
         .container {
             max-width: 800px;
             margin: 0 auto;
@@ -68,25 +32,17 @@
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
-
-        .dropdown {
-            margin-bottom: 20px;
+        h1 {
+            text-align: center; /* Centrar el título */
+            margin-bottom: 20px; /* Espaciado inferior */
+            font-size: 24px; /* Tamaño de fuente */
+            color: #333; /* Color del texto */
         }
-
-        select {
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-
         .buttons {
             margin-top: 20px;
             display: flex;
-            justify-content: space-between; /* Espacio entre botones */
+            justify-content: flex-end;
         }
-
         .buttons button {
             padding: 10px 20px;
             cursor: pointer;
@@ -95,17 +51,16 @@
             transition: background-color 0.3s;
             background-color: #28a745;
             color: white;
+            font-size: 16px; /* Tamaño de fuente */
+            margin-left: 10px; /* Espacio entre botones */
         }
-
-        .buttons .btn-back {
+        .btn-back {
             background-color: #007bff; /* Color para el botón de regresar */
         }
-
-        .buttons .btn-back:hover {
-            background-color: #0056b3; /* Color al pasar el mouse */
+        .btn-back:hover {
+            background-color: #0056b3;
         }
-
-        .error {
+        .error, .success {
             background-color: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
@@ -113,14 +68,28 @@
             border-radius: 5px;
             margin-bottom: 20px;
         }
-
         .success {
             background-color: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
+        }
+        .alumno-row {
+            margin: 10px 0; /* Espacio entre filas de alumnos */
             padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 20px;
+            border: 1px solid #ccc; /* Borde alrededor de cada fila */
+            border-radius: 5px; /* Bordes redondeados */
+            background-color: #fafafa; /* Color de fondo de la fila */
+        }
+        .alumno-row strong {
+            display: block; /* Hacer que el nombre del alumno esté en una línea separada */
+            margin-bottom: 5px; /* Espacio debajo del nombre */
+        }
+        select {
+            width: 100%; /* Ancho completo para el campo de notas */
+            padding: 5px; /* Espaciado interno */
+            border-radius: 5px; /* Bordes redondeados */
+            border: 1px solid #ccc; /* Borde */
+            background-color: #fff; /* Color de fondo del select */
         }
     </style>
 </head>
@@ -137,41 +106,27 @@
     </div>
 
     <div class="main-content">
-        <h1>Registro Académico - {{ curso.nombre }}</h1>
+        <h1>Registrar Calificaciones - {{ curso.nombre }}</h1>
         <div class="container">
             {% if messages %}
-                {% for message in messages %}
-                    <div class="success">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-
+            {% for message in messages %}
+                <div class="success">{{ message }}</div>  <!-- Asegúrate de usar 'messages' -->
+            {% endfor %}
+        {% endif %}
             <form method="POST">
                 {% csrf_token %}
-                <div class="dropdown">
-                    <label for="calificaciones">Calificaciones:</label>
-                    <select id="calificaciones">
-                        {% for calificacion in calificaciones %}
-                            <option value="{{ calificacion.id }}">{{ calificacion.fecha }} - {{ calificacion.nota }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="dropdown">
-                    <label for="asistencias">Asistencias:</label>
-                    <select id="asistencias">
-                        {% for asistencia in asistencias %}
-                            <option value="{{ asistencia.id }}">{{ asistencia.fecha }} - {{ asistencia.alumnos_presentes.count }} alumnos presentes</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
+                {% for alumno, form in form_list.items %}
+                    <div class="alumno-row">
+                        <strong>{{ alumno.nombre }} {{ alumno.apellido }}</strong>
+                        <p><strong>Nota:</strong> {{ form.nota }}</p>
+                    </div>
+                {% endfor %}
                 <div class="buttons">
-                    <button type="submit">Guardar Cambios</button>
-                    <button type="button" class="btn-back" onclick="window.location.href='{% url 'profesor_cursos' %}'">Regresar</button>
+                    <button type="submit">Guardar Calificaciones</button>
+                    <button type="button" class="btn-back" onclick="window.location.href='{% url 'profesor_libro' curso.id %}'">Regresar</button>
                 </div>
             </form>
 
-            <!-- Mostrar errores de validación -->
             {% if errores %}
                 <div class="error">
                     <p>Errores encontrados:</p>
