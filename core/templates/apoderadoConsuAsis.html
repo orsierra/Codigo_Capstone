@@ -5,39 +5,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Consulta de Asistencia - Apoderado</title>
     <style>
-        body {
+        /* Estilos para asegurar que html y body ocupen toda la altura y ancho de la pantalla */
+        html, body {
+            height: 100%;
+            margin: 0;
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
-            margin: 0;
             display: flex;
+            flex-direction: row; /* Alinear barra lateral y contenido en fila */
         }
         .sidebar {
-            width: 200px;
+            width: 250px; /* Ancho de la barra lateral */
             background-color: #333;
             color: white;
             padding: 20px;
+            height: 100%; /* Asegura que la barra lateral ocupe toda la altura */
+            box-sizing: border-box; /* Incluye padding en el cálculo del ancho */
+            transition: width 0.3s; /* Transición suave para el ancho */
         }
         .sidebar a {
             color: white;
             text-decoration: none;
             display: block;
             padding: 10px;
+            transition: background-color 0.3s; /* Transición suave para el fondo */
         }
         .sidebar a:hover {
             background-color: #575757;
         }
         .content {
-            flex: 1;
+            flex: 1; /* Hace que el contenido ocupe todo el espacio restante */
             padding: 20px;
             background-color: white;
+            height: 100%; /* Asegura que el contenido ocupe toda la altura */
+            overflow-y: auto; /* Permite desplazamiento vertical si el contenido es demasiado grande */
+            box-sizing: border-box; /* Incluye padding en el cálculo del ancho */
         }
         h1 {
             text-align: center;
-            font-size: 36px;
+            font-size: 2.5em; /* Tamaño de fuente más grande */
             margin-bottom: 20px;
         }
         table {
-            width: 100%;
+            width: 100%; /* Asegura que la tabla ocupe todo el ancho */
             border-collapse: collapse;
             margin-top: 20px;
         }
@@ -55,7 +65,41 @@
         .no-data {
             text-align: center;
             font-weight: bold;
-            color: #ff0000; /* Red color for no data message */
+            color: #ff0000; /* Color rojo para el mensaje de no datos */
+        }
+        
+        /* Estilos responsivos */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 60px; /* Cambia el ancho de la barra lateral en pantallas pequeñas */
+                overflow: hidden; /* Oculta el texto en la barra lateral */
+            }
+            .sidebar a {
+                text-align: center; /* Centra el texto en la barra lateral */
+                padding: 10px 0; /* Ajusta el padding */
+            }
+            .content {
+                padding: 10px; /* Reduce el padding del contenido en pantallas pequeñas */
+            }
+            h1 {
+                font-size: 2em; /* Reduce el tamaño de fuente del encabezado */
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.5em; /* Reduce aún más el tamaño de fuente en pantallas muy pequeñas */
+            }
+            .sidebar a {
+                padding: 5px; /* Ajusta el padding en pantallas muy pequeñas */
+            }
+        }
+
+        /* Elimina márgenes y paddings que puedan causar desplazamiento */
+        * {
+            box-sizing: border-box; /* Incluye padding y border en el tamaño total */
+            margin: 0; /* Elimina márgenes por defecto */
+            padding: 0; /* Elimina padding por defecto */
         }
     </style>
 </head>
