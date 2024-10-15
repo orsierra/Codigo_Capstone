@@ -148,10 +148,12 @@ def registro_academico(request, curso_id):
     curso = get_object_or_404(Curso, id=curso_id)
     alumnos = curso.alumnos.all()
     calificaciones = Calificacion.objects.filter(curso=curso)
+    asistencias = Asistencia.objects.filter(curso=curso)
 
     # Construir un diccionario para mapear alumnos a sus calificaciones
     calificaciones_por_alumno = {}
     promedios_por_alumno = {}
+    asistencias_por_alumno = {}
 
     for alumno in alumnos:
         calificaciones_alumno = calificaciones.filter(alumno=alumno)
@@ -161,10 +163,15 @@ def registro_academico(request, curso_id):
         promedio = calificaciones_alumno.aggregate(Avg('nota'))['nota__avg'] or 0
         promedios_por_alumno[alumno] = promedio
 
+        # Obtener asistencias para cada alumno
+        asistencias_alumno = asistencias.filter(alumnos_presentes=alumno) | asistencias.filter(alumnos_ausentes=alumno)
+        asistencias_por_alumno[alumno] = asistencias_alumno
+
     context = {
         'curso': curso,
         'calificaciones_por_alumno': calificaciones_por_alumno,
         'promedios_por_alumno': promedios_por_alumno,
+        'asistencias_por_alumno': asistencias_por_alumno,
     }
     return render(request, 'registroAcademico.html', context)
 # ===============================================================================================================================================================
