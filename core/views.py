@@ -367,7 +367,33 @@ def apoderadoConsuAsis(request):
 
 
 def apoderadoConsuNotas(request):
-    return render(request, 'apoderadoConsuNotas.html')
+    try:
+        apoderado = Apoderado.objects.get(user=request.user)
+    except Apoderado.DoesNotExist:
+        return render(request, 'error.html', {'mensaje': 'No se encontró apoderado para este usuario.'})
+
+    try:
+        alumno = Alumno.objects.get(apoderado=apoderado)
+    except Alumno.DoesNotExist:
+        return render(request, 'error.html', {'mensaje': 'No se encontró un alumno asociado con este apoderado.'})
+
+    calificaciones = Calificacion.objects.filter(alumno=alumno)
+    cursos = Curso.objects.filter(calificacion__alumno=alumno).distinct()
+
+    # Calcular el promedio de cada curso
+    for curso in cursos:
+        calificaciones_curso = calificaciones.filter(curso=curso)
+        total_notas = sum(c.nota for c in calificaciones_curso if c.nota is not None)
+        count_notas = calificaciones_curso.count()
+        curso.promedio = total_notas / count_notas if count_notas > 0 else 0
+
+    context = {
+        'calificaciones': calificaciones,
+        'cursos': cursos,
+        'alumno': alumno
+    }
+    return render(request, 'apoderadoConsuNotas.html', context)
+
 
 def apoderadoMatri(request):
     return render(request, 'apoderadoMatri.html')
