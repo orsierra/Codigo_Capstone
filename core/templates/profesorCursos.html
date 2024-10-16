@@ -9,6 +9,7 @@
             font-family: Arial, sans-serif;
             margin: 0;
             display: flex;
+            height: 100vh; /* Asegurarse de que ocupe toda la altura de la pantalla */
         }
         
         .sidebar {
@@ -16,10 +17,14 @@
             background-color: #222;
             color: white;
             padding: 20px;
+            display: flex;
+            flex-direction: column; /* Alinear los elementos verticalmente */
+            justify-content: space-between; /* Espacio entre los elementos */
         }
         
         .sidebar h2 {
             text-align: center;
+            margin-bottom: 20px; /* Espacio debajo del título */
         } 
         
         .sidebar ul {
@@ -34,12 +39,18 @@
         .sidebar ul li a {
             color: white;
             text-decoration: none;
+            transition: color 0.3s; /* Transición suave para el color */
+        }
+
+        .sidebar ul li a:hover {
+            color: #4CAF50; /* Color al pasar el mouse */
         }
         
         .main-content {
             flex-grow: 1;
             padding: 20px;
             background-color: #f4f4f4;
+            overflow-y: auto; /* Permitir el desplazamiento si es necesario */
         }
         
         .cursos-list {
@@ -60,20 +71,29 @@
             border: none;
             padding: 10px;
             cursor: pointer;
+            border-radius: 5px; /* Bordes redondeados para el botón */
+            transition: background-color 0.3s; /* Transición suave */
         }
 
         .curso button:hover {
-            background-color: #45a049;
+            background-color: #45a049; /* Color del botón al pasar el mouse */
         }
         
         footer {
-            position: fixed;
-            bottom: 10px;
-            left: 10px;
-            right: 10px;
             text-align: center;
+            margin-top: 20px; /* Espacio arriba del pie de página */
         }
         
+        .footer {
+            margin-top: auto; /* Empujar el pie de página hacia abajo */
+            text-align: center; /* Centrar el texto del pie de página */
+        }
+        
+        .footer a {
+            color: white; /* Color de los enlaces del pie de página */
+            text-decoration: none; /* Sin subrayado */
+            margin: 0 10px; /* Espacio entre los enlaces */
+        }
     </style>
 </head>
 <body>

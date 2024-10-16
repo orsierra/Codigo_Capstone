@@ -1,170 +1,144 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asistencia {{ curso.nombre }}</title>
+    <title>Asistencia - {{ curso.nombre }}</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}"> <!-- Si tienes un archivo CSS externo -->
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
             margin: 0;
-            display: flex; /* Flexbox para organizar la barra lateral y el contenido principal */
-        }
-
-        .sidebar {
-            width: 250px; /* Ancho de la barra lateral */
-            background-color: #222; /* Color de fondo de la barra lateral */
-            color: white; /* Color del texto */
-            padding: 20px; /* Espaciado interno */
-            height: 100vh; /* Altura completa de la ventana */
-        }
-
-        .sidebar h2 {
-            text-align: center; /* Centrar el título */
-        } 
-        
-        .sidebar ul {
-            list-style: none; /* Sin viñetas */
-            padding: 0; /* Sin espaciado interno */
-        }
-        
-        .sidebar ul li {
-            margin: 15px 0; /* Espaciado entre elementos de la lista */
-        }
-        
-        .sidebar ul li a {
-            color: white; /* Color del texto de los enlaces */
-            text-decoration: none; /* Sin subrayado */
-        }
-
-        .main-content {
-            flex-grow: 1; /* Toma el espacio restante */
-            padding: 20px; /* Espaciado interno */
+            padding: 20px;
         }
 
         h1 {
             text-align: center;
-            color: #fff;
-            background-color: #000;
-            padding: 10px;
-            margin-bottom: 20px; /* Margen inferior para separar del contenido */
+            color: #333;
+            margin-bottom: 20px;
         }
 
         .container {
-            max-width: 800px; /* Ancho máximo del contenedor de la tabla */
-            margin: 0 auto; /* Centrar el contenedor */
-            background-color: white; /* Color de fondo del contenedor */
-            padding: 20px; /* Espaciado interno */
-            border-radius: 10px; /* Bordes redondeados */
-            box-shadow: 0 0 10px rgba(0,0,0,0.1); /* Sombra */
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
 
         table {
-            width: 100%; /* Ancho completo de la tabla */
-            border-collapse: collapse; /* Colapsar bordes */
-        }
-
-        table, th, td {
-            border: 1px solid black; /* Bordes de la tabla */
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
         }
 
         th, td {
-            padding: 10px; /* Espaciado interno en celdas */
-            text-align: center; /* Centrar texto en celdas */
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
         }
 
         th {
-            background-color: #f4f4f4; /* Color de fondo de las cabeceras */
+            background-color: #007bff;
+            color: white;
         }
 
         tr:nth-child(even) {
-            background-color: #f9f9f9; /* Color de fondo para filas pares */
-        }
-
-        .attendance-option {
-            display: flex; /* Flexbox para opciones de asistencia */
-            justify-content: center; /* Centrar opciones */
-            gap: 10px; /* Espaciado entre opciones */
+            background-color: #f9f9f9;
         }
 
         .buttons {
-            margin-top: 20px; /* Margen superior para botones */
-            display: flex; /* Flexbox para botones */
-            justify-content: space-between; /* Espacio entre botones */
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
         }
 
-        .buttons button {
-            padding: 10px 20px; /* Espaciado interno en botones */
-            cursor: pointer; /* Cursor tipo puntero al pasar sobre el botón */
+        .btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
         }
 
-        .btn-modify {
-            background-color: #ffc107; /* Color de fondo para botón de modificar */
-            color: black; /* Color del texto del botón */
-            border: none; /* Sin borde */
-            border-radius: 5px; /* Bordes redondeados */
+        .btn:hover {
+            background-color: #218838;
         }
 
-        .btn-save {
-            background-color: #28a745; /* Color de fondo para botón de guardar */
-            color: white; /* Color del texto del botón */
-            border: none; /* Sin borde */
-            border-radius: 5px; /* Bordes redondeados */
+        .btn-back {
+            background-color: #007bff; /* Color para el botón de regresar */
+        }
+
+        .btn-back:hover {
+            background-color: #0056b3;
+        }
+
+        .message {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none; /* Ocultar por defecto */
         }
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <h2>Página de la Institución</h2>
-        <ul>
-            <li><a href="{% url 'profesor' %}">Profesor</a></li>
-            <li><a href="{% url 'profesor_cursos' %}">Mis cursos</a></li>
-            <li><a href="#">Asistencia</a></li>
-            <li><a href="#">Notas</a></li>
-            <li><a href="#">Salir</a></li>
-        </ul>
-    </div>
-
-    <div class="main-content">
-        <h1>Asistencia {{ curso.nombre }}</h1>
-
-        <div class="container">
-            <form method="post">
-                {% csrf_token %}
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Alumnos</th>
-                            <th>Ausente</th>
-                            <th>Presente</th>
-                            <th>Justificado</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for alumno in curso.alumnos.all %}
-                            <tr>
-                                <td>{{ alumno.nombre }} {{ alumno.apellido }}</td>
-                                <td>
-                                    <input type="radio" name="asistencia_{{ alumno.id }}" value="ausente">
-                                </td>
-                                <td>
-                                    <input type="radio" name="asistencia_{{ alumno.id }}" value="presente" checked>
-                                </td>
-                                <td>
-                                    <input type="radio" name="asistencia_{{ alumno.id }}" value="justificado">
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-
-                <div class="buttons">
-                    <button type="submit" name="action" value="modificar" class="btn-modify">Modificar</button>
-                    <button type="submit" name="action" value="guardar" class="btn-save">Guardar</button>
-                </div>
-            </form>
+    <div class="container">
+        <h1>Asistencia para {{ curso.nombre }}</h1>
+        
+        <div class="message" id="successMessage">
+            <p>Se han guardado los cambios exitosamente.</p>
         </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Alumnos</th>
+                        <th>Ausente</th>
+                        <th>Presente</th>
+                        <th>Justificado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for alumno in curso.alumnos.all %}
+                        <tr>
+                            <td>{{ alumno.nombre }} {{ alumno.apellido }}</td>
+                            <td>
+                                <input type="radio" name="asistencia_{{ alumno.id }}" value="ausente">
+                            </td>
+                            <td>
+                                <input type="radio" name="asistencia_{{ alumno.id }}" value="presente" checked>
+                            </td>
+                            <td>
+                                <input type="radio" name="asistencia_{{ alumno.id }}" value="justificado">
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="buttons">
+                <button type="submit" class="btn">Guardar</button>
+                <button type="button" class="btn btn-back" onclick="window.location.href='{% url 'profesor_libro' curso.id %}'">Regresar</button>
+            </div>
+        </form>
     </div>
+
+    <script>
+        // Mostrar el mensaje de éxito si está presente
+        {% if messages %}
+            document.getElementById('successMessage').style.display = 'block';
+        {% endif %}
+    </script>
 </body>
 </html>

@@ -3,12 +3,12 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Curso, Profesor,Asistencia, Calificacion, RegistroAcademico, Informe, Observacion, Alumno, Apoderado
+from .models import Curso, Profesor,Asistencia, Calificacion, Informe, Observacion, Alumno, Apoderado
 from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404
 from datetime import date
 from django.utils import timezone
-from .forms import CalificacionForm
+from .forms import CalificacionForm, ObservacionForm 
 from django.contrib import messages
 from django.db.models import Avg
 from django.http import HttpResponse
@@ -23,7 +23,7 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Table
 import json
 import logging
 from django.http import JsonResponse
-
+from django.db.models import Q  # Agrega esta línea
 
 def login_view(request):
     if request.method == "POST":
@@ -38,7 +38,7 @@ def login_view(request):
             elif hasattr(user, 'profesor'):  # Verifica si el usuario tiene un perfil de profesor
                 return redirect('profesor')  # Redirigir al profesor
             elif hasattr(user, 'apoderado'):  # Verifica si el usuario tiene un perfil de apoderado
-                return redirect('apoderado_home')  # Redirigir al apoderado
+                return redirect('apoderado_view')  # Redirigir al apoderado
             else:
                 return redirect('default')  # Redirigir a una página predeterminada
         else:
@@ -85,9 +85,8 @@ def libro_clases(request, curso_id):
     return render(request, 'profesorLibro.html', context)
 # ==========================================================================================================================================================
 
-# VISTAS DE PROFESOR MIS CURSOS
+# ================================================================= REGISTRAR ASISTENCIA ==================================================================
 
-#registrar asistencia
 @login_required
 def registrar_asistencia(request, curso_id):
     curso = get_object_or_404(Curso, id=curso_id)
@@ -113,13 +112,16 @@ def registrar_asistencia(request, curso_id):
                 asistencia.alumnos_justificados.add(alumno)
         
         asistencia.save()
-        return redirect('profesor_cursos')  # Redirigir a la lista de cursos
-    
+        messages.success(request, "Los cambios se han guardado exitosamente.")
+        return redirect('registrar_asistencia', curso_id=curso.id)  # Cambia aquí a la vista de registrar asistencia
 
     return render(request, 'registrarAsistencia.html', {'curso': curso, 'alumnos': alumnos})
 
+
+
 #=============================================================== REGISTRAR CALIFICACIONES ====================================================================
 
+@login_required
 def registrar_calificaciones(request, curso_id):
     curso = get_object_or_404(Curso, id=curso_id)
     errores = {}
@@ -152,8 +154,6 @@ def registrar_calificaciones(request, curso_id):
     })
 
 
-#=============================================================================================================================================================
-
 # =================================================== REGISTRO ACADEMICO =====================================================================================
 
 @login_required
@@ -161,10 +161,12 @@ def registro_academico(request, curso_id):
     curso = get_object_or_404(Curso, id=curso_id)
     alumnos = curso.alumnos.all()
     calificaciones = Calificacion.objects.filter(curso=curso)
+    asistencias = Asistencia.objects.filter(curso=curso)
 
     # Construir un diccionario para mapear alumnos a sus calificaciones
     calificaciones_por_alumno = {}
     promedios_por_alumno = {}
+    asistencias_por_alumno = {}
 
     for alumno in alumnos:
         calificaciones_alumno = calificaciones.filter(alumno=alumno)
@@ -174,10 +176,15 @@ def registro_academico(request, curso_id):
         promedio = calificaciones_alumno.aggregate(Avg('nota'))['nota__avg'] or 0
         promedios_por_alumno[alumno] = promedio
 
+        # Obtener asistencias para cada alumno
+        asistencias_alumno = asistencias.filter(alumnos_presentes=alumno) | asistencias.filter(alumnos_ausentes=alumno)
+        asistencias_por_alumno[alumno] = asistencias_alumno
+
     context = {
         'curso': curso,
         'calificaciones_por_alumno': calificaciones_por_alumno,
         'promedios_por_alumno': promedios_por_alumno,
+        'asistencias_por_alumno': asistencias_por_alumno,
     }
     return render(request, 'registroAcademico.html', context)
 # ===============================================================================================================================================================
@@ -249,13 +256,33 @@ def generar_pdf(request):
         return JsonResponse({'error': 'Solo se permiten solicitudes POST'}, status=405)
 
 
+# =============================================================== OBSERVACIONES =========================================================================
+
 @login_required
 def observaciones(request, curso_id):
-    curso = Curso.objects.get(id=curso_id)
+    curso = get_object_or_404(Curso, id=curso_id)
     observaciones = Observacion.objects.filter(curso=curso)
-    return render(request, 'observaciones.html', {'curso': curso, 'observaciones': observaciones})
 
-#====================================================================================================================================================
+    if request.method == 'POST':
+        form = ObservacionForm(request.POST)
+        if form.is_valid():
+            observacion = form.save(commit=False)
+            observacion.curso = curso  # Asociar la observación al curso
+            # Aquí no necesitas asignar el alumno, ya que el formulario tendrá el campo de selección
+            observacion.save()
+            return redirect('observaciones', curso_id=curso.id)  # Redirigir después de guardar
+    else:
+        # Al crear el formulario, solo incluir alumnos del curso actual
+        form = ObservacionForm()
+        form.fields['alumno'].queryset = curso.alumnos.all()  # Filtrar alumnos
+
+    return render(request, 'observaciones.html', {
+        'curso': curso,
+        'observaciones': observaciones,
+        'form': form,
+    })
+
+#========================================================================================================================================================
 #alumno consulta asitencia y notas
 # Vista para el panel del alumno
 def alumno_dashboard(request):
@@ -307,14 +334,37 @@ def apoderado_view(request):
     # Aquí podrías agregar lógica para obtener datos relevantes para el apoderado si es necesario
     return render(request, 'apoderado.html')
 
+@login_required
 def apoderadoConsuAsis(request):
-    # Filtra las asistencias según el apoderado
-    asistencias_data = Asistencia.objects.filter(alumno__apoderado=request.user.apoderado)  # Ajusta según tu modelo
+    apoderado = get_object_or_404(Apoderado, user=request.user)
+    alumnos = Alumno.objects.filter(apoderado=apoderado)  # Obtener los alumnos del apoderado
+    asistencias_data = []
 
-    return render(request, 'apoderado_consulta_asistencia.html', {
-        'asistencias_data': asistencias_data,
-        'nombre_apoderado': request.user.apoderado.nombre
-    })
+    # Recorremos los alumnos para obtener la información de asistencia
+    for alumno in alumnos:
+        cursos = Curso.objects.filter(alumnos=alumno)  # Obtener los cursos del alumno
+        
+        for curso in cursos:
+            total_clases = Asistencia.objects.filter(curso=curso).count()  # Total de clases (días)
+            asistencias_presente = Asistencia.objects.filter(curso=curso, alumnos_presentes=alumno).count()  # Total de asistencias
+            asistencias_justificado = Asistencia.objects.filter(curso=curso, alumnos_justificados=alumno).count()  # Total de justificados
+
+            # Se suma el presente con el justificado para obtener el total de asistencia válida
+            total_asistencia = asistencias_presente + asistencias_justificado
+            porcentaje_asistencia = (total_asistencia / total_clases * 100) if total_clases > 0 else 0
+
+            asistencias_data.append({
+                'nombre_alumno': alumno.nombre,  # Asegúrate de que el modelo Alumno tenga este campo
+                'curso': curso.nombre,
+                'asignatura': curso.asignatura,
+                'total_clases': total_clases,
+                'asistencia': total_asistencia,
+                'porcentaje_asistencia': round(porcentaje_asistencia, 2)
+            })
+
+    return render(request, 'apoderadoConsuAsis.html', {'asistencias_data': asistencias_data})
+
+
 
 def apoderadoConsuNotas(request):
     return render(request, 'apoderadoConsuNotas.html')
