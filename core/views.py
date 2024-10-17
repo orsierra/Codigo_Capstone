@@ -194,7 +194,7 @@ def generar_informes(request, curso_id):
     curso = get_object_or_404(Curso, id=curso_id)
     alumnos = Alumno.objects.filter(curso=curso)  # Obtener los alumnos del curso
     return render(request, 'Profe_generar_informes.html', {'curso': curso, 'alumnos': alumnos})
-
+# generar informe en pdf para el profesor por alumno
 def generar_pdf(request):
     if request.method == 'POST':
         try:
