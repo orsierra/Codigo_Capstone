@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Observaciones - {{ curso.nombre }}</title>
-    <link rel="stylesheet" href="{% static 'styles.css' %}"> <!-- Si tienes un archivo CSS externo -->
+    <link rel="stylesheet" href="{% static 'styles.css' %}"> 
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -109,21 +109,21 @@
         <form method="POST">
             {% csrf_token %}
             <label for="{{ form.alumno.id_for_label }}">Alumno:</label>
-            {{ form.alumno }}  <!-- Campo para seleccionar el alumno filtrado -->
+            {{ form.alumno }}  <!-- se filtra el alumno -->
             <script>
-                document.getElementById("{{ form.alumno.id_for_label }}").className += " form-control"; // Agregar clase
+                document.getElementById("{{ form.alumno.id_for_label }}").className += " form-control"; 
             </script>
 
             <label for="{{ form.fecha.id_for_label }}">Fecha:</label>
             {{ form.fecha }}   <!-- Campo para la fecha -->
             <script>
-                document.getElementById("{{ form.fecha.id_for_label }}").className += " form-control"; // Agregar clase
+                document.getElementById("{{ form.fecha.id_for_label }}").className += " form-control"; 
             </script>
 
             <label for="{{ form.contenido.id_for_label }}">Contenido de la Observación:</label>
-            {{ form.contenido }}  <!-- Campo para el contenido -->
+            {{ form.contenido }}  
             <script>
-                document.getElementById("{{ form.contenido.id_for_label }}").className += " form-control"; // Agregar clase
+                document.getElementById("{{ form.contenido.id_for_label }}").className += " form-control";
             </script>
         
             <button type="submit" class="btn">Agregar Observación</button>

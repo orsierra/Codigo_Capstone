@@ -349,12 +349,12 @@ def apoderadoConsuAsis(request):
             asistencias_presente = Asistencia.objects.filter(curso=curso, alumnos_presentes=alumno).count()  # Total de asistencias
             asistencias_justificado = Asistencia.objects.filter(curso=curso, alumnos_justificados=alumno).count()  # Total de justificados
 
-            # Se suma el presente con el justificado para obtener el total de asistencia válida
+            # la asistencia toma como presente el justificado
             total_asistencia = asistencias_presente + asistencias_justificado
             porcentaje_asistencia = (total_asistencia / total_clases * 100) if total_clases > 0 else 0
 
             asistencias_data.append({
-                'nombre_alumno': alumno.nombre,  # Asegúrate de que el modelo Alumno tenga este campo
+                'nombre_alumno': alumno.nombre,  
                 'curso': curso.nombre,
                 'asignatura': curso.asignatura,
                 'total_clases': total_clases,
@@ -380,7 +380,7 @@ def apoderadoConsuNotas(request):
     calificaciones = Calificacion.objects.filter(alumno=alumno)
     cursos = Curso.objects.filter(calificacion__alumno=alumno).distinct()
 
-    # Calcular el promedio de cada curso
+    # se calcula el promedio de notas de los alumnos
     for curso in cursos:
         calificaciones_curso = calificaciones.filter(curso=curso)
         total_notas = sum(c.nota for c in calificaciones_curso if c.nota is not None)

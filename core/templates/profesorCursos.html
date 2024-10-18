@@ -119,9 +119,9 @@
                         <strong>{{ curso.nombre }}</strong><br>
                         {{ curso.asignatura }}<br>
                         <span>{{ curso.dias }} - {{ curso.hora|time:"h:i A" }}</span><br>
-                        <strong>Sala: {{ curso.sala }}</strong><br> <!-- Aquí se agrega la sala -->
+                        <strong>Sala: {{ curso.sala }}</strong><br> <!-- se agrega la sala -->
 
-                        <!-- Botón para ver el libro de clases -->
+                        <!-- boton de libro de clases -->
                         <a href="{% url 'profesor_libro' curso.id %}">
                             <button>Ver Libro de Clases</button>
                         </a>
