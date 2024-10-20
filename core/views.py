@@ -12,7 +12,7 @@ from .forms import CalificacionForm, ObservacionForm
 from django.contrib import messages
 from django.db.models import Avg
 from django.http import HttpResponse
-import io
+import io 
 from io import BytesIO
 from collections import defaultdict
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
