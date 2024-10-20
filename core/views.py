@@ -28,7 +28,7 @@ from django.db.models import Q  # Agrega esta línea
 
 # ============================================================ MODULO LOGIN ==============================================================================
 
-@login_required
+
 def login_view(request):
     if request.method == "POST":
         username = request.POST['username']
