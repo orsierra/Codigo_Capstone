@@ -6,25 +6,29 @@
     <title>Cursos de {{ profesor.nombre }}</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             margin: 0;
             display: flex;
             height: 100vh; /* Asegurarse de que ocupe toda la altura de la pantalla */
+            background-color: #f0f0f0; /* Color de fondo general */
         }
         
         .sidebar {
             width: 250px;
-            background-color: #222;
+            background-color: #222; /* Color más oscuro para el sidebar */
             color: white;
             padding: 20px;
             display: flex;
             flex-direction: column; /* Alinear los elementos verticalmente */
             justify-content: space-between; /* Espacio entre los elementos */
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2); /* Sombra para el sidebar */
         }
         
         .sidebar h2 {
             text-align: center;
             margin-bottom: 20px; /* Espacio debajo del título */
+            font-size: 1.5em; /* Aumentar tamaño de fuente */
+            font-weight: bold; /* Peso de fuente más fuerte */
         } 
         
         .sidebar ul {
@@ -39,18 +43,28 @@
         .sidebar ul li a {
             color: white;
             text-decoration: none;
-            transition: color 0.3s; /* Transición suave para el color */
+            padding: 10px 15px; /* Añadir padding */
+            border-radius: 5px; /* Bordes redondeados */
+            transition: background-color 0.3s, color 0.3s; /* Transiciones suaves */
         }
 
         .sidebar ul li a:hover {
-            color: #4CAF50; /* Color al pasar el mouse */
+            background-color: #4CAF50; /* Color al pasar el mouse */
+            color: white; /* Mantener el color del texto */
         }
         
         .main-content {
             flex-grow: 1;
-            padding: 20px;
-            background-color: #f4f4f4;
+            padding: 30px; /* Aumentar el padding */
+            background-color: #ffffff; /* Fondo blanco para el contenido */
             overflow-y: auto; /* Permitir el desplazamiento si es necesario */
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1); /* Sombra para el contenido */
+        }
+        
+        h1 {
+            color: #333; /* Color del título */
+            font-size: 2em; /* Tamaño del título */
+            margin-bottom: 20px; /* Espacio debajo del título */
         }
         
         .cursos-list {
@@ -58,21 +72,31 @@
         }
         
         .curso {
-            background-color: #e0e0e0;
-            padding: 15px;
+            background-color: #e0e0e0; /* Color de fondo más claro para los cursos */
+            padding: 20px; /* Aumentar el padding */
             margin: 10px 0;
-            border-radius: 5px;
+            border-radius: 8px; /* Bordes redondeados más suaves */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Sombra para los cursos */
         }
         
+        .curso strong {
+            display: block; /* Mostrar como bloque */
+            margin-bottom: 5px; /* Espacio debajo del nombre del curso */
+            font-size: 1.2em; /* Tamaño más grande para el nombre del curso */
+            color: #2c3e50; /* Color del texto */
+        }
+
         .curso button {
             margin-top: 10px;
             background-color: #4CAF50;
             color: white;
             border: none;
-            padding: 10px;
+            padding: 12px 20px; /* Aumentar el padding del botón */
             cursor: pointer;
             border-radius: 5px; /* Bordes redondeados para el botón */
             transition: background-color 0.3s; /* Transición suave */
+            font-size: 16px; /* Tamaño de fuente del botón */
+            width: 100%; /* Botón ocupa el ancho completo */
         }
 
         .curso button:hover {
@@ -87,12 +111,18 @@
         .footer {
             margin-top: auto; /* Empujar el pie de página hacia abajo */
             text-align: center; /* Centrar el texto del pie de página */
+            font-size: 14px; /* Tamaño de fuente más pequeño */
         }
         
         .footer a {
             color: white; /* Color de los enlaces del pie de página */
             text-decoration: none; /* Sin subrayado */
             margin: 0 10px; /* Espacio entre los enlaces */
+            transition: color 0.3s; /* Transición suave para el color */
+        }
+
+        .footer a:hover {
+            text-decoration: underline; /* Subrayar al pasar el mouse */
         }
     </style>
 </head>
@@ -104,8 +134,7 @@
             <li><a href="{% url 'profesor_cursos' %}">Mis cursos</a></li>
         </ul>
         <div class="footer">
-            <a href="#">Privacidad</a>
-            <a href="#">Accesibilidad</a>
+            <a href="#">Nuevos horizontes</a>
         </div>
     </div>
 
@@ -117,11 +146,11 @@
                 {% for curso in cursos %}
                     <div class="curso">
                         <strong>{{ curso.nombre }}</strong><br>
-                        {{ curso.asignatura }}<br>
+                        <span>{{ curso.asignatura }}</span><br>
                         <span>{{ curso.dias }} - {{ curso.hora|time:"h:i A" }}</span><br>
                         <strong>Sala: {{ curso.sala }}</strong><br> <!-- se agrega la sala -->
 
-                        <!-- boton de libro de clases -->
+                        <!-- botón de libro de clases -->
                         <a href="{% url 'profesor_libro' curso.id %}">
                             <button>Ver Libro de Clases</button>
                         </a>

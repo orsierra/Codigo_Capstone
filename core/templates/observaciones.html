@@ -1,33 +1,99 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Observaciones - {{ curso.nombre }}</title>
-    <link rel="stylesheet" href="{% static 'styles.css' %}"> 
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
             margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh; /* Asegurarse de que ocupe toda la altura de la pantalla */
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: #222;
+            color: white;
             padding: 20px;
+            display: flex;
+            flex-direction: column; /* Alinear los elementos verticalmente */
+            justify-content: space-between; /* Espacio entre los elementos */
+        }
+        
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 20px; /* Espacio debajo del título */
+        } 
+        
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .sidebar ul li {
+            margin: 15px 0;
+        }
+        
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s; /* Transición suave para el color */
+        }
+
+        .sidebar ul li a:hover {
+            color: #4CAF50; /* Color al pasar el mouse */
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            background-color: #f4f4f4;
+            overflow-y: auto; /* Permitir el desplazamiento si es necesario */
+            width: 100%; /* Asegura que el contenido ocupe el ancho completo */
         }
 
         h1 {
+            font-size: 36px;
             text-align: center;
-            color: #333;
-            margin-bottom: 20px;
+            color: black;
+            margin-bottom: 20px; /* Margen inferior para separar del contenido */
         }
 
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px; /* Espacio superior para los botones */
+        }
+
+        .button-container button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            margin: 10px 0;
+            border-radius: 25px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s; /* Transición suave */
+        }
+
+        .button-container button:hover {
+            background-color: #45a049; /* Color al pasar el mouse */
+        }
+
+        .form-control {
+            width: 100%; /* Ancho completo del formulario */
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box; /* Incluye padding en el ancho total */
         }
 
         .error {
@@ -37,39 +103,6 @@
             padding: 10px;
             border-radius: 5px;
             margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-top: 10px;
-            font-weight: bold;
-            color: #555;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box; /* Asegura que el padding se incluya en el ancho total */
-        }
-
-        .btn {
-            background-color: #28a745;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            margin-top: 20px;
-            display: block;
-            width: 100%;
-        }
-
-        .btn:hover {
-            background-color: #218838;
         }
 
         .observaciones-list {
@@ -85,12 +118,43 @@
             margin: 5px 0;
             padding: 10px;
             border-radius: 5px;
-            border-left: 5px solid #007bff; /* Color a la izquierda para resaltar */
+            border-left: 5px solid #007bff;
+            display: flex;
+            justify-content: space-between; 
+            align-items: center; 
+        }
+
+        .footer {
+            margin-top: auto; /* Empujar el pie de página hacia abajo */
+            text-align: center; /* Centrar el texto del pie de página */
+        }
+        
+        .footer a {
+            color: #222; /* Color de los enlaces del pie de página */
+            text-decoration: none; /* Sin subrayado */
+            margin: 0 10px; /* Espacio entre los enlaces */
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="sidebar">
+        <h2>Menú</h2>
+        <ul>
+            <li><a href="{% url 'profesor' %}">Profesor</a></li>
+            <li><a href="{% url 'profesor_cursos' %}">Mis cursos</a></li>
+            <li><a href="{% url 'registrar_asistencia' curso.id %}">Registrar asistencia</a></li>
+            <li><a href="{% url 'registrar_calificaciones' curso.id %}">Registrar calificaciones</a></li>
+            <li><a href="{% url 'registro_academico' curso.id %}">Registro Académico</a></li>
+            
+            <li><a href="{% url 'observaciones' curso.id %}">Observaciones</a></li>
+        </ul>
+        <div class="footer">
+            <a href="#">Privacidad</a>
+            <a href="#">Accesibilidad</a>
+        </div>
+    </div>
+
+    <div class="main-content">
         <h1>Observaciones para {{ curso.nombre }}</h1>
 
         {% if form.errors %}
@@ -108,37 +172,42 @@
 
         <form method="POST">
             {% csrf_token %}
-            <label for="{{ form.alumno.id_for_label }}">Alumno:</label>
-            {{ form.alumno }}  <!-- se filtra el alumno -->
-            <script>
-                document.getElementById("{{ form.alumno.id_for_label }}").className += " form-control"; 
-            </script>
-
-            <label for="{{ form.fecha.id_for_label }}">Fecha:</label>
-            {{ form.fecha }}   <!-- Campo para la fecha -->
-            <script>
-                document.getElementById("{{ form.fecha.id_for_label }}").className += " form-control"; 
-            </script>
-
-            <label for="{{ form.contenido.id_for_label }}">Contenido de la Observación:</label>
-            {{ form.contenido }}  
-            <script>
-                document.getElementById("{{ form.contenido.id_for_label }}").className += " form-control";
-            </script>
-        
-            <button type="submit" class="btn">Agregar Observación</button>
+            <div class="form-group">
+                <label for="{{ form.alumno.id_for_label }}">Alumno:</label>
+                {{ form.alumno }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.fecha.id_for_label }}">Fecha:</label>
+                {{ form.fecha }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.contenido.id_for_label }}">Contenido de la Observación:</label>
+                {{ form.contenido }}
+            </div>
+            <button type="submit" class="btn btn-success">Agregar Observación</button>
         </form>
 
         <h2>Observaciones Existentes:</h2>
         <ul class="observaciones-list">
             {% for observacion in observaciones %}
-                <li>{{ observacion.fecha }}: {{ observacion.contenido }}</li>
+                <li>
+                    <span>{{ observacion.fecha }}: {{ observacion.contenido }}</span>
+                    <form method="POST" action="" style="display:inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="observacion_id" value="{{ observacion.id }}">
+                        <button type="submit" class="btn btn-danger" name="eliminar">Eliminar</button>
+                    </form>
+                </li>
             {% empty %}
                 <li>No hay observaciones registradas.</li>
             {% endfor %}
         </ul>
 
-        <button class="btn" onclick="window.location.href='{% url 'profesor_libro' curso.id%}'">Regresar</button>
+        <div class="footer">
+            <a href="#">Nuevos Horizontes</a>
+        </div>
+        
+        <button class="btn btn-secondary" onclick="window.location.href='{% url 'profesor_libro' curso.id%}'">Regresar</button>
     </div>
 </body>
 </html>

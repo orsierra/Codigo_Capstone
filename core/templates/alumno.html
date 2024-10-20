@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -13,7 +14,9 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #f0f0f0;
+            background-image: url("{% static 'img/fondo.jpg' %}"); /* Imagen de fondo */
+            background-size: cover; /* Cubrir toda la pantalla */
+            background-position: center; /* Centrar la imagen */
         }
         .dashboard-container {
             display: flex;
@@ -21,9 +24,11 @@
             align-items: center;
             text-align: center;
             background-color: white;
-            padding: 50px;
+            padding: 80px; /* Aumentar el padding para hacer el cuadro más grande */
             border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Sombra más prominente */
+            max-width: 600px; /* Establecer un ancho máximo */
+            width: 100%; /* Hacer que ocupe el 100% del contenedor */
         }
         h1 {
             font-size: 36px;
@@ -37,7 +42,7 @@
             color: white;
             text-decoration: none;
             border-radius: 5px;
-            margin: 10px 0;
+            margin-top: 20px; /* Añadir un margen superior al botón */
         }
         .btn:hover {
             background-color: #333;
@@ -51,9 +56,9 @@
 <body>
     <div class="dashboard-container">
         <h1>Alumno</h1>
-        <!-- Boton Consulta de asistencia -->
+        <!-- Botón Consulta de asistencia -->
         <a href="{% url 'alumnoConsuAsis' %}" class="btn">Consulta de asistencia</a>
-        <!-- Boton Consulta de notas -->
+        <!-- Botón Consulta de notas -->
         <a href="{% url 'alumnoConsuNotas' %}" class="btn">Consulta de notas</a>
         <footer>
             <p>Colegio Nuevos Horizontes</p>

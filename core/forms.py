@@ -33,6 +33,7 @@ class CalificacionForm(forms.ModelForm):
         return nota
 
 
+
 class ObservacionForm(forms.ModelForm):
     alumno = forms.ModelChoiceField(queryset=Alumno.objects.none(), label='Alumno')  # Inicialmente vacío
 
@@ -50,5 +51,6 @@ class ObservacionForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(ObservacionForm, self).__init__(*args, **kwargs)
-        self.fields['contenido'].widget.attrs.update({'class': 'form-control'})
+        self.fields['alumno'].widget.attrs.update({'class': 'form-control'})
         self.fields['fecha'].widget.attrs.update({'class': 'form-control'})
+        self.fields['contenido'].widget.attrs.update({'class': 'form-control'})

@@ -1,5 +1,6 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head> 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,22 +8,29 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-image: url('/static/images/background.jpg'); /* Imagen de fondo */
-            background-size: cover;
+            background-image: linear-gradient(to bottom right, rgba(0, 102, 204, 0.8), rgba(0, 204, 255, 0.8)), 
+                              url('{% static "img/horizontes.jpg" %}'); /* Imagen de fondo */
+            background-size: cover; /* Cubrir toda la pantalla */
+            background-repeat: no-repeat; /* Evitar repetir la imagen */
+            background-position: center; /* Centrar la imagen */
             margin: 0;
             padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
         .login-container {
             width: 100%;
             max-width: 400px;
             padding: 40px;
-            background-color: #00cfff;
-            margin: 100px auto;
+            background-color: rgba(255, 255, 255, 0.9); /* Color de fondo más claro para el contenedor */
             border-radius: 10px;
             text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
         .login-container h2 {
-            color: white;
+            color: #003366; /* Color de texto más oscuro para un mejor contraste */
             font-weight: bold;
             margin-bottom: 20px;
         }
@@ -31,7 +39,7 @@
             padding: 10px;
             margin: 10px 0;
             border-radius: 5px;
-            border: none;
+            border: 1px solid #ccc; /* Borde más definido */
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
         .login-container button {
@@ -41,29 +49,35 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            transition: background-color 0.3s ease; /* Transición suave para el hover */
         }
         .login-container button:hover {
             background-color: #0056b3;
+        }
+        .error-message {
+            color: red;
+            margin-top: 10px;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
     <div class="login-container">
-        <h2>LOGIN WITH YOUR ACCOUNT</h2>
+        <h2>INICIA SESIÓN EN TU CUENTA</h2>
         <form method="POST">
             {% csrf_token %}
-            <label for="username">User:</label>
+            <label for="username">Usuario:</label>
             <input type="text" id="username" name="username" required><br>
 
-            <label for="password">Password:</label>
+            <label for="password">Contraseña:</label>
             <input type="password" id="password" name="password" required><br>
 
-            <button type="submit">LOGIN</button>
+            <button type="submit">INICIAR SESIÓN</button>
         </form>
         {% if messages %}
-            <div>
+            <div class="error-message">
                 {% for message in messages %}
-                    <p style="color: red;">{{ message }}</p>
+                    <p>{{ message }}</p>
                 {% endfor %}
             </div>
         {% endif %}

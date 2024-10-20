@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apoderado - Colegio Nuevos Horizontes</title>
+    <title>Director - Colegio Nuevos Horizontes</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -14,7 +14,7 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-image: url("{% static 'img/fondo.jpg' %}");
+            background-image: url("{% static 'img/fondo.jpg' %}"); /* Imagen de fondo */
             background-size: cover; /* Cubrir toda la pantalla */
             background-position: center; /* Centrar la imagen */
         }
@@ -55,13 +55,9 @@
 </head>
 <body>
     <div class="dashboard-container">
-        <h1>Apoderado</h1>
-        <!-- Botón consulta asistencia -->
-        <a href="{% url 'apoderadoConsuAsis' %}" class="btn">Consulta de Asistencia</a>
-        <!-- Botón Consulta de notas -->
-        <a href="{% url 'apoderadoConsuNotas' %}" class="btn">Consulta de Notas</a>
-        <!-- Botón matricula -->
-        <a href="{% url 'apoderadoMatri' %}" class="btn">Matricular</a>
+        <h1>Director</h1>
+        <!-- Botones de navegación para el director -->
+        <!-- <a href="{% url 'consulta_informes' %}" class="btn">Consulta de Informes</a> -->
         <footer>
             <p>Colegio Nuevos Horizontes</p>
             <div>
