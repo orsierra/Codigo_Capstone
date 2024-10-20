@@ -25,6 +25,10 @@ import logging
 from django.http import JsonResponse
 from django.db.models import Q  # Agrega esta línea
 
+
+# ============================================================ MODULO LOGIN ==============================================================================
+
+@login_required
 def login_view(request):
     if request.method == "POST":
         username = request.POST['username']
@@ -45,13 +49,13 @@ def login_view(request):
             messages.error(request, 'Invalid username or password')
     return render(request, 'login.html')
 
-# views.py
-
+# =================================================================== DASHBOARD DE PROFESOR ==============================================================
 
 @login_required
 def profesor_dashboard(request):
     return render(request, 'profesor.html')  # Renderiza el dashboard del profesor
-# views.py
+
+# =================================================================== profesor cursos =====================================================================
 @login_required
 def profesor_cursos(request):
     profesor = Profesor.objects.get(user=request.user)  # Obtener el profesor basado en el usuario logueado
@@ -62,16 +66,19 @@ def profesor_cursos(request):
     }
     return render(request, 'profesorCursos.html', context)
 
+# ================================================================== USER DB ===============================================================================
 def crear_usuario_db(request):
     # Crear un usuario si no existe
     user = User.objects.create_user(username='Orly', password='contraseña', email='orlandone@gmail.com')
 
-# Crear un profesor
-    profesor = Profesor.objects.create(user=user, nombre='Orly', apellido='Tapia', email='orlandone@gmail.com')
+# ======================================================== Crear un profesor ===============================================================================
+
+    profesor = Profesor.objects.create(user=user, nombre='Orly', apellido='APELLIDO', email='orlandone@gmail.com')
     return redirect(login)
 
 # ======================================================= VIEWS PROFESOR LIBRO =============================================================================
 
+@login_required
 def libro_clases(request, curso_id):
     # Obtener el curso específico con el ID proporcionado
     curso = get_object_or_404(Curso, id=curso_id)
@@ -80,12 +87,10 @@ def libro_clases(request, curso_id):
     context = {
         'curso': curso,
     }
-
     # Renderizar la plantilla 'profesorLibro.html'
     return render(request, 'profesorLibro.html', context)
-# ==========================================================================================================================================================
 
-# ================================================================= REGISTRAR ASISTENCIA ==================================================================
+# ================================================================= REGISTRAR ASISTENCIA ===================================================================
 
 @login_required
 def registrar_asistencia(request, curso_id):
@@ -114,10 +119,7 @@ def registrar_asistencia(request, curso_id):
         asistencia.save()
         messages.success(request, "Los cambios se han guardado exitosamente.")
         return redirect('registrar_asistencia', curso_id=curso.id)  # Cambia aquí a la vista de registrar asistencia
-
     return render(request, 'registrarAsistencia.html', {'curso': curso, 'alumnos': alumnos})
-
-
 
 #=============================================================== REGISTRAR CALIFICACIONES ====================================================================
 
@@ -160,9 +162,6 @@ def registrar_calificaciones(request, curso_id):
         'promedios': promedios
     })
 
-
-
-
 # =================================================== REGISTRO ACADEMICO =====================================================================================
 
 @login_required
@@ -203,7 +202,10 @@ def generar_informes(request, curso_id):
     curso = get_object_or_404(Curso, id=curso_id)
     alumnos = Alumno.objects.filter(curso=curso)  # Obtener los alumnos del curso
     return render(request, 'Profe_generar_informes.html', {'curso': curso, 'alumnos': alumnos})
-# generar informe en pdf para el profesor por alumno
+
+# ============================================ generar informe en pdf para el profesor por alumno ================================================================
+
+@login_required
 def generar_pdf(request):
     if request.method == 'POST':
         try:
@@ -272,7 +274,6 @@ def observaciones(request, curso_id):
     observaciones = Observacion.objects.filter(curso=curso)
 
     if request.method == 'POST':
-        # Comprobar si se está eliminando una observación
         if 'eliminar' in request.POST:
             observacion_id = request.POST.get('observacion_id')
             observacion = get_object_or_404(Observacion, id=observacion_id)
@@ -281,7 +282,7 @@ def observaciones(request, curso_id):
 
         # Lógica para agregar una nueva observación
         form = ObservacionForm(request.POST)
-        form.fields['alumno'].queryset = curso.alumnos.all()  # Asegurarse de que el queryset esté disponible aquí
+        form.fields['alumno'].queryset = curso.alumnos.all()  
         if form.is_valid():
             observacion = form.save(commit=False)
             observacion.curso = curso  # Asociar la observación al curso
@@ -297,14 +298,12 @@ def observaciones(request, curso_id):
         'form': form,
     })
 
+# ============================================================= DASHBOARD ALUMNOS =======================================================================
 
-#========================================================================================================================================================
-#alumno consulta asitencia y notas
-# Vista para el panel del alumno
 def alumno_dashboard(request):
     return render(request, 'alumno.html')
 
-# Vista para la consulta de asistencia
+# ===================================================== Vista para la consulta de asistencia ============================================================
 @login_required
 def alumno_consulta_asistencia(request):
     alumno = get_object_or_404(Alumno, user=request.user)
@@ -331,10 +330,12 @@ def alumno_consulta_asistencia(request):
 
     return render(request, 'alumnoConsuAsis.html', {'asistencias_data': asistencias_data})
 
-# Vista para la consulta de notas
+# =========================================================== Vista para la consulta de notas ==========================================================================
+
 def alumno_consulta_notas(request):
     return render(request, 'alumnoConsuNotas.html')
-#alumno home
+
+# ===================================================================== alumno home ====================================================================================
 @login_required
 def alumno_home(request):
     # Aquí puedes obtener más información del alumno si es necesario
@@ -345,9 +346,8 @@ def alumno_home(request):
     }
     return render(request, 'alumno.html', context)
 
-# views.py APODERADO
+# ===================================================================== APODERADO =====================================================================================
 def apoderado_view(request):
-    # Aquí podrías agregar lógica para obtener datos relevantes para el apoderado si es necesario
     return render(request, 'apoderado.html')
 
 @login_required
@@ -355,7 +355,6 @@ def apoderadoConsuAsis(request):
     apoderado = get_object_or_404(Apoderado, user=request.user)
     alumnos = Alumno.objects.filter(apoderado=apoderado)  # Obtener los alumnos del apoderado
     asistencias_data = []
-
     # Recorremos los alumnos para obtener la información de asistencia
     for alumno in alumnos:
         cursos = Curso.objects.filter(alumnos=alumno)  # Obtener los cursos del alumno
@@ -380,8 +379,9 @@ def apoderadoConsuAsis(request):
 
     return render(request, 'apoderadoConsuAsis.html', {'asistencias_data': asistencias_data})
 
+# =====================================================================================================================================================================
 
-
+@login_required
 def apoderadoConsuNotas(request):
     try:
         apoderado = Apoderado.objects.get(user=request.user)
