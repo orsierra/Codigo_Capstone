@@ -126,32 +126,41 @@ def registrar_calificaciones(request, curso_id):
     curso = get_object_or_404(Curso, id=curso_id)
     errores = {}
     form_list = {}
+    promedios = {}
 
     if request.method == 'POST':
         for alumno in Alumno.objects.filter(curso=curso):
             form = CalificacionForm(request.POST, prefix=str(alumno.id))
             if form.is_valid():
-                # Guarda la calificación usando el alumno y curso correcto
-                calificacion = form.save(commit=False)  # No guarda aún en la base de datos
-                calificacion.alumno = alumno  # Asocia el alumno
-                calificacion.curso = curso  # Asocia el curso
-                calificacion.save()  # Guarda en la base de datos
+                calificacion = form.save(commit=False)
+                calificacion.alumno = alumno
+                calificacion.curso = curso
+                calificacion.save()
             else:
-                errores[alumno] = form.errors  # Guarda los errores
+                errores[alumno] = form.errors
 
         if not errores:
             messages.success(request, "Se han guardado los cambios exitosamente.")
-            return redirect('registrar_calificaciones', curso_id=curso_id)  # Cambia aquí
+            return redirect('registrar_calificaciones', curso_id=curso_id)
 
     else:
-        # Crea formularios para cada alumno
-        form_list = {alumno: CalificacionForm(prefix=str(alumno.id)) for alumno in Alumno.objects.filter(curso=curso)}
+        alumnos = Alumno.objects.filter(curso=curso)
+        form_list = {alumno: CalificacionForm(prefix=str(alumno.id)) for alumno in alumnos}
+
+        for alumno in alumnos:
+            calificaciones = Calificacion.objects.filter(alumno=alumno, curso=curso)
+            if calificaciones.exists():
+                promedio = sum(float(c.nota) for c in calificaciones) / calificaciones.count()
+                promedios[alumno.id] = round(promedio, 2)  # Asegúrate de redondear aquí
 
     return render(request, 'registrarCalificaciones.html', {
         'curso': curso,
         'form_list': form_list,
-        'errores': errores
+        'errores': errores,
+        'promedios': promedios
     })
+
+
 
 
 # =================================================== REGISTRO ACADEMICO =====================================================================================
@@ -405,3 +414,9 @@ def apoderadoConsuNotas(request):
 def apoderadoMatri(request):
     return render(request, 'apoderadoMatri.html')
 
+
+# ==================================================================== DIRECTOR =========================================================================================
+def director_dashboard(request):
+    return render(request, 'director.html') 
+
+# =======================================================================================================================================================================
