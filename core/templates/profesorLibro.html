@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -7,26 +8,32 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
             display: flex;
-            height: 100vh; /* Asegurarse de que ocupe toda la altura de la pantalla */
+            height: 100vh; 
+            background-image: url("{% static 'img/Login.jpg' %}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
         }
         
         .sidebar {
             width: 250px;
-            background-color: #222;
+            background-color: rgba(52, 58, 64, 0.9); /* Fondo semi-transparente */
             color: white;
             padding: 20px;
             display: flex;
-            flex-direction: column; /* Alinear los elementos verticalmente */
-            justify-content: space-between; /* Espacio entre los elementos */
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
         }
         
         .sidebar h2 {
             text-align: center;
-            margin-bottom: 20px; /* Espacio debajo del título */
+            margin-bottom: 30px;
+            font-weight: bold;
         } 
         
         .sidebar ul {
@@ -41,81 +48,100 @@
         .sidebar ul li a {
             color: white;
             text-decoration: none;
-            transition: color 0.3s; /* Transición suave para el color */
+            font-weight: 500;
+            transition: color 0.3s;
         }
 
         .sidebar ul li a:hover {
-            color: #4CAF50; /* Color al pasar el mouse */
+            color: #17a2b8; 
         }
 
         .main-content {
             flex-grow: 1;
-            padding: 20px;
-            background-color: #f4f4f4;
-            overflow-y: auto; /* Permitir el desplazamiento si es necesario */
+            padding: 40px;
+            background-color: rgba(255, 255, 255, 0.8); /* Fondo semi-transparente */
+            overflow-y: auto;
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            margin: 20px;
         }
         
         h1 {
-            font-size: 36px;
+            font-size: 28px;
             text-align: center;
-            color: black;
-            margin-bottom: 20px; /* Margen inferior para separar del contenido */
+            color: #343a40;
+            margin-bottom: 40px;
+            font-weight: bold;
         }
 
         .button-container {
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: 20px; /* Espacio superior para los botones */
+            margin-top: 30px;
+        }
+
+        .button-container a {
+            width: 100%;
+            max-width: 300px;
+            margin: 10px 0;
         }
 
         .button-container button {
-            background-color: #4CAF50;
+            background-color: #007bff;
             color: white;
             border: none;
-            padding: 15px 30px;
-            margin: 10px 0;
-            border-radius: 25px;
-            font-size: 18px;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 16px;
             cursor: pointer;
-            transition: background-color 0.3s; /* Transición suave */
+            transition: background-color 0.3s, transform 0.2s;
+            width: 100%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         .button-container button:hover {
-            background-color: #45a049; /* Color al pasar el mouse */
+            background-color: #0056b3;
+            transform: scale(1.02);
         }
 
         .footer {
-            margin-top: auto; /* Empujar el pie de página hacia abajo */
-            text-align: center; /* Centrar el texto del pie de página */
+            margin-top: auto;
+            text-align: center;
+            font-size: 14px;
         }
         
         .footer a {
-            color: white; /* Color de los enlaces del pie de página */
-            text-decoration: none; /* Sin subrayado */
-            margin: 0 10px; /* Espacio entre los enlaces */
+            color: #17a2b8;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .footer a:hover {
+            color: #ffffff;
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
     <div class="sidebar">
-        <h2>Libro de clase</h2>
+        <h2>Libro de Clase</h2>
         <ul>
             <li><a href="{% url 'profesor' %}">Profesor</a></li>
-            <li><a href="{% url 'profesor_cursos' %}">Mis cursos</a></li>
+            <li><a href="{% url 'profesor_cursos' %}">Mis Cursos</a></li>
         </ul>
         <div class="footer">
-            <a href="#">Nuevos Horziontes</a>
+            <a href="#">Nuevos Horizontes</a>
         </div>
     </div>
 
     <div class="main-content">
-        <h1>{{ curso.asignatura }} {{ curso.nombre }}</h1>
+        <h1>{{ curso.asignatura }} - {{ curso.nombre }}</h1>
 
         <div class="button-container">
-            <a href="{% url 'registrar_asistencia' curso.id %}"><button>Registrar asistencia</button></a>
-            <a href="{% url 'registrar_calificaciones' curso.id %}"><button>Registrar calificaciones</button></a>
-            <a href="{% url 'registro_academico' curso.id %}"><button>Registro Academico</button></a>
+            <a href="{% url 'registrar_asistencia' curso.id %}"><button>Registrar Asistencia</button></a>
+            <a href="{% url 'registrar_calificaciones' curso.id %}"><button>Registrar Calificaciones</button></a>
+            <a href="{% url 'registro_academico' curso.id %}"><button>Registro Académico</button></a>
             <a href="{% url 'generar_informes' curso.id %}"><button>Generar Informe</button></a>
             <a href="{% url 'observaciones' curso_id=curso.id %}"><button>Observaciones</button></a>
         </div>

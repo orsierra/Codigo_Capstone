@@ -9,9 +9,48 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
             margin: 0;
+            display: flex; /* Usar flexbox para la barra lateral */
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #222; /* Color de la barra lateral */
+            color: white;
             padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+            height: 100vh; /* Asegurar que ocupe toda la altura de la pantalla */
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin: 15px 0;
+        }
+
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .sidebar ul li a:hover {
+            color: #4CAF50; /* Color al pasar el mouse */
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            background-color: #f4f4f4;
+            overflow-y: auto;
         }
 
         h1 {
@@ -105,79 +144,93 @@
     </script>
 </head>
 <body>
-    <h1>Registro Académico para {{ curso.nombre }}</h1>
-
-    <div class="accordion">
-        {% for alumno, calificaciones in calificaciones_por_alumno.items %}
-        <div class="panel">
-            <div class="panel-heading" onclick="togglePanel('calificaciones-{{ alumno.id }}')">
-                <span>{{ alumno.nombre }} {{ alumno.apellido }} - Calificaciones</span>
-                <span>&#x25BC;</span>
-            </div>
-            <div id="calificaciones-{{ alumno.id }}" class="panel-content">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>Nota</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for calificacion in calificaciones %}
-                        <tr>
-                            <td>{{ calificacion.fecha }}</td>
-                            <td>{{ calificacion.nota }}</td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="2">No hay calificaciones registradas.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                <p><strong>Promedio:</strong> {{ promedios_por_alumno|get_item:alumno }}</p>
-            </div>
-        </div>
-
-        <div class="panel">
-            <div class="panel-heading" onclick="togglePanel('asistencias-{{ alumno.id }}')">
-                <span>{{ alumno.nombre }} {{ alumno.apellido }} - Asistencia</span>
-                <span>&#x25BC;</span>
-            </div>
-            <div id="asistencias-{{ alumno.id }}" class="panel-content">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>Estado</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for asistencia in asistencias_por_alumno|get_item:alumno %}
-                        <tr>
-                            <td>{{ asistencia.fecha }}</td>
-                            <td>
-                                {% if alumno in asistencia.alumnos_presentes.all %}
-                                    Presente
-                                {% else %}
-                                    Ausente
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="2">No hay asistencia registrada.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        {% endfor %}
+    <div class="sidebar">
+        <h2>Menú</h2>
+        <ul>
+            <li><a href="{% url 'profesor' %}">Profesor</a></li>
+            <li><a href="{% url 'profesor_cursos' %}">Mis cursos</a></li>
+            <li><a href="{% url 'registrar_asistencia' curso.id %}">Registrar asistencia</a></li>
+            <li><a href="{% url 'registrar_calificaciones' curso.id %}">Registrar calificaciones</a></li>
+            <li><a href="{% url 'registro_academico' curso.id %}">Registro Académico</a></li>
+            <li><a href="{% url 'observaciones' curso.id %}">Observaciones</a></li>
+        </ul>
     </div>
 
-    <div class="buttons">
-        <button class="btn" onclick="window.location.href='{% url 'profesor_libro' curso.id %}'">Regresar</button>
+    <div class="main-content">
+        <h1>Registro Académico para {{ curso.nombre }}</h1>
+
+        <div class="accordion">
+            {% for alumno, calificaciones in calificaciones_por_alumno.items %}
+            <div class="panel">
+                <div class="panel-heading" onclick="togglePanel('calificaciones-{{ alumno.id }}')">
+                    <span>{{ alumno.nombre }} {{ alumno.apellido }} - Calificaciones</span>
+                    <span>&#x25BC;</span>
+                </div>
+                <div id="calificaciones-{{ alumno.id }}" class="panel-content">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Nota</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for calificacion in calificaciones %}
+                            <tr>
+                                <td>{{ calificacion.fecha }}</td>
+                                <td>{{ calificacion.nota }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="2">No hay calificaciones registradas.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <p><strong>Promedio:</strong> {{ promedios_por_alumno|get_item:alumno }}</p>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-heading" onclick="togglePanel('asistencias-{{ alumno.id }}')">
+                    <span>{{ alumno.nombre }} {{ alumno.apellido }} - Asistencia</span>
+                    <span>&#x25BC;</span>
+                </div>
+                <div id="asistencias-{{ alumno.id }}" class="panel-content">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for asistencia in asistencias_por_alumno|get_item:alumno %}
+                            <tr>
+                                <td>{{ asistencia.fecha }}</td>
+                                <td>
+                                    {% if alumno in asistencia.alumnos_presentes.all %}
+                                        Presente
+                                    {% else %}
+                                        Ausente
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="2">No hay asistencia registrada.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="buttons">
+            <button class="btn" onclick="window.location.href='{% url 'profesor_libro' curso.id %}'">Regresar</button>
+        </div>
     </div>
 </body>
 </html>

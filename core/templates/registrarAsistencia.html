@@ -6,11 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Asistencia - {{ curso.nombre }}</title>
-<<<<<<< HEAD
     <link rel="stylesheet" href="{% static 'styles.css' %}">
-=======
-    <link rel="stylesheet" href="{% static 'styles.css' %}"> 
->>>>>>> a84962d81506f77831c2f9a28c5a1a791100c920
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -142,7 +138,7 @@
             <li><a href="{% url 'registrar_asistencia' curso.id %}">Registrar asistencia</a></li>
             <li><a href="{% url 'registrar_calificaciones' curso.id %}">Registrar calificaciones</a></li>
             <li><a href="{% url 'registro_academico' curso.id %}">Registro Académico</a></li>
-            <li><a href="{% url 'generar_informes' %}">Generar informes</a></li>
+            
             <li><a href="{% url 'observaciones' curso.id %}">Observaciones</a></li>
         </ul>
 
