@@ -183,22 +183,28 @@ def generar_informes(request, curso_id):
     return render(request, 'generar_informes.html', {'curso': curso, 'informes': informes})
 
 # =============================================================== OBSERVACIONES =========================================================================
-
 @login_required
 def observaciones(request, curso_id):
     curso = get_object_or_404(Curso, id=curso_id)
     observaciones = Observacion.objects.filter(curso=curso)
 
     if request.method == 'POST':
+        # Comprobar si se está eliminando una observación
+        if 'eliminar' in request.POST:
+            observacion_id = request.POST.get('observacion_id')
+            observacion = get_object_or_404(Observacion, id=observacion_id)
+            observacion.delete()
+            return redirect('observaciones', curso_id=curso.id)  # Redirigir después de eliminar
+
+        # Lógica para agregar una nueva observación
         form = ObservacionForm(request.POST)
+        form.fields['alumno'].queryset = curso.alumnos.all()  # Asegurarse de que el queryset esté disponible aquí
         if form.is_valid():
             observacion = form.save(commit=False)
             observacion.curso = curso  # Asociar la observación al curso
-            # Aquí no necesitas asignar el alumno, ya que el formulario tendrá el campo de selección
             observacion.save()
             return redirect('observaciones', curso_id=curso.id)  # Redirigir después de guardar
     else:
-        # Al crear el formulario, solo incluir alumnos del curso actual
         form = ObservacionForm()
         form.fields['alumno'].queryset = curso.alumnos.all()  # Filtrar alumnos
 
@@ -207,6 +213,7 @@ def observaciones(request, curso_id):
         'observaciones': observaciones,
         'form': form,
     })
+
 
 #========================================================================================================================================================
 #alumno consulta asitencia y notas
