@@ -4,7 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Observaciones - {{ curso.nombre }}</title>
+<<<<<<< HEAD
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+=======
+    <link rel="stylesheet" href="{% static 'styles.css' %}"> 
+>>>>>>> a84962d81506f77831c2f9a28c5a1a791100c920
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -171,6 +175,7 @@
 
         <form method="POST">
             {% csrf_token %}
+<<<<<<< HEAD
             <div class="form-group">
                 <label for="{{ form.alumno.id_for_label }}">Alumno:</label>
                 {{ form.alumno }}
@@ -184,6 +189,27 @@
                 {{ form.contenido }}
             </div>
             <button type="submit" class="btn btn-success">Agregar Observación</button>
+=======
+            <label for="{{ form.alumno.id_for_label }}">Alumno:</label>
+            {{ form.alumno }}  <!-- se filtra el alumno -->
+            <script>
+                document.getElementById("{{ form.alumno.id_for_label }}").className += " form-control"; 
+            </script>
+
+            <label for="{{ form.fecha.id_for_label }}">Fecha:</label>
+            {{ form.fecha }}   <!-- Campo para la fecha -->
+            <script>
+                document.getElementById("{{ form.fecha.id_for_label }}").className += " form-control"; 
+            </script>
+
+            <label for="{{ form.contenido.id_for_label }}">Contenido de la Observación:</label>
+            {{ form.contenido }}  
+            <script>
+                document.getElementById("{{ form.contenido.id_for_label }}").className += " form-control";
+            </script>
+        
+            <button type="submit" class="btn">Agregar Observación</button>
+>>>>>>> a84962d81506f77831c2f9a28c5a1a791100c920
         </form>
 
         <h2>Observaciones Existentes:</h2>

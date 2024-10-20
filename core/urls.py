@@ -13,9 +13,9 @@ urlpatterns = [
     #Profesor mis cursos
     path('libro-clases/<int:curso_id>/', libro_clases, name='profesor_libro'),
     path('registrar-asistencia/<int:curso_id>/', views.registrar_asistencia, name='registrar_asistencia'),
-    path('registrar-calificaciones/<int:curso_id>/', registrar_calificaciones, name='registrar_calificaciones'),  # Asegúrate de usar curso_id
+    path('registrar-calificaciones/<int:curso_id>/', registrar_calificaciones, name='registrar_calificaciones'),  
     path('registro-academico/<int:curso_id>/', registro_academico, name='registro_academico'),
-    path('generar-informes/', views.generar_informes, name='generar_informes'),
+    path('generar-informes/<int:curso_id>/', views.generar_informes, name='generar_informes'),
     path('observaciones/<int:curso_id>/', observaciones, name='observaciones'),
     #alumno
     path('alumno/', views.alumno_dashboard, name='alumno_dashboard'),
@@ -23,10 +23,11 @@ urlpatterns = [
     path('alumno/notas/', views.alumno_consulta_notas, name='alumnoConsuNotas'),
     path('alumno/', views.alumno_home, name='alumno_home'),
     #Apoderado
-    path('apoderado/', apoderado_view, name='apoderado_home'),
-    path('apoderado/consulta-asistencia/', views.apoderadoConsuAsis, name='apoderadoConsuAsis'),
-    path('apoderado/consulta-notas/', views.apoderadoConsuNotas, name='apoderadoConsuNotas'),
-    path('apoderado/matricular/', views.apoderadoMatri, name='apoderadoMatri'),
+    path('apoderado/', apoderado_view, name='apoderado_view'),  # Dashboard del apoderado
+    path('consulta-asistencia/', apoderadoConsuAsis, name='apoderadoConsuAsis'),  # Consulta de asistencia
+    path('apoderado/consulta-notas/', apoderadoConsuNotas, name='apoderadoConsuNotas'),  # Consulta de notas
+    path('apoderado/matricula/', apoderadoMatri, name='apoderadoMatri'),
+
     
     
     # URL DE LIBRO

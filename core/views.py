@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Curso, Profesor,Asistencia, Calificacion, Informe, Observacion, Alumno
+from .models import Curso, Profesor,Asistencia, Calificacion, Informe, Observacion, Alumno, Apoderado
 from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404
 from datetime import date
@@ -11,6 +11,19 @@ from django.utils import timezone
 from .forms import CalificacionForm, ObservacionForm 
 from django.contrib import messages
 from django.db.models import Avg
+from django.http import HttpResponse
+import io
+from io import BytesIO
+from collections import defaultdict
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Paragraph,  Table, TableStyle
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Table
+import json
+import logging
+from django.http import JsonResponse
+from django.db.models import Q  # Agrega esta línea
 
 def login_view(request):
     if request.method == "POST":
@@ -25,7 +38,7 @@ def login_view(request):
             elif hasattr(user, 'profesor'):  # Verifica si el usuario tiene un perfil de profesor
                 return redirect('profesor')  # Redirigir al profesor
             elif hasattr(user, 'apoderado'):  # Verifica si el usuario tiene un perfil de apoderado
-                return redirect('apoderado_home')  # Redirigir al apoderado
+                return redirect('apoderado_view')  # Redirigir al apoderado
             else:
                 return redirect('default')  # Redirigir a una página predeterminada
         else:
@@ -178,9 +191,70 @@ def registro_academico(request, curso_id):
 
 @login_required
 def generar_informes(request, curso_id):
-    curso = Curso.objects.get(id=curso_id)
-    informes = Informe.objects.filter(curso=curso)
-    return render(request, 'generar_informes.html', {'curso': curso, 'informes': informes})
+    curso = get_object_or_404(Curso, id=curso_id)
+    alumnos = Alumno.objects.filter(curso=curso)  # Obtener los alumnos del curso
+    return render(request, 'Profe_generar_informes.html', {'curso': curso, 'alumnos': alumnos})
+# generar informe en pdf para el profesor por alumno
+def generar_pdf(request):
+    if request.method == 'POST':
+        try:
+            # Obtener los datos de la solicitud
+            data = json.loads(request.body)
+            alumno_id = int(data.get('alumno_id', 0))
+            curso_id = int(data.get('curso_id', 0))
+
+            # Validación de datos
+            if not alumno_id or not curso_id:
+                return JsonResponse({'error': 'Los campos alumno_id y curso_id son requeridos'}, status=400)
+
+            # Obtener los datos del alumno, curso, calificaciones y asistencias
+            alumno = Alumno.objects.get(id=alumno_id)
+            curso = Curso.objects.get(id=curso_id)
+            calificaciones = Calificacion.objects.filter(alumno=alumno, curso=curso)
+            asistencias = Asistencia.objects.filter(alumno=alumno, curso=curso)
+
+            # Crear el PDF utilizando ReportLab
+            buffer = BytesIO()
+            doc = SimpleDocTemplate(buffer, pagesize=letter)
+            story = []
+
+            # Agregar encabezado con estilo
+            styles = getSampleStyleSheet()
+            styleH1 = styles["Heading1"]
+            story.append(Paragraph(f"Informe de {alumno.nombre} {alumno.apellido} - {curso.nombre}", styleH1))
+
+            # Crear tabla de calificaciones y asistencias
+            data = [
+                ['Asignatura', 'Nota', 'Asistencia (%)']
+            ]
+            for calificacion in calificaciones:
+                total_asistencias_alumno = asistencias.filter(alumno=calificacion.alumno).count()
+                total_clases_posibles = Curso.objects.get(id=curso_id).total_clases
+                asistencia_porcentaje = (total_asistencias_alumno / total_clases_posibles) * 100
+                data.append([calificacion.asignatura.nombre, calificacion.nota, f"{asistencia_porcentaje:.2f}%"])
+
+            # Crear tabla con estilo
+            table = Table(data)
+            table.setStyle(TableStyle([
+                ('ALIGN', (1,1), (-2,-2), 'RIGHT'),
+                ('TEXTCOLOR', (1,1), (-2,-2), colors.blue),
+                ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+                ('GRID', (0,0), (-1,-1), 1, colors.black),
+            ]))
+            story.append(table)
+
+            # Generar el PDF
+            doc.build(story)
+
+            # Enviar el PDF como respuesta
+            buffer.seek(0)
+            return HttpResponse(buffer.getvalue(), content_type='application/pdf')
+
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    else:
+        return JsonResponse({'error': 'Solo se permiten solicitudes POST'}, status=405)
+
 
 # =============================================================== OBSERVACIONES =========================================================================
 @login_required
@@ -267,17 +341,66 @@ def apoderado_view(request):
     # Aquí podrías agregar lógica para obtener datos relevantes para el apoderado si es necesario
     return render(request, 'apoderado.html')
 
+@login_required
 def apoderadoConsuAsis(request):
-    # Filtra las asistencias según el apoderado
-    asistencias_data = Asistencia.objects.filter(alumno__apoderado=request.user.apoderado)  # Ajusta según tu modelo
+    apoderado = get_object_or_404(Apoderado, user=request.user)
+    alumnos = Alumno.objects.filter(apoderado=apoderado)  # Obtener los alumnos del apoderado
+    asistencias_data = []
 
-    return render(request, 'apoderado_consulta_asistencia.html', {
-        'asistencias_data': asistencias_data,
-        'nombre_apoderado': request.user.apoderado.nombre
-    })
+    # Recorremos los alumnos para obtener la información de asistencia
+    for alumno in alumnos:
+        cursos = Curso.objects.filter(alumnos=alumno)  # Obtener los cursos del alumno
+        
+        for curso in cursos:
+            total_clases = Asistencia.objects.filter(curso=curso).count()  # Total de clases (días)
+            asistencias_presente = Asistencia.objects.filter(curso=curso, alumnos_presentes=alumno).count()  # Total de asistencias
+            asistencias_justificado = Asistencia.objects.filter(curso=curso, alumnos_justificados=alumno).count()  # Total de justificados
+
+            # la asistencia toma como presente el justificado
+            total_asistencia = asistencias_presente + asistencias_justificado
+            porcentaje_asistencia = (total_asistencia / total_clases * 100) if total_clases > 0 else 0
+
+            asistencias_data.append({
+                'nombre_alumno': alumno.nombre,  
+                'curso': curso.nombre,
+                'asignatura': curso.asignatura,
+                'total_clases': total_clases,
+                'asistencia': total_asistencia,
+                'porcentaje_asistencia': round(porcentaje_asistencia, 2)
+            })
+
+    return render(request, 'apoderadoConsuAsis.html', {'asistencias_data': asistencias_data})
+
+
 
 def apoderadoConsuNotas(request):
-    return render(request, 'apoderadoConsuNotas.html')
+    try:
+        apoderado = Apoderado.objects.get(user=request.user)
+    except Apoderado.DoesNotExist:
+        return render(request, 'error.html', {'mensaje': 'No se encontró apoderado para este usuario.'})
+
+    try:
+        alumno = Alumno.objects.get(apoderado=apoderado)
+    except Alumno.DoesNotExist:
+        return render(request, 'error.html', {'mensaje': 'No se encontró un alumno asociado con este apoderado.'})
+
+    calificaciones = Calificacion.objects.filter(alumno=alumno)
+    cursos = Curso.objects.filter(calificacion__alumno=alumno).distinct()
+
+    # se calcula el promedio de notas de los alumnos
+    for curso in cursos:
+        calificaciones_curso = calificaciones.filter(curso=curso)
+        total_notas = sum(c.nota for c in calificaciones_curso if c.nota is not None)
+        count_notas = calificaciones_curso.count()
+        curso.promedio = total_notas / count_notas if count_notas > 0 else 0
+
+    context = {
+        'calificaciones': calificaciones,
+        'cursos': cursos,
+        'alumno': alumno
+    }
+    return render(request, 'apoderadoConsuNotas.html', context)
+
 
 def apoderadoMatri(request):
     return render(request, 'apoderadoMatri.html')
