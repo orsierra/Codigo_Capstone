@@ -10,14 +10,16 @@
             margin: 0;
             padding: 0;
             background-color: #f4f4f4;
+            display: flex; /* Para permitir que la barra lateral y el contenido estén uno al lado del otro */
         }
         .sidebar {
             width: 200px;
             background-color: #000;
             color: white;
             padding: 20px;
-            position: fixed;
+            position: fixed; /* Fija la barra lateral */
             height: 100%;
+            box-sizing: border-box; /* Incluye el padding en el ancho total */
         }
         .sidebar h2 {
             margin-top: 0;
@@ -32,8 +34,9 @@
             background-color: #575757;
         }
         .content {
-            margin-left: 200px;
+            margin-left: 220px; /* Deja espacio para la barra lateral */
             padding: 20px;
+            flex: 1; /* Permite que el contenido ocupe todo el espacio restante */
         }
         .header {
             display: flex;
@@ -148,7 +151,7 @@
                             </thead>
                             <tbody>
                                 {% for calificacion in calificaciones %}
-                                    {% if calificacion.curso == curso %}
+                                    {% if calificacion.curso == curso %} <!-- Asegúrate de que aquí comparas correctamente -->
                                         <tr>
                                             <td>Nota {{ forloop.counter }}</td>
                                             <td>{{ calificacion.nota }}</td>

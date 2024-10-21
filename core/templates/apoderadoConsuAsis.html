@@ -10,19 +10,19 @@
             height: 100%;
             margin: 0;
             font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            display: flex;
-            flex-direction: row; /* Alinear barra lateral y contenido en fila */
+            background-color: #f4f4f4; /* Color de fondo de la página */
         }
+
         .sidebar {
-            width: 250px; /* Ancho de la barra lateral */
-            background-color: #333;
+            width: 200px; /* Ancho de la barra lateral */
+            background-color: #000; /* Fondo negro para la barra lateral */
             color: white;
             padding: 20px;
             height: 100%; /* Asegura que la barra lateral ocupe toda la altura */
+            position: fixed; /* Fija la barra lateral */
             box-sizing: border-box; /* Incluye padding en el cálculo del ancho */
-            transition: width 0.3s; /* Transición suave para el ancho */
         }
+
         .sidebar a {
             color: white;
             text-decoration: none;
@@ -30,69 +30,51 @@
             padding: 10px;
             transition: background-color 0.3s; /* Transición suave para el fondo */
         }
+
         .sidebar a:hover {
-            background-color: #575757;
+            background-color: #575757; /* Color de fondo al pasar el ratón */
         }
+
         .content {
-            flex: 1; /* Hace que el contenido ocupe todo el espacio restante */
+            margin-left: 220px; /* Deja espacio para la barra lateral */
             padding: 20px;
-            background-color: white;
+            background-color: white; /* Fondo blanco para el contenido */
             height: 100%; /* Asegura que el contenido ocupe toda la altura */
             overflow-y: auto; /* Permite desplazamiento vertical si el contenido es demasiado grande */
             box-sizing: border-box; /* Incluye padding en el cálculo del ancho */
         }
+
         h1 {
             text-align: center;
             font-size: 2.5em; /* Tamaño de fuente más grande */
             margin-bottom: 20px;
         }
+
         table {
             width: 100%; /* Asegura que la tabla ocupe todo el ancho */
             border-collapse: collapse;
             margin-top: 20px;
         }
+
         th, td {
-            border: 1px solid #ccc;
+            border: 1px solid #ccc; /* Color del borde */
             padding: 10px;
             text-align: center;
         }
+
         th {
-            background-color: #e0f7fa;
+            background-color: #444; /* Fondo oscuro para el encabezado de la tabla */
+            color: white; /* Color del texto en el encabezado */
         }
+
         tr:nth-child(even) {
-            background-color: #f9f9f9;
+            background-color: #f9f9f9; /* Color de fondo para filas pares */
         }
+
         .no-data {
             text-align: center;
             font-weight: bold;
             color: #ff0000; /* Color rojo para el mensaje de no datos */
-        }
-        
-        /* Estilos responsivos */
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 60px; /* Cambia el ancho de la barra lateral en pantallas pequeñas */
-                overflow: hidden; /* Oculta el texto en la barra lateral */
-            }
-            .sidebar a {
-                text-align: center; /* Centra el texto en la barra lateral */
-                padding: 10px 0; /* Ajusta el padding */
-            }
-            .content {
-                padding: 10px; /* Reduce el padding del contenido en pantallas pequeñas */
-            }
-            h1 {
-                font-size: 2em; /* Reduce el tamaño de fuente del encabezado */
-            }
-        }
-        
-        @media (max-width: 480px) {
-            h1 {
-                font-size: 1.5em; /* Reduce aún más el tamaño de fuente en pantallas muy pequeñas */
-            }
-            .sidebar a {
-                padding: 5px; /* Ajusta el padding en pantallas muy pequeñas */
-            }
         }
 
         /* Elimina márgenes y paddings que puedan causar desplazamiento */

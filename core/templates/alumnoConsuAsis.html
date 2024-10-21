@@ -7,14 +7,43 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            background-color: #f4f4f4; /* Color de fondo de la página */
             margin: 0;
+            padding: 0;
+        }
+
+        .sidebar {
+            width: 200px; /* Ancho de la barra lateral */
+            background-color: #000; /* Fondo negro para la barra lateral */
+            color: white;
+            padding: 20px;
+            position: fixed; /* Fija la barra lateral */
+            height: 100%; /* Altura completa */
+        }
+
+        .sidebar h2 {
+            margin-top: 0;
+        }
+
+        .sidebar a {
+            color: white; /* Color del texto de los enlaces */
+            display: block;
+            text-decoration: none;
+            padding: 10px 0;
+        }
+
+        .sidebar a:hover {
+            background-color: #575757; /* Color de fondo al pasar el ratón */
+        }
+
+        .content {
+            margin-left: 220px; /* Espacio para la barra lateral */
             padding: 20px;
         }
 
         h1 {
             text-align: center;
-            background-color: #4CAF50;
+            background-color: #000; /* Fondo negro para el título */
             color: white;
             padding: 15px;
             border-radius: 5px;
@@ -25,7 +54,7 @@
             align-items: center;
             margin-bottom: 20px;
             text-decoration: none;
-            color: #4CAF50;
+            color: #000; /* Color negro para el enlace de retroceso */
             font-size: 18px;
             font-weight: bold;
         }
@@ -45,7 +74,7 @@
         }
 
         table, th, td {
-            border: 1px solid #ccc;
+            border: 1px solid #ccc; /* Color del borde */
         }
 
         th, td {
@@ -54,12 +83,13 @@
         }
 
         th {
-            background-color: #f4f4f4;
+            background-color: #444; /* Fondo oscuro para el encabezado de la tabla */
+            color: white; /* Color del texto en el encabezado */
         }
 
         .total-row {
             font-weight: bold;
-            background-color: #d9edf7;
+            background-color: #d9edf7; /* Fondo claro para la fila total */
         }
 
         .summary {
@@ -74,50 +104,58 @@
         .percentage {
             font-size: 20px;
             font-weight: bold;
-            color: #4CAF50;
+            color: #000; /* Color negro para el porcentaje */
         }
     </style>
 </head>
 <body>
 
-    <!-- flecha devuekve -->
-    <a href="{% url 'alumno_home' %}" class="back-link">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left">
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
-        </svg>
-        Volver a Alumno
-    </a>
+    <!-- Enlace de retroceso -->
+    <div class="sidebar">
+        <h2>Página de la Institución</h2>
+        <a href="{% url 'alumno_home' %}">Inicio</a>
+        <a href="#">Salir</a>
+    </div>
 
-    <h1>Consulta de Asistencia</h1>
+    <div class="content">
+        <a href="{% url 'alumno_home' %}" class="back-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            
+        </a>
 
-    <div class="container">
-        <table>
-            <thead>
-                <tr>
-                    <th>Curso</th>
-                    <th>Asignatura</th>
-                    <th>Total de Clases</th>
-                    <th>Asistencia</th>
-                    <th>Porcentaje</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for asistencia in asistencias_data %}
+        <h1>Consulta de Asistencia</h1>
+
+        <div class="container">
+            <table>
+                <thead>
                     <tr>
-                        <td>{{ asistencia.curso }}</td>
-                        <td>{{ asistencia.asignatura }}</td>
-                        <td>{{ asistencia.total_clases }}</td>
-                        <td>{{ asistencia.asistencia }}</td>
-                        <td>{{ asistencia.porcentaje_asistencia }}%</td>
+                        <th>Curso</th>
+                        <th>Asignatura</th>
+                        <th>Total de Clases</th>
+                        <th>Asistencia</th>
+                        <th>Porcentaje</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for asistencia in asistencias_data %}
+                        <tr>
+                            <td>{{ asistencia.curso }}</td>
+                            <td>{{ asistencia.asignatura }}</td>
+                            <td>{{ asistencia.total_clases }}</td>
+                            <td>{{ asistencia.asistencia }}</td>
+                            <td>{{ asistencia.porcentaje_asistencia }}%</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
 
-        {% if asistencias_data|length == 0 %}
-            <p>No se han registrado asistencias aún.</p>
-        {% endif %}
+            {% if asistencias_data|length == 0 %}
+                <p>No se han registrado asistencias aún.</p>
+            {% endif %}
+        </div>
     </div>
 
 </body>

@@ -1,0 +1,194 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planificación Académica Primer Semestre</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="{% static 'css/fontawesome-all.min.css' %}">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            background-color: #f4f7fc;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #000000; /* Fondo negro */
+            color: white;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar h2 {
+            color: white;
+            text-align: center;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin: 15px 0;
+        }
+
+        .sidebar ul li a {
+            color: white; /* Cambiado a blanco */
+            text-decoration: none;
+        }
+
+        .sidebar ul li a:hover {
+            color: #17a2b8; /* Efecto hover azul */
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 40px;
+            background-color: white;
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            margin: 20px;
+        }
+
+        h1 {
+            font-size: 28px;
+            color: #000000; /* Cambiado a negro */
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th, table td {
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        table th {
+            text-align: left;
+            color: #000000; /* Cambiado a negro */
+        }
+
+        .edit-input {
+            width: 100%;
+            border: none;
+            background: none;
+            padding: 5px;
+        }
+
+        .save-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .save-btn:hover {
+            background-color: #218838;
+        }
+
+        input[type="time"] {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>Planificación Académica</h2>
+        <ul>
+            <li><a href="{% url 'director_plani' %}">Planificación Académica</a></li>
+            <li><a href="#">Perfil</a></li>
+            <li><a href="#">Informes y Finanzas</a></li>
+            <li><a href="#">Salir</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <h1>Planificación Académica Primer Semestre</h1>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Profesor Responsable</th>
+                    <th>Asignatura</th>
+                    <th>Horario Asignado</th>
+                    <th>Sala</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for curso in cursos %}
+                <tr data-curso-id="{{ curso.id }}">
+                    <td>{{ curso.profesor.nombre }}</td>
+                    <td>{{ curso.asignatura }}</td>
+                    <td>
+                        {{ curso.dias }} - <input type="time" class="edit-input hora" value="{{ curso.hora|time:"H:i" }}">
+                    </td>
+                    <td>
+                        <input type="text" class="edit-input sala" value="{{ curso.sala }}">
+                    </td>
+                    <td>
+                        <button class="save-btn">Guardar</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Al hacer clic en el botón "Guardar"
+            $('.save-btn').on('click', function() {
+                var row = $(this).closest('tr');
+                var cursoId = row.data('curso-id');
+                var hora = row.find('.hora').val();
+                var sala = row.find('.sala').val();
+
+                $.ajax({
+                    url: '{% url "update_curso" %}',  // URL de tu vista Django
+                    type: 'POST',
+                    data: {
+                        'csrfmiddlewaretoken': '{{ csrf_token }}',
+                        'curso_id': cursoId,
+                        'hora': hora,
+                        'sala': sala
+                    },
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            alert('Cambios guardados correctamente');
+                        } else {
+                            alert('Error: ' + response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Ha ocurrido un error: ' + error);
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
