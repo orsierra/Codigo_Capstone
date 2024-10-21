@@ -28,7 +28,6 @@ from django.db.models import Q  # Agrega esta línea
 
 # ============================================================ MODULO LOGIN ==============================================================================
 
-
 def login_view(request):
     if request.method == "POST":
         username = request.POST['username']
@@ -128,38 +127,31 @@ def registrar_calificaciones(request, curso_id):
     curso = get_object_or_404(Curso, id=curso_id)
     errores = {}
     form_list = {}
-    promedios = {}
 
     if request.method == 'POST':
         for alumno in Alumno.objects.filter(curso=curso):
             form = CalificacionForm(request.POST, prefix=str(alumno.id))
             if form.is_valid():
-                calificacion = form.save(commit=False)
-                calificacion.alumno = alumno
-                calificacion.curso = curso
-                calificacion.save()
+                # Guarda la calificación usando el alumno y curso correcto
+                calificacion = form.save(commit=False)  # No guarda aún en la base de datos
+                calificacion.alumno = alumno  # Asocia el alumno
+                calificacion.curso = curso  # Asocia el curso
+                calificacion.save()  # Guarda en la base de datos
             else:
-                errores[alumno] = form.errors
+                errores[alumno] = form.errors  # Guarda los errores
 
         if not errores:
             messages.success(request, "Se han guardado los cambios exitosamente.")
-            return redirect('registrar_calificaciones', curso_id=curso_id)
+            return redirect('registrar_calificaciones', curso_id=curso_id)  # Cambia aquí
 
     else:
-        alumnos = Alumno.objects.filter(curso=curso)
-        form_list = {alumno: CalificacionForm(prefix=str(alumno.id)) for alumno in alumnos}
-
-        for alumno in alumnos:
-            calificaciones = Calificacion.objects.filter(alumno=alumno, curso=curso)
-            if calificaciones.exists():
-                promedio = sum(float(c.nota) for c in calificaciones) / calificaciones.count()
-                promedios[alumno.id] = round(promedio, 2)  # Asegúrate de redondear aquí
+        # Crea formularios para cada alumno
+        form_list = {alumno: CalificacionForm(prefix=str(alumno.id)) for alumno in Alumno.objects.filter(curso=curso)}
 
     return render(request, 'registrarCalificaciones.html', {
         'curso': curso,
         'form_list': form_list,
-        'errores': errores,
-        'promedios': promedios
+        'errores': errores
     })
 
 # =================================================== REGISTRO ACADEMICO =====================================================================================
@@ -416,7 +408,11 @@ def apoderadoMatri(request):
 
 
 # ==================================================================== DIRECTOR =========================================================================================
+<<<<<<< HEAD
 @login_required
+=======
+
+>>>>>>> 34fa96a982437b49e860cb12eda81ba5bd71550a
 def director_dashboard(request):
     return render(request, 'director.html') 
 @login_required
