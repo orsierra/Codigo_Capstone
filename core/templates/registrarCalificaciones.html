@@ -8,7 +8,125 @@
     <title>Registrar Calificaciones - {{ curso.nombre }}</title>
     <link rel="stylesheet" href="{% static 'styles.css' %}">
     <style>
-        /* Tu estilo aquí... */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            display: flex; /* Usar flexbox para la barra lateral */
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #222;
+            color: white;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+            height: 100vh; /* Asegurar que ocupe toda la altura de la pantalla */
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin: 15px 0;
+        }
+
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .sidebar ul li a:hover {
+            color: #4CAF50; /* Color al pasar el mouse */
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            background-color: #f4f4f4;
+            overflow-y: auto; /* Permitir el desplazamiento si es necesario */
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #218838;
+        }
+
+        .btn-back {
+            background-color: #007bff; /* Color para el botón de regresar */
+        }
+
+        .btn-back:hover {
+            background-color: #0056b3;
+        }
+
+        .message {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none; /* Ocultar por defecto */
+        }
     </style>
 </head>
 <body>
@@ -20,6 +138,7 @@
             <li><a href="{% url 'registrar_asistencia' curso.id %}">Registrar asistencia</a></li>
             <li><a href="{% url 'registrar_calificaciones' curso.id %}">Registrar calificaciones</a></li>
             <li><a href="{% url 'registro_academico' curso.id %}">Registro Académico</a></li>
+
             <li><a href="{% url 'observaciones' curso.id %}">Observaciones</a></li>
         </ul>
     </div>
@@ -28,6 +147,10 @@
         <div class="container">
             <h1>Registrar Calificaciones para {{ curso.nombre }}</h1>
 
+            <div class="message" id="successMessage">
+                <p>Se han guardado los cambios exitosamente.</p>
+            </div>
+
             <form method="post">
                 {% csrf_token %}
                 <table>
@@ -35,7 +158,6 @@
                         <tr>
                             <th>Alumnos</th>
                             <th>Calificación</th>
-                            <th>Promedio</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -43,7 +165,6 @@
                             <tr>
                                 <td>{{ alumno.nombre }} {{ alumno.apellido }}</td>
                                 <td>{{ form.nota }}</td>
-                                <td>{{ promedios[alumno.id]|floatformat:2 }}</td> <!-- Redondear a dos decimales -->
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -56,5 +177,12 @@
             </form>
         </div>
     </div>
+
+    <script>
+        // Mostrar el mensaje de éxito si está presente
+        {% if messages %}
+            document.getElementById('successMessage').style.display = 'block';
+        {% endif %}
+    </script>
 </body>
 </html>

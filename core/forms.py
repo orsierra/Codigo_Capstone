@@ -54,3 +54,5 @@ class ObservacionForm(forms.ModelForm):
         self.fields['alumno'].widget.attrs.update({'class': 'form-control'})
         self.fields['fecha'].widget.attrs.update({'class': 'form-control'})
         self.fields['contenido'].widget.attrs.update({'class': 'form-control'})
+    
+    

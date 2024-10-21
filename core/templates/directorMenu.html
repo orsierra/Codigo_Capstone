@@ -1,0 +1,148 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planificación Académica</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            background-color: #f8f9fa; /* Cambiar a un color de fondo sólido */
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: rgba(52, 58, 64, 0.9); /* Fondo semi-transparente */
+            color: white;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin: 15px 0;
+        }
+
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .sidebar ul li a:hover {
+            color: #17a2b8;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 40px;
+            background-color: rgba(255, 255, 255, 0.8); /* Fondo semi-transparente */
+            overflow-y: auto;
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            margin: 20px;
+        }
+
+        h1 {
+            font-size: 28px;
+            text-align: center;
+            color: #343a40;
+            margin-bottom: 40px;
+            font-weight: bold;
+        }
+
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 30px;
+        }
+
+        .button-container a {
+            width: 100%;
+            max-width: 300px;
+            margin: 10px 0;
+        }
+
+        .button-container button {
+            background-color: black; /* Cambiar el color del botón a negro */
+            color: white; /* Mantener el texto en blanco para contraste */
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            width: 100%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .button-container button:hover {
+            background-color: #444; /* Color de fondo al pasar el mouse */
+            transform: scale(1.02);
+        }
+
+        .footer {
+            margin-top: auto;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .footer a {
+            color: #17a2b8;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .footer a:hover {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Planificación Académica</h2>
+        <ul>
+            <li><a href="#">Página de la Institución</a></li>
+            <li><a href="#">Perfil</a></li>
+            <li><a href="#">Salir</a></li>
+        </ul>
+        <div class="footer">
+            <a href="#">Privacidad</a>
+            <a href="#">Accesibilidad</a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <h1>Planificación Académica
+
+        </h1>
+        <div class="button-container">
+            <a href="{% url 'director_plani' %}"><button>Planificación Académica</button></a>
+            <a href="{% url 'informes_academicos' %}"><button>Informes Académicos</button></a>
+            <a href="{% url 'informes_finanzas' %}"><button>Informes Finanzas</button></a>
+        </div>
+    </div>
+</body>
+</html>

@@ -182,7 +182,7 @@ def registro_academico(request, curso_id):
 
         # Calcular el promedio de calificaciones
         promedio = calificaciones_alumno.aggregate(Avg('nota'))['nota__avg'] or 0
-        promedios_por_alumno[alumno] = promedio
+        promedios_por_alumno[alumno] = round(promedio, 2)
 
         # Obtener asistencias para cada alumno
         asistencias_alumno = asistencias.filter(alumnos_presentes=alumno) | asistencias.filter(alumnos_ausentes=alumno)
@@ -396,12 +396,12 @@ def apoderadoConsuNotas(request):
     calificaciones = Calificacion.objects.filter(alumno=alumno)
     cursos = Curso.objects.filter(calificacion__alumno=alumno).distinct()
 
-    # se calcula el promedio de notas de los alumnos
+    # Se calcula el promedio de notas de los alumnos
     for curso in cursos:
         calificaciones_curso = calificaciones.filter(curso=curso)
         total_notas = sum(c.nota for c in calificaciones_curso if c.nota is not None)
         count_notas = calificaciones_curso.count()
-        curso.promedio = total_notas / count_notas if count_notas > 0 else 0
+        curso.promedio = round(total_notas / count_notas, 2) if count_notas > 0 else 0  # Redondea a 2 decimales
 
     context = {
         'calificaciones': calificaciones,
@@ -410,13 +410,77 @@ def apoderadoConsuNotas(request):
     }
     return render(request, 'apoderadoConsuNotas.html', context)
 
-
+@login_required
 def apoderadoMatri(request):
     return render(request, 'apoderadoMatri.html')
 
 
 # ==================================================================== DIRECTOR =========================================================================================
+@login_required
 def director_dashboard(request):
     return render(request, 'director.html') 
+@login_required
+def directorMenu(request):
+    # Aquí podrías agregar lógica para consultar informes si es necesario
+    return render(request, 'directorMenu.html')
+
+from django.shortcuts import render, redirect
+from .models import Curso
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt
+def director_plani(request):
+    cursos = Curso.objects.all()
+
+    if request.method == "POST":
+        # Procesar la edición del curso
+        curso_id = request.POST.get("curso_id")
+        asignatura = request.POST.get("asignatura")
+        dias = request.POST.get("dias")
+        hora = request.POST.get("hora")
+        sala = request.POST.get("sala")
+
+        curso = Curso.objects.get(id=curso_id)
+        curso.asignatura = asignatura
+        curso.dias = dias
+        curso.hora = hora
+        curso.sala = sala
+        curso.save()
+
+        return JsonResponse({'success': True})
+
+    return render(request, 'directorPlani.html', {'cursos': cursos})
+
+
+def informes_academicos(request):
+    return render(request, 'direInfoAca.html')
+
+def informes_finanzas(request):
+    return render(request, 'direInfoFinan.html')
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .models import Curso  # Asegúrate de importar tu modelo
+
+@csrf_exempt  # Solo si es necesario; no recomendado para producción sin protección
+def update_curso(request):
+    if request.method == 'POST':
+        curso_id = request.POST.get('curso_id')
+        hora = request.POST.get('hora')
+        sala = request.POST.get('sala')
+
+        try:
+            curso = Curso.objects.get(id=curso_id)
+            curso.hora = hora
+            curso.sala = sala
+            curso.save()
+
+            return JsonResponse({'status': 'success'})
+        except Curso.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Curso no encontrado'}, status=404)
+
+    return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=405)
+
 
 # =======================================================================================================================================================================

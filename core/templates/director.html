@@ -24,11 +24,11 @@
             align-items: center;
             text-align: center;
             background-color: white;
-            padding: 80px; /* Aumentar el padding para hacer el cuadro más grande */
+            padding: 80px;
             border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Sombra más prominente */
-            max-width: 600px; /* Establecer un ancho máximo */
-            width: 100%; /* Hacer que ocupe el 100% del contenedor */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            max-width: 600px;
+            width: 100%;
         }
         h1 {
             font-size: 36px;
@@ -42,7 +42,7 @@
             color: white;
             text-decoration: none;
             border-radius: 5px;
-            margin-top: 20px; /* Añadir un margen superior al botón */
+            margin-top: 20px;
         }
         .btn:hover {
             background-color: #333;
@@ -56,8 +56,7 @@
 <body>
     <div class="dashboard-container">
         <h1>Director</h1>
-        <!-- Botones de navegación para el director -->
-        <!-- <a href="{% url 'consulta_informes' %}" class="btn">Consulta de Informes</a> -->
+        <a href="{% url 'director_menu' %}" class="btn">Consulta de Informes</a>
         <footer>
             <p>Colegio Nuevos Horizontes</p>
             <div>
