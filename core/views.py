@@ -408,14 +408,10 @@ def apoderadoMatri(request):
 
 
 # ==================================================================== DIRECTOR =========================================================================================
-<<<<<<< HEAD
-@login_required
-=======
-
->>>>>>> 34fa96a982437b49e860cb12eda81ba5bd71550a
+#@login_required
 def director_dashboard(request):
     return render(request, 'director.html') 
-@login_required
+#@login_required
 def directorMenu(request):
     # Aquí podrías agregar lógica para consultar informes si es necesario
     return render(request, 'directorMenu.html')
@@ -450,7 +446,39 @@ def director_plani(request):
 
 
 def informes_academicos(request):
-    return render(request, 'direInfoAca.html')
+    cursos = Curso.objects.all()  # Obtener todos los cursos
+    informes = []
+
+    for curso in cursos:
+        alumnos = curso.alumnos.all()  # Obtener todos los alumnos del curso
+        total_alumnos = alumnos.count()  # Contar el número de alumnos inscritos
+        
+        # Calcular el promedio de calificaciones para el curso
+        promedio_notas = Calificacion.objects.filter(alumno__in=alumnos).aggregate(Avg('nota'))['nota__avg'] or 0
+        
+        # Calcular el total de días de asistencia y asistencias
+        total_asistencias = Asistencia.objects.filter(alumnos_presentes__in=alumnos).count()
+        total_dias = Asistencia.objects.filter(curso=curso).count()
+        
+        # Verificar que no haya división por cero
+        if total_alumnos > 0 and total_dias > 0:
+            promedio_asistencia = (total_asistencias / (total_alumnos * total_dias)) * 100
+        else:
+            promedio_asistencia = 0  # Si no hay alumnos o días, el promedio de asistencia es 0
+        
+        # Crear un diccionario con la información del informe para este curso
+        informes.append({
+            'curso': curso,
+            'total_alumnos': total_alumnos,
+            'promedio_notas': round(promedio_notas, 1),  # Redondear a un decimal
+            'promedio_asistencia': round(promedio_asistencia, 1)  # Redondear a un decimal
+        })
+
+    context = {
+        'informes': informes
+    }
+
+    return render(request, 'direInfoAca.html', context)
 
 def informes_finanzas(request):
     return render(request, 'direInfoFinan.html')

@@ -1,0 +1,172 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe Académico - Primer Semestre</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+            background-color: #f4f4f4;
+        }
+        /* Barra lateral */
+        .sidebar {
+            width: 250px;
+            background-color: #000000; /* Fondo negro para la barra lateral */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+            color: white;
+        }
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            padding: 15px;
+            font-size: 18px;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .sidebar a:hover {
+            background-color: #333;
+        }
+        .sidebar .logo {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 40px;
+        }
+        .sidebar .bottom-links {
+            font-size: 14px;
+        }
+
+        /* Título y flecha */
+        .header {
+            background-color: #000000; /* Fondo negro para el título */
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 28px;
+        }
+        .back-arrow {
+            text-align: left;
+            margin: 20px;
+        }
+        .back-arrow a {
+            color: #2C3E50;
+            text-decoration: none;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+        }
+
+        .container {
+            margin: 20px auto;
+            width: 80%;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #34495E;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+        table th {
+            background-color: #2980B9;
+            color: white;
+        }
+        table td {
+            font-size: 16px;
+            color: #2C3E50;
+        }
+        .btn {
+            background-color: #2C3E50;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            display: inline-block;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        .btn:hover {
+            background-color: #1A252F;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Barra lateral izquierda sin imágenes -->
+    <div class="sidebar">
+        <div class="logo">Colegio Nuevos Horizontes</div>
+        <div class="menu">
+            <a href="{% url 'director_menu' %}">Planificación Académica</a>
+            <a href="#">Perfil</a>
+            <a href="{% url 'informes_academicos' %}">Informes y Finanzas</a>
+            <a >Salir</a>
+        </div>
+        <div class="bottom-links">
+            <p><a href="#">Privacidad</a> | <a href="#">Accesibilidad</a></p>
+        </div>
+    </div>
+
+    <!-- Contenido principal -->
+    <div class="main-content">
+        <!-- Título -->
+        <div class="header">
+            Informe Académico Primer Semestre
+        </div>
+
+        <!-- Flecha para volver -->
+        <div class="back-arrow">
+            <a href="{% url 'director_menu' %}">← </a>
+        </div>
+
+        <!-- Contenedor principal -->
+        <div class="container">
+            <h2>Informe Académico</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Estudiantes Inscritos</th>
+                        <th>Promedio</th>
+                        <th>% Asistencia</th>
+                        <th>Curso</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for informe in informes %}
+                    <tr>
+                        <td>{{ informe.total_alumnos }}</td>
+                        <td>{{ informe.promedio_notas }}</td>
+                        <td>{{ informe.promedio_asistencia }}%</td>
+                        <td>{{ informe.curso.nombre }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</body>
+</html>

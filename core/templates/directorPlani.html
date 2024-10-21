@@ -20,13 +20,36 @@
 
         .sidebar {
             width: 250px;
-            background-color: #343a40;
+            background-color: #000000; /* Fondo negro */
             color: white;
             padding: 20px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar h2 {
+            color: white;
+            text-align: center;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin: 15px 0;
+        }
+
+        .sidebar ul li a {
+            color: white; /* Cambiado a blanco */
+            text-decoration: none;
+        }
+
+        .sidebar ul li a:hover {
+            color: #17a2b8; /* Efecto hover azul */
         }
 
         .main-content {
@@ -40,7 +63,7 @@
 
         h1 {
             font-size: 28px;
-            color: #17a2b8;
+            color: #000000; /* Cambiado a negro */
             margin-bottom: 20px;
             text-align: center;
             font-weight: bold;
@@ -58,7 +81,7 @@
 
         table th {
             text-align: left;
-            color: #17a2b8;
+            color: #000000; /* Cambiado a negro */
         }
 
         .edit-input {
