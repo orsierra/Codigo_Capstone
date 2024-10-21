@@ -384,11 +384,7 @@ def apoderadoMatri(request):
 
 
 # ==================================================================== DIRECTOR =========================================================================================
-<<<<<<< HEAD
 #@login_required
-=======
-@login_required
->>>>>>> 296154a5ce0dd4557152ba8c1ec1c89b39ada058
 def director_dashboard(request):
     return render(request, 'director.html') 
 #@login_required
