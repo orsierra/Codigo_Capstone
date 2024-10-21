@@ -15,11 +15,6 @@ from django.http import HttpResponse
 import io 
 from io import BytesIO
 from collections import defaultdict
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib import colors
-from reportlab.platypus import SimpleDocTemplate, Paragraph,  Table, TableStyle
-from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Table
 import json
 import logging
 from django.http import JsonResponse
@@ -196,69 +191,50 @@ def generar_informes(request, curso_id):
     return render(request, 'Profe_generar_informes.html', {'curso': curso, 'alumnos': alumnos})
 
 # ============================================ generar informe en pdf para el profesor por alumno ================================================================
-
 @login_required
-def generar_pdf(request):
-    if request.method == 'POST':
-        try:
-            # Obtener los datos de la solicitud
-            data = json.loads(request.body)
-            alumno_id = int(data.get('alumno_id', 0))
-            curso_id = int(data.get('curso_id', 0))
+def detalle_alumno(request, alumno_id):
+    alumno = get_object_or_404(Alumno, id=alumno_id)
+    cursos = alumno.curso_set.all()
 
-            # Validación de datos
-            if not alumno_id or not curso_id:
-                return JsonResponse({'error': 'Los campos alumno_id y curso_id son requeridos'}, status=400)
+    # Diccionarios para almacenar datos organizados por curso
+    calificaciones_por_curso = {}
+    promedios_por_curso = {}
+    asistencias_por_curso = {}
 
-            # Obtener los datos del alumno, curso, calificaciones y asistencias
-            alumno = Alumno.objects.get(id=alumno_id)
-            curso = Curso.objects.get(id=curso_id)
-            calificaciones = Calificacion.objects.filter(alumno=alumno, curso=curso)
-            asistencias = Asistencia.objects.filter(alumno=alumno, curso=curso)
+    for curso in cursos:
+        calificaciones_curso = Calificacion.objects.filter(alumno=alumno, curso=curso)
+        calificaciones_por_curso[curso] = calificaciones_curso
 
-            # Crear el PDF utilizando ReportLab
-            buffer = BytesIO()
-            doc = SimpleDocTemplate(buffer, pagesize=letter)
-            story = []
+        # Calcular promedio
+        promedio = calificaciones_curso.aggregate(Avg('nota'))['nota__avg'] or 0
+        promedios_por_curso[curso] = promedio
 
-            # Agregar encabezado con estilo
-            styles = getSampleStyleSheet()
-            styleH1 = styles["Heading1"]
-            story.append(Paragraph(f"Informe de {alumno.nombre} {alumno.apellido} - {curso.nombre}", styleH1))
+        asistencias_curso = Asistencia.objects.filter(Q(alumnos_presentes=alumno) | Q(alumnos_ausentes=alumno), curso=curso)
+        asistencias_por_curso[curso] = asistencias_curso
 
-            # Crear tabla de calificaciones y asistencias
-            data = [
-                ['Asignatura', 'Nota', 'Asistencia (%)']
-            ]
-            for calificacion in calificaciones:
-                total_asistencias_alumno = asistencias.filter(alumno=calificacion.alumno).count()
-                total_clases_posibles = Curso.objects.get(id=curso_id).total_clases
-                asistencia_porcentaje = (total_asistencias_alumno / total_clases_posibles) * 100
-                data.append([calificacion.asignatura.nombre, calificacion.nota, f"{asistencia_porcentaje:.2f}%"])
+    # Convertir los datos a un formato adecuado para JSON
+    data = {
+        'alumno': {
+            'nombre': alumno.nombre,
+            'apellido': alumno.apellido,
+            # Agrega aquí otros campos del modelo Alumno que quieras incluir
+        },
+        'cursos': [
+            {
+                'nombre': curso.nombre,
+                'profesor': curso.profesor.nombre,  # Asumiendo que Profesor tiene un campo nombre
+                'calificaciones': [
+                    {'fecha': calificacion.fecha, 'nota': calificacion.nota} for calificacion in calificaciones_curso
+                ],
+                'promedio': promedio,
+                'asistencias': [asistencia.fecha for asistencia in asistencias_curso],  # Ejemplo de cómo incluir asistencias
+            } for curso in cursos
+        ]
+    }
 
-            # Crear tabla con estilo
-            table = Table(data)
-            table.setStyle(TableStyle([
-                ('ALIGN', (1,1), (-2,-2), 'RIGHT'),
-                ('TEXTCOLOR', (1,1), (-2,-2), colors.blue),
-                ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
-                ('GRID', (0,0), (-1,-1), 1, colors.black),
-            ]))
-            story.append(table)
+    return render(request, 'Profe_generar_informes.html', {'data': data})
 
-            # Generar el PDF
-            doc.build(story)
-
-            # Enviar el PDF como respuesta
-            buffer.seek(0)
-            return HttpResponse(buffer.getvalue(), content_type='application/pdf')
-
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
-    else:
-        return JsonResponse({'error': 'Solo se permiten solicitudes POST'}, status=405)
-
-
+    
 # =============================================================== OBSERVACIONES =========================================================================
 @login_required
 def observaciones(request, curso_id):

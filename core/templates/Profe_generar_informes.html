@@ -1,53 +1,200 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <title>Informe de Alumnos</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cursos de {{ profesor.nombre }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            display: flex; /* Usar flexbox para la barra lateral */
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #222;
+            color: white;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+            height: 100vh; /* Asegurar que ocupe toda la altura de la pantalla */
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin: 15px 0;
+        }
+
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .sidebar ul li a:hover {
+            color: #4CAF50; /* Color al pasar el mouse */
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            background-color: #f4f4f4;
+            overflow-y: auto; /* Permitir el desplazamiento si es necesario */
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #218838;
+        }
+
+        .btn-back {
+            background-color: #007bff; /* Color para el botón de regresar */
+        }
+
+        .btn-back:hover {
+            background-color: #0056b3;
+        }
+
+        .message {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none; /* Ocultar por defecto */
+        }
+    </style>
 </head>
 <body>
+    <div class="sidebar">
+      <h2>Menú</h2>
+      <ul>
+        <li><a href="{% url 'profesor' %}">Profesor</a></li>
+        <li><a href="{% url 'profesor_cursos' %}">Mis cursos</a></li>
+        <li><a href="{% url 'registrar_asistencia' curso.id %}">Registrar asistencia</a></li>
+        <li><a href="{% url 'registrar_calificaciones' curso.id %}">Registrar calificaciones</a></li>
+        <li><a href="{% url 'registro_academico' curso.id %}">Registro Académico</a></li>
+        <li><a href="{% url 'observaciones' curso.id %}">Observaciones</a></li>
+      </ul>
+    </div>
+  
     <h1>Informe de Alumnos - {{ curso.nombre }}</h1>
-
-    <ul>
+  
+    <div class="cursos-list">
+      <ul>
         {% for alumno in alumnos %}
         <li>
-            {{ alumno.nombre }} {{ alumno.apellido }}
-            <button data-alumno-id="{{ alumno.id }}">Generar Informe</button>
+          {{ alumno.nombre }} {{ alumno.apellido }}
+          <button data-alumno-id="{{ alumno.id }}" class="btn-generar-informe" onclick="alumnoModal.showModal()">Generar Informe</button>
+
         </li>
         {% endfor %}
-    </ul>
-
-    <script>
-        const cursoId = {{ curso.id }};
-
-        document.querySelectorAll('button').forEach(button => {
-            button.addEventListener('click', () => {
-                const alumnoId = button.dataset.alumnoId;
-
-                fetch('/generar_pdf/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        alumno_id: alumnoId,
-                        curso_id: cursoId
-                    })
-                })
-                .then(response => response.blob())
-                .then(blob => {
-                    const url = window.URL.createObjectURL(blob);
-                    const link = document.createElement('a');
-                    link.href = url;
-                    link.setAttribute('download', `informe_${alumnoId}.pdf`);
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Error al generar el informe. Por favor, inténtalo de nuevo más tarde.');
-                });
-            });
-        });
-    </script>
-</body>
+      </ul>
+    </div>
+       </body>
 </html>
+<!-- Open the modal using ID.showModal() method -->
+<dialog id="alumnoModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <div id="modal-body">
+        <h2>{{ alumno.nombre }} {{ alumno.apellido }}</h2>
+  
+        <table>
+          <thead>
+            <tr>
+              <th>Curso</th>
+              <th>Profesor</th>
+              <th>Calificaciones</th>
+              <th>Promedio</th>
+              <th>Asistencias</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for curso in cursos %}
+            <tr>
+              <td>{{ curso.nombre }}</td>
+              <td>{{ curso.profesor }}</td>
+              <td>
+                <ul>
+                  {% for calificacion in curso.calificaciones %}
+                  <li>{{ calificacion.fecha }}: {{ calificacion.nota }}</li>
+                  {% endfor %}
+                </ul>
+              </td>
+              <td>{{ curso.promedio }}</td>
+              <td>
+                <ul>
+                  {% for asistencia in curso.asistencias %}
+                  <li>{{ asistencia }}</li>
+                  {% endfor %}
+                </ul>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </dialog>
