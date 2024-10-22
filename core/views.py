@@ -535,7 +535,6 @@ def update_curso(request):
 # ========================================================================== ADMISION Y MATRICULA ============================================================================================
 
 def gestionar_estudiantes(request):
-    # Filtrar alumnos con estado de admisión "Pendiente y aprobado"
     alumnos_pendientes = Alumno.objects.filter(estado_admision='Pendiente')
     alumnos_aprobados = Alumno.objects.filter(estado_admision='Aprobado')
     
@@ -545,6 +544,7 @@ def gestionar_estudiantes(request):
     }
     
     return render(request, 'gestionar_estudiantes.html', context)
+
 
 
 def agregar_alumno(request):
@@ -580,11 +580,19 @@ def eliminar_alumno(request, alumno_id):
     alumno.delete()  # Eliminar el alumno
     return redirect('gestionar_estudiantes')  # Redirige a la lista de estudiantes
 
-# Vista para actualizar la matrícula
-def actualizar_matricula(request):
-    # Filtrar alumnos de "Primero Medio"
-    alumnos = Alumno.objects.filter(nivel='Primero Medio')
-    return render(request, 'actualizar_matricula.html', {'alumnos': alumnos})
+def actualizar_matricula(request, id):
+    alumno = get_object_or_404(Alumno, id=id)
+
+    if request.method == 'POST':
+        form = AlumnoForm(request.POST, instance=alumno)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Matrícula actualizada con éxito.')
+            return redirect('gestionar_estudiantes')  # Redirigir a la lista de estudiantes
+    else:
+        form = AlumnoForm(instance=alumno)
+
+    return render(request, 'actualizar_matricula.html', {'form': form, 'alumno': alumno})
 
 
 

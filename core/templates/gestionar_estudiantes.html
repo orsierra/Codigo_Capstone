@@ -10,20 +10,46 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 20px;
+            background-color: #f4f4f4;
         }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        h2 {
+            color: #444;
+        }
+
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            background-color: #d4edda;
+            color: #155724;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
+
         th, td {
             border: 1px solid #ddd;
-            padding: 8px;
+            padding: 10px;
             text-align: left;
         }
+
         th {
             background-color: #f2f2f2;
+            color: #333;
         }
+
         .btn-eliminar {
             color: red;
             text-decoration: none;
@@ -31,14 +57,71 @@
             padding: 5px 10px;
             border-radius: 4px;
             cursor: pointer;
+            transition: background-color 0.3s;
         }
+
         .btn-eliminar:hover {
             background-color: #ffdddd;
+        }
+
+        .btn-actualizar {
+            color: #007bff;
+            text-decoration: none;
+            border: 1px solid #007bff;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-actualizar:hover {
+            background-color: #e7f3ff;
+        }
+
+        /* Responsividad */
+        @media (max-width: 768px) {
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            th, td {
+                display: block;
+                text-align: right;
+                border: none;
+            }
+
+            th {
+                display: none; /* Esconde los encabezados para pantallas pequeñas */
+            }
+
+            td {
+                border-bottom: 1px solid #ddd; /* Separación entre filas */
+                position: relative;
+                padding-left: 50%; /* Espacio para los datos */
+            }
+
+            td::before {
+                content: attr(data-label); /* Usa el atributo data-label para mostrar encabezados */
+                position: absolute;
+                left: 10px;
+                text-align: left;
+                font-weight: bold;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>Lista de Estudiantes Pendientes</h1>
+    <h1>Gestionar Estudiantes</h1>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <h2>Lista de Estudiantes Pendientes</h2>
     <table>
         <thead>
             <tr>
@@ -52,12 +135,12 @@
         <tbody>
             {% for alumno in alumnos_pendientes %}
                 <tr>
-                    <td>{{ alumno.id }}</td>
-                    <td>{{ alumno.nombre }}</td>
-                    <td>{{ alumno.apellido }}</td>
-                    <td>{{ alumno.estado_admision }}</td>
-                    <td>
-                        <a href="{% url 'actualizar_matricula' alumno.id %}">Actualizar</a>
+                    <td data-label="ID">{{ alumno.id }}</td>
+                    <td data-label="Nombre">{{ alumno.nombre }}</td>
+                    <td data-label="Apellido">{{ alumno.apellido }}</td>
+                    <td data-label="Estado de Admisión">{{ alumno.estado_admision }}</td>
+                    <td data-label="Acciones">
+                        <a class="btn-actualizar" href="{% url 'actualizar_matricula' alumno.id %}">Actualizar</a>
                         <a class="btn-eliminar" href="{% url 'eliminar_alumno' alumno.id %}">Eliminar</a>
                     </td>
                 </tr>
@@ -69,7 +152,7 @@
         </tbody>
     </table>
 
-    <h1>Lista de Estudiantes Aprobados</h1>
+    <h2>Lista de Estudiantes Aprobados</h2>
     <table>
         <thead>
             <tr>
@@ -83,12 +166,12 @@
         <tbody>
             {% for alumno in alumnos_aprobados %}
                 <tr>
-                    <td>{{ alumno.id }}</td>
-                    <td>{{ alumno.nombre }}</td>
-                    <td>{{ alumno.apellido }}</td>
-                    <td>{{ alumno.estado_admision }}</td>
-                    <td>
-                        <a href="{% url 'actualizar_matricula' alumno.id %}">Actualizar</a>
+                    <td data-label="ID">{{ alumno.id }}</td>
+                    <td data-label="Nombre">{{ alumno.nombre }}</td>
+                    <td data-label="Apellido">{{ alumno.apellido }}</td>
+                    <td data-label="Estado de Admisión">{{ alumno.estado_admision }}</td>
+                    <td data-label="Acciones">
+                        <a class="btn-actualizar" href="{% url 'actualizar_matricula' alumno.id %}">Actualizar</a>
                         <a class="btn-eliminar" href="{% url 'eliminar_alumno' alumno.id %}">Eliminar</a>
                     </td>
                 </tr>
