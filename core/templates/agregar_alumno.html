@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar Alumno</title>
+    {% load static %}
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+
+        form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        fieldset {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            padding: 10px;
+        }
+
+        legend {
+            font-weight: bold;
+            padding: 0 10px;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>Agregar Alumno</h1>
+    
+    <form method="post">
+        {% csrf_token %}
+        <div>
+            {{ form.non_field_errors }}  <!-- Muestra errores de validación generales -->
+        </div>
+
+        <fieldset>
+            <legend>Información Personal</legend>
+            <div>
+                <label for="{{ form.nombre.id_for_label }}">{{ form.nombre.label }}</label>
+                {{ form.nombre }}  
+                {{ form.nombre.errors }}  
+            </div>
+            
+            <div>
+                <label for="{{ form.apellido.id_for_label }}">{{ form.apellido.label }}</label>
+                {{ form.apellido }}  
+                {{ form.apellido.errors }}  
+            </div>
+            
+            <div>
+                <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+                {{ form.email }}  
+                {{ form.email.errors }}  
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>Información de Admisión</legend>
+            <div>
+                <label for="{{ form.apoderado.id_for_label }}">{{ form.apoderado.label }}</label>
+                {{ form.apoderado }}  
+                {{ form.apoderado.errors }}  
+            </div>
+
+            <div>
+                <label for="{{ form.curso.id_for_label }}">{{ form.curso.label }}</label>
+                {{ form.curso }}  
+                {{ form.curso.errors }}  
+            </div>
+            
+            <div>
+                <label for="{{ form.estado_admision.id_for_label }}">{{ form.estado_admision.label }}</label>
+                {{ form.estado_admision }}  
+                {{ form.estado_admision.errors }}  
+            </div>
+
+            <div>
+                <label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
+                {{ form.password }}  
+                {{ form.password.errors }}  
+            </div>
+        </fieldset>
+        
+        <button type="submit">Agregar Alumno</button>
+    </form>
+
+    <a href="{% url 'gestionar_estudiantes' %}">Volver a la lista de estudiantes</a>
+</body>
+</html>

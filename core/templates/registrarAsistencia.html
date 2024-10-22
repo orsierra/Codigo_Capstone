@@ -11,7 +11,8 @@
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            display: flex; /* Usar flexbox para la barra lateral */
+            display: flex;
+            height: 100vh;
         }
 
         .sidebar {
@@ -20,7 +21,9 @@
             color: white;
             padding: 20px;
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
-            height: 100vh; /* Asegurar que ocupe toda la altura de la pantalla */
+            height: 100%;
+            position: sticky;
+            top: 0;
         }
 
         .sidebar h2 {
@@ -44,29 +47,33 @@
         }
 
         .sidebar ul li a:hover {
-            color: #4CAF50; /* Color al pasar el mouse */
+            color: #4CAF50;
         }
 
         .main-content {
             flex-grow: 1;
             padding: 20px;
             background-color: #f4f4f4;
-            overflow-y: auto; /* Permitir el desplazamiento si es necesario */
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 90%; /* Aumentar el ancho */
+            max-width: 1200px; /* Establecer un ancho máximo */
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
 
         h1 {
             text-align: center;
             color: #333;
             margin-bottom: 20px;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
 
         table {
@@ -77,7 +84,7 @@
 
         th, td {
             border: 1px solid #ccc;
-            padding: 10px;
+            padding: 12px; /* Aumentar el padding para mejor legibilidad */
             text-align: center;
         }
 
@@ -100,7 +107,7 @@
             background-color: #28a745;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 12px 20px; /* Aumentar el padding */
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s;
@@ -111,7 +118,7 @@
         }
 
         .btn-back {
-            background-color: #007bff; /* Color para el botón de regresar */
+            background-color: #007bff;
         }
 
         .btn-back:hover {
@@ -125,7 +132,9 @@
             padding: 10px;
             border-radius: 5px;
             margin-bottom: 20px;
-            display: none; /* Ocultar por defecto */
+            display: none;
+            width: 100%;
+            text-align: center; /* Centrar el texto del mensaje */
         }
     </style>
 </head>
@@ -138,20 +147,22 @@
             <li><a href="{% url 'registrar_asistencia' curso.id %}">Registrar asistencia</a></li>
             <li><a href="{% url 'registrar_calificaciones' curso.id %}">Registrar calificaciones</a></li>
             <li><a href="{% url 'registro_academico' curso.id %}">Registro Académico</a></li>
-            
             <li><a href="{% url 'observaciones' curso.id %}">Observaciones</a></li>
         </ul>
-
     </div>
 
     <div class="main-content">
         <div class="container">
             <h1>Asistencia para {{ curso.nombre }}</h1>
-            
-            <div class="message" id="successMessage">
-                <p>Se han guardado los cambios exitosamente.</p>
-            </div>
-
+        
+            {% if messages %}
+                <div class="message" id="successMessage" style="display: block;">
+                    {% for message in messages %}
+                        <p>{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        
             <form method="post">
                 {% csrf_token %}
                 <table>
@@ -164,7 +175,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for alumno in curso.alumnos.all %}
+                        {% for alumno in alumnos_aprobados %}
                             <tr>
                                 <td>{{ alumno.nombre }} {{ alumno.apellido }}</td>
                                 <td>
@@ -180,7 +191,8 @@
                         {% endfor %}
                     </tbody>
                 </table>
-
+                
+        
                 <div class="buttons">
                     <button type="submit" class="btn">Guardar</button>
                     <button type="button" class="btn btn-back" onclick="window.location.href='{% url 'profesor_libro' curso.id %}'">Regresar</button>
@@ -190,7 +202,7 @@
     </div>
 
     <script>
-        // se muestra si esta presente
+        // Muestra el mensaje si hay mensajes en la vista
         {% if messages %}
             document.getElementById('successMessage').style.display = 'block';
         {% endif %}

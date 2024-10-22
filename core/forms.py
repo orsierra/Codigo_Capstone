@@ -1,5 +1,5 @@
 from django import forms
-from .models import Asistencia, Alumno, Calificacion, Observacion
+from .models import Asistencia, Alumno, Calificacion, Observacion, Apoderado, Curso
 from django.core.exceptions import ValidationError
 class AsistenciaForm(forms.ModelForm):
     class Meta:
@@ -56,3 +56,23 @@ class ObservacionForm(forms.ModelForm):
         self.fields['contenido'].widget.attrs.update({'class': 'form-control'})
     
     
+
+
+class ApoderadoForm(forms.ModelForm):
+    class Meta:
+        model = Apoderado
+        fields = ['nombre', 'apellido', 'email', 'telefono']
+
+from django import forms
+from .models import Alumno, Curso, Apoderado  # Asegúrate de importar los modelos que necesitas
+
+class AlumnoForm(forms.ModelForm):
+    password = forms.CharField(widget=forms.PasswordInput)  # Campo de contraseña
+    
+    class Meta:
+        model = Alumno
+        fields = ['nombre', 'apellido', 'email', 'apoderado', 'password', 'curso', 'estado_admision'] 
+        widgets = {
+            'curso': forms.Select(),  # Esto generará un menú desplegable para seleccionar el curso
+            'apoderado': forms.Select(),  # Esto generará un menú desplegable para seleccionar el apoderado
+        }

@@ -1,67 +1,77 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Consulta de Notas - Apoderado</title>
     <style>
+        /* Estilos para asegurar que html y body ocupen toda la altura y ancho de la pantalla */
+        html,
         body {
-            font-family: Arial, sans-serif;
+            height: 100%;
             margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-            display: flex; /* Para permitir que la barra lateral y el contenido estén uno al lado del otro */
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4; /* Color de fondo de la página */
         }
+
         .sidebar {
-            width: 200px;
-            background-color: #000;
+            width: 240px; /* Ancho de la barra lateral */
+            background-color: #333; /* Fondo oscuro para la barra lateral */
             color: white;
             padding: 20px;
+            height: 100%; /* Asegura que la barra lateral ocupe toda la altura */
             position: fixed; /* Fija la barra lateral */
-            height: 100%;
-            box-sizing: border-box; /* Incluye el padding en el ancho total */
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5); /* Sombra para la barra lateral */
+            overflow-y: auto; /* Permite desplazamiento vertical si es necesario */
         }
+
         .sidebar h2 {
-            margin-top: 0;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            text-align: center;
         }
+
         .sidebar a {
             color: white;
-            display: block;
             text-decoration: none;
-            padding: 10px 0;
+            display: block;
+            padding: 12px 15px;
+            transition: background-color 0.3s; /* Transición suave para el fondo */
+            border-radius: 4px; /* Bordes redondeados */
         }
+
         .sidebar a:hover {
-            background-color: #575757;
+            background-color: #575757; /* Color de fondo al pasar el ratón */
         }
+
         .content {
-            margin-left: 220px; /* Deja espacio para la barra lateral */
+            margin-left: 260px; /* Deja espacio para la barra lateral */
             padding: 20px;
-            flex: 1; /* Permite que el contenido ocupe todo el espacio restante */
+            background-color: white; /* Fondo blanco para el contenido */
+            height: 100%; /* Asegura que el contenido ocupe toda la altura */
+            overflow-y: auto; /* Permite desplazamiento vertical si el contenido es demasiado grande */
+            box-sizing: border-box; /* Incluye padding en el cálculo del ancho */
+            border-radius: 8px; /* Bordes redondeados */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Sombra para el contenido */
         }
+
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: #000;
+            background-color: #333; /* Fondo oscuro para la cabecera */
             color: white;
             padding: 20px;
+            border-radius: 8px; /* Bordes redondeados */
+            margin-bottom: 20px; /* Margen inferior */
         }
+
         .header h1 {
             margin: 0;
-            font-size: 24px;
+            font-size: 2.5em; /* Tamaño de fuente más grande */
         }
-        .profile {
-            text-align: center;
-        }
-        .profile img {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-        }
-        .profile h3 {
-            margin-top: 10px;
-        }
-        /* Accordion style */
+
         .accordion {
             background-color: #e0e0e0;
             border-radius: 5px;
@@ -75,17 +85,21 @@
             justify-content: space-between;
             align-items: center;
         }
+
         .accordion:hover {
             background-color: #d0d0d0;
         }
+
         .accordion:after {
             content: '\25BC'; /* Arrow down */
             font-size: 20px;
             color: #000;
         }
+
         .accordion.active:after {
             content: '\25B2'; /* Arrow up */
         }
+
         .panel {
             padding: 0 15px;
             display: none;
@@ -93,38 +107,59 @@
             margin-bottom: 10px;
             border-radius: 5px;
         }
+
         .panel table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
             text-align: left;
         }
-        .panel th, .panel td {
+
+        .panel th,
+        .panel td {
             border: 1px solid #ccc;
             padding: 10px;
         }
+
         .panel th {
             background-color: #e0f7fa;
         }
+
         .panel td {
             background-color: #fff;
         }
-        .panel .promedio {
+
+        .promedio {
             font-weight: bold;
             text-align: right;
             margin-top: 10px;
         }
+
+        .no-data {
+            text-align: center;
+            font-weight: bold;
+            color: #ff0000; /* Color rojo para el mensaje de no datos */
+            margin-top: 20px; /* Margen superior */
+        }
+
+        /* Elimina márgenes y paddings que puedan causar desplazamiento */
+        * {
+            box-sizing: border-box; /* Incluye padding y border en el tamaño total */
+            margin: 0; /* Elimina márgenes por defecto */
+            padding: 0; /* Elimina padding por defecto */
+        }
     </style>
 </head>
+
 <body>
 
     <div class="sidebar">
-        <h2>Página de la Institución</h2>
+        <h2>Menú</h2>
         <a href="{% url 'apoderado_view' %}">Apoderado</a>
         <a href="{% url 'apoderadoConsuAsis' %}">Asistencia</a>
         <a href="{% url 'apoderadoConsuNotas' %}">Notas</a>
         <a href="{% url 'apoderadoMatri' %}">Matrícula</a>
-        <a href="#">Salir</a>
+
     </div>
 
     <div class="content">
@@ -137,42 +172,44 @@
 
         <div>
             {% if cursos %}
-                {% for curso in cursos %}
-                    <div class="accordion">
-                        {{ curso.nombre }}
-                    </div>
-                    <div class="panel">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Parciales</th>
-                                    <th>Nota</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for calificacion in calificaciones %}
-                                    {% if calificacion.curso == curso %} <!-- Asegúrate de que aquí comparas correctamente -->
-                                        <tr>
-                                            <td>Nota {{ forloop.counter }}</td>
-                                            <td>{{ calificacion.nota }}</td>
-                                        </tr>
-                                    {% endif %}
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                        <div class="promedio">Promedio: {{ curso.promedio }}</div>
-                    </div>
-                {% endfor %}
+            {% for curso in cursos %}
+            <div class="accordion">
+                {{ curso.nombre }}
+            </div>
+            <div class="panel">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Parciales</th>
+                            <th>Nota</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for calificacion in calificaciones %}
+                        {% if calificacion.curso == curso %} <!-- Asegúrate de que aquí comparas correctamente -->
+                        <tr>
+                            <td>Nota {{ forloop.counter }}</td>
+                            <td>{{ calificacion.nota }}</td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div class="promedio">Promedio: {{ curso.promedio }}</div>
+            </div>
+            {% endfor %}
             {% else %}
-                <p>No hay calificaciones disponibles.</p>
+            <p class="no-data">No hay calificaciones disponibles.</p>
             {% endif %}
         </div>
+
+        <button onclick="window.history.back();" style="margin-top: 20px; padding: 10px 15px; font-size: 1em;">Regresar</button>
     </div>
 
     <script>
         var accordions = document.getElementsByClassName("accordion");
         for (var i = 0; i < accordions.length; i++) {
-            accordions[i].addEventListener("click", function() {
+            accordions[i].addEventListener("click", function () {
                 this.classList.toggle("active");
                 var panel = this.nextElementSibling;
                 if (panel.style.display === "block") {
@@ -185,4 +222,5 @@
     </script>
 
 </body>
+
 </html>

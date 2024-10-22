@@ -138,7 +138,6 @@
             <li><a href="{% url 'registrar_asistencia' curso.id %}">Registrar asistencia</a></li>
             <li><a href="{% url 'registrar_calificaciones' curso.id %}">Registrar calificaciones</a></li>
             <li><a href="{% url 'registro_academico' curso.id %}">Registro Académico</a></li>
-
             <li><a href="{% url 'observaciones' curso.id %}">Observaciones</a></li>
         </ul>
     </div>
@@ -147,16 +146,23 @@
         <div class="container">
             <h1>Registrar Calificaciones para {{ curso.nombre }}</h1>
 
-            <div class="message" id="successMessage">
-                <p>Se han guardado los cambios exitosamente.</p>
-            </div>
+            {% if errores %}
+                <div class="alert alert-danger">
+                    <p>Se encontraron errores en los formularios:</p>
+                    <ul>
+                        {% for alumno, error in errores.items %}
+                            <li>{{ alumno.nombre }}: {{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
 
             <form method="post">
                 {% csrf_token %}
                 <table>
                     <thead>
                         <tr>
-                            <th>Alumnos</th>
+                            <th>Alumno</th>
                             <th>Calificación</th>
                         </tr>
                     </thead>
@@ -164,7 +170,7 @@
                         {% for alumno, form in form_list.items %}
                             <tr>
                                 <td>{{ alumno.nombre }} {{ alumno.apellido }}</td>
-                                <td>{{ form.nota }}</td>
+                                <td>{{ form.as_table }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -177,12 +183,5 @@
             </form>
         </div>
     </div>
-
-    <script>
-        // Mostrar el mensaje de éxito si está presente
-        {% if messages %}
-            document.getElementById('successMessage').style.display = 'block';
-        {% endif %}
-    </script>
 </body>
 </html>
