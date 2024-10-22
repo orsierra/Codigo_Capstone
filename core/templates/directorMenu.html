@@ -13,12 +13,13 @@
             padding: 0;
             display: flex;
             height: 100vh;
-            background-color: #f8f9fa; /* Cambiar a un color de fondo sólido */
+            background-color: #f8f9fa; /* Fondo sólido */
         }
 
+        /* Barra lateral */
         .sidebar {
             width: 250px;
-            background-color: rgba(52, 58, 64, 0.9); /* Fondo semi-transparente */
+            background-color: #000000; /* Fondo negro sólido */
             color: white;
             padding: 20px;
             display: flex;
@@ -50,13 +51,13 @@
         }
 
         .sidebar ul li a:hover {
-            color: #17a2b8;
+            color: #17a2b8; /* Efecto hover con color azul */
         }
 
         .main-content {
             flex-grow: 1;
             padding: 40px;
-            background-color: rgba(255, 255, 255, 0.8); /* Fondo semi-transparente */
+            background-color: #ffffff; /* Fondo blanco para el contenido */
             overflow-y: auto;
             box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
@@ -71,6 +72,7 @@
             font-weight: bold;
         }
 
+        /* Contenedor de botones */
         .button-container {
             display: flex;
             flex-direction: column;
@@ -84,9 +86,10 @@
             margin: 10px 0;
         }
 
+        /* Estilos para los botones */
         .button-container button {
-            background-color: black; /* Cambiar el color del botón a negro */
-            color: white; /* Mantener el texto en blanco para contraste */
+            background-color: black; /* Botones en color negro */
+            color: white; /* Texto blanco para los botones */
             border: none;
             padding: 15px;
             border-radius: 8px;
@@ -98,10 +101,11 @@
         }
 
         .button-container button:hover {
-            background-color: #444; /* Color de fondo al pasar el mouse */
+            background-color: #444; /* Color de fondo más claro al pasar el mouse */
             transform: scale(1.02);
         }
 
+        /* Pie de página */
         .footer {
             margin-top: auto;
             text-align: center;
@@ -121,6 +125,8 @@
     </style>
 </head>
 <body>
+
+    <!-- Barra lateral -->
     <div class="sidebar">
         <h2>Planificación Académica</h2>
         <ul>
@@ -134,15 +140,15 @@
         </div>
     </div>
 
+    <!-- Contenido principal -->
     <div class="main-content">
-        <h1>Planificación Académica
-
-        </h1>
+        <h1>Planificación Académica</h1>
         <div class="button-container">
             <a href="{% url 'director_plani' %}"><button>Planificación Académica</button></a>
             <a href="{% url 'informes_academicos' %}"><button>Informes Académicos</button></a>
             <a href="{% url 'informes_finanzas' %}"><button>Informes Finanzas</button></a>
         </div>
     </div>
+
 </body>
 </html>
