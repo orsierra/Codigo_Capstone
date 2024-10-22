@@ -16,6 +16,7 @@ urlpatterns = [
     path('registrar-calificaciones/<int:curso_id>/', registrar_calificaciones, name='registrar_calificaciones'),  
     path('registro-academico/<int:curso_id>/', registro_academico, name='registro_academico'),
     path('generar-informes/<int:curso_id>/', views.generar_informes, name='generar_informes'),
+    path('api/alumno/<int:alumno_id>/', views.alumno_detalle, name='alumno_detalle'),
     path('observaciones/<int:curso_id>/', observaciones, name='observaciones'),
     #alumno
     path('alumno/', views.alumno_dashboard, name='alumno_dashboard'),
@@ -37,7 +38,7 @@ urlpatterns = [
     # Asistende De admision y Matricula
     path('gestionar_estudiantes/', views.gestionar_estudiantes, name='gestionar_estudiantes'),
     path('agregar_alumno/', views.agregar_alumno, name='agregar_alumno'),
-    path('actualizar_matricula/<int:alumno_id>/', views.actualizar_matricula, name='actualizar_matricula'),
+    path('actualizar_matricula/<int:id>/', views.actualizar_matricula, name='actualizar_matricula'),
     path('panel_admision/', views.panel_admision, name='panel_admision'),
     path('eliminar_alumno/<int:alumno_id>/', views.eliminar_alumno, name='eliminar_alumno'),
 
