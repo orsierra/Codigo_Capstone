@@ -152,49 +152,46 @@
         {% endfor %}
       </ul>
     </div>
+    <script>
+      const buttons = document.querySelectorAll('.btn-generar-informe');
+    
+      buttons.forEach(button => {
+        button.addEventListener('click', () => {
+          const alumnoId = button.dataset.alumnoId;
+          // Realizar una solicitud AJAX al servidor para obtener los datos del alumno
+          fetch(`/api/alumno/${alumnoId}/`)
+            .then(response => response.json())
+            .then(data => {
+              // Actualizar el contenido del modal con los datos
+              const modal = document.getElementById('alumnoModal');
+              modal.querySelector('p:nth-child(1)').textContent = `Nombre: ${data.alumno.nombre}`;
+              modal.querySelector('p:nth-child(2)').textContent = `Apellido: ${data.alumno.apellido}`;
+              // ... actualizar otros elementos del modal
+              modal.showModal();
+            });
+        });
+      });
+    </script>
+
        </body>
 </html>
 <!-- Open the modal using ID.showModal() method -->
 <dialog id="alumnoModal" class="modal">
-    <div class="modal-content">
-      <span class="close">&times;</span>
-      <div id="modal-body">
-        <h2>{{ alumno.nombre }} {{ alumno.apellido }}</h2>
+  <h1>Información del Alumno</h1>
+  <p>Nombre: {{ data.alumno.nombre }}</p>
+  <p>Apellido: {{ data.alumno.apellido }}</p>
   
-        <table>
-          <thead>
-            <tr>
-              <th>Curso</th>
-              <th>Profesor</th>
-              <th>Calificaciones</th>
-              <th>Promedio</th>
-              <th>Asistencias</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for curso in cursos %}
-            <tr>
-              <td>{{ curso.nombre }}</td>
-              <td>{{ curso.profesor }}</td>
-              <td>
-                <ul>
-                  {% for calificacion in curso.calificaciones %}
-                  <li>{{ calificacion.fecha }}: {{ calificacion.nota }}</li>
-                  {% endfor %}
-                </ul>
-              </td>
-              <td>{{ curso.promedio }}</td>
-              <td>
-                <ul>
-                  {% for asistencia in curso.asistencias %}
-                  <li>{{ asistencia }}</li>
-                  {% endfor %}
-                </ul>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    </div>
+  <h2>Cursos</h2>
+  <ul>
+    {% for curso in data.cursos %}
+    <li>
+      {{ curso.nombre }} - Promedio: {{ curso.promedio }}
+      <ul>
+        {% for calificacion in curso.calificaciones %}
+        <li>{{ calificacion.fecha }}: {{ calificacion.nota }}</li>
+        {% endfor %}
+      </ul>
+    </li>
+    {% endfor %}
+  </ul>
   </dialog>
