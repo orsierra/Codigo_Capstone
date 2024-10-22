@@ -36,7 +36,6 @@ urlpatterns = [
     path('update-curso/', update_curso, name='update_curso'),
     #====================================================================================================
     path('informe-financiero/', views.informe_financiero_view, name='informe_financiero'),
-    path('informe-financiero/editar/<int:id>/', views.editar_informe_view, name='editar_informe'),
     path('informe-financiero/eliminar/<int:informe_id>/', views.eliminar_informe_view, name='eliminar_informe'),
     path('informe-financiero/pdf/', views.generar_pdf_view, name='descargar_pdf'),
     # Asistende De admision y Matricula

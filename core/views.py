@@ -565,21 +565,25 @@ def informe_financiero_view(request):
 
 
 def informe_financiero_view(request):
-    informes = InformeFinanciero.objects.all()
-    
     if request.method == 'POST':
         form = InformeFinancieroForm(request.POST)
         if form.is_valid():
-            form.save()  # Guarda el nuevo informe
-            return redirect('informe_financiero')  # Redirige a la vista de informes
+            form.save()
+            return redirect('informe_financiero')  # Redirige después de agregar
     else:
         form = InformeFinancieroForm()
+    
+    # Obtener todos los informes financieros
+    informes = InformeFinanciero.objects.all()
 
+    # Pasar el contexto al template
     context = {
         'form': form,
         'informes': informes,
     }
     return render(request, 'informe_financiero.html', context)
+
+
 
 def generar_pdf_view(request):
     # Obtener todos los informes financieros del modelo
@@ -602,22 +606,6 @@ def generar_pdf_view(request):
     response['Content-Disposition'] = 'attachment; filename="informe_financiero.pdf"'
     return response
 
-
-
-
-def editar_informe_view(request, informe_id):
-    informe = get_object_or_404(InformeFinanciero, id=informe_id)
-
-    if request.method == 'POST':
-        form = InformeFinancieroForm(request.POST, instance=informe)
-        if form.is_valid():
-            form.save()
-            # Redirigir a una página de éxito o de lista de informes después de guardar
-            return redirect('informe_financiero')
-    else:
-        form = InformeFinancieroForm(instance=informe)
-
-    return render(request, 'editar_informe.html', {'form': form, 'informe': informe})
 
 
 def eliminar_informe_view(request, informe_id):
