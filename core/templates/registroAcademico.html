@@ -1,5 +1,4 @@
 {% load custom_filters %}
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -10,16 +9,17 @@
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            display: flex; /* Usar flexbox para la barra lateral */
+            display: flex;
+            height: 100vh; /* Asegura que la altura sea completa */
         }
 
         .sidebar {
             width: 250px;
-            background-color: #222; /* Color de la barra lateral */
+            background-color: #222;
             color: white;
             padding: 20px;
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
-            height: 100vh; /* Asegurar que ocupe toda la altura de la pantalla */
+            overflow-y: auto; /* Permite el desplazamiento si el contenido excede la altura */
         }
 
         .sidebar h2 {
@@ -43,14 +43,14 @@
         }
 
         .sidebar ul li a:hover {
-            color: #4CAF50; /* Color al pasar el mouse */
+            color: #4CAF50;
         }
 
         .main-content {
             flex-grow: 1;
             padding: 20px;
             background-color: #f4f4f4;
-            overflow-y: auto;
+            overflow-y: auto; /* Permite el desplazamiento si el contenido excede la altura */
         }
 
         h1 {
@@ -76,7 +76,6 @@
             color: white;
             cursor: pointer;
             padding: 10px;
-            font-weight: bold;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -135,6 +134,19 @@
         .btn-back:hover {
             background-color: #0056b3;
         }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%; /* Full width on small screens */
+                height: auto; /* Adjust height */
+                position: relative; /* Change position */
+                box-shadow: none; /* Remove shadow */
+            }
+
+            .main-content {
+                padding: 10px; /* Reduce padding */
+            }
+        }
     </style>
     <script>
         function togglePanel(panelId) {
@@ -162,11 +174,12 @@
         <div class="accordion">
             {% for alumno, calificaciones in calificaciones_por_alumno.items %}
             <div class="panel">
-                <div class="panel-heading" onclick="togglePanel('calificaciones-{{ alumno.id }}')">
-                    <span>{{ alumno.nombre }} {{ alumno.apellido }} - Calificaciones</span>
+                <div class="panel-heading" onclick="togglePanel('panel-{{ alumno.id }}')">
+                    <span>{{ alumno.nombre }} {{ alumno.apellido }}</span>
                     <span>&#x25BC;</span>
                 </div>
-                <div id="calificaciones-{{ alumno.id }}" class="panel-content">
+                <div id="panel-{{ alumno.id }}" class="panel-content">
+                    <h4>Calificaciones</h4>
                     <table>
                         <thead>
                             <tr>
@@ -187,16 +200,7 @@
                             {% endfor %}
                         </tbody>
                     </table>
-                    <p><strong>Promedio:</strong> {{ promedios_por_alumno|get_item:alumno }}</p>
-                </div>
-            </div>
-
-            <div class="panel">
-                <div class="panel-heading" onclick="togglePanel('asistencias-{{ alumno.id }}')">
-                    <span>{{ alumno.nombre }} {{ alumno.apellido }} - Asistencia</span>
-                    <span>&#x25BC;</span>
-                </div>
-                <div id="asistencias-{{ alumno.id }}" class="panel-content">
+                    <h4>Asistencia</h4>
                     <table>
                         <thead>
                             <tr>
@@ -211,25 +215,30 @@
                                 <td>
                                     {% if alumno in asistencia.alumnos_presentes.all %}
                                         Presente
-                                    {% else %}
+                                    {% elif alumno in asistencia.alumnos_ausentes.all %}
                                         Ausente
+                                    {% elif alumno in asistencia.alumnos_justificados.all %}
+                                        Justificado
+                                    {% else %}
+                                        Sin registro
                                     {% endif %}
                                 </td>
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="2">No hay asistencia registrada.</td>
+                                <td colspan="2">No hay registros de asistencia.</td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
+                    <p><strong>Promedio:</strong> {{ promedios_por_alumno|get_item:alumno }}</p>
                 </div>
             </div>
             {% endfor %}
         </div>
 
         <div class="buttons">
-            <button class="btn" onclick="window.location.href='{% url 'profesor_libro' curso.id %}'">Regresar</button>
+            <button class="btn btn-back" onclick="window.history.back()">Regresar</button>
         </div>
     </div>
 </body>

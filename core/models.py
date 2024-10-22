@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 
 
+
 # modelo profesor, apoderado y alumno
 
 class Profesor(models.Model):
@@ -31,15 +32,21 @@ class Alumno(models.Model):
     apellido = models.CharField(max_length=200, default='Sin apellido')
     email = models.EmailField(unique=True)
     apoderado = models.ForeignKey(Apoderado, related_name='alumnos', on_delete=models.SET_NULL, null=True)
+    estado_admision = models.CharField(max_length=50, default='Pendiente')
+    curso = models.ForeignKey('Curso', related_name='alumnos_inscritos', on_delete=models.SET_NULL, null=True)
+
 
     def __str__(self):
         return f"{self.nombre} {self.apellido}"
+
+
+
 #Modulo curso relacionado con alumno
 class Curso(models.Model): 
     nombre = models.CharField(max_length=100)
     asignatura = models.CharField(max_length=100)
     profesor = models.ForeignKey('Profesor', on_delete=models.CASCADE)  
-    alumnos = models.ManyToManyField(Alumno, blank=True)  
+    alumnos = models.ManyToManyField('Alumno', blank=True, related_name='cursos_asignados')  # Cadena para evitar circular
     dias = models.CharField(max_length=100)
     hora = models.TimeField()
     sala = models.CharField(max_length=50, default='Sala por asignar')
@@ -105,4 +112,6 @@ class Observacion(models.Model):
 
     def __str__(self):
         return f"Observación de {self.alumno} en {self.curso} el {self.fecha}"
-#===============================================================================================
+    
+#==============================================================================================
+

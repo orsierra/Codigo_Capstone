@@ -1,6 +1,6 @@
 # urls.py
 from django.urls import path
-from .views import login_view, profesor_dashboard, profesor_cursos, crear_usuario_db, registrar_calificaciones, registro_academico, observaciones,libro_clases, apoderadoConsuAsis, apoderadoConsuNotas, apoderadoMatri, apoderado_view, director_dashboard,directorMenu,director_plani,informes_academicos,informes_finanzas,update_curso
+from .views import login_view, profesor_dashboard, profesor_cursos, crear_usuario_db, registrar_calificaciones, registro_academico, observaciones,libro_clases, apoderadoConsuAsis, apoderadoConsuNotas, apoderadoMatri, apoderado_view, director_dashboard, update_curso
 from core import views
 
 
@@ -34,7 +34,11 @@ urlpatterns = [
     path('informes-academicos/', views.informes_academicos, name='informes_academicos'),
     path('informes-finanzas/', views.informes_finanzas, name='informes_finanzas'),
     path('update-curso/', update_curso, name='update_curso'),
-    
-    # URL DE LIBRO
+    # Asistende De admision y Matricula
+    path('gestionar_estudiantes/', views.gestionar_estudiantes, name='gestionar_estudiantes'),
+    path('agregar_alumno/', views.agregar_alumno, name='agregar_alumno'),
+    path('actualizar_matricula/<int:alumno_id>/', views.actualizar_matricula, name='actualizar_matricula'),
+    path('panel_admision/', views.panel_admision, name='panel_admision'),
+    path('eliminar_alumno/<int:alumno_id>/', views.eliminar_alumno, name='eliminar_alumno'),
 
 ]

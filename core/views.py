@@ -3,12 +3,12 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Curso, Profesor,Asistencia, Calificacion, Informe, Observacion, Alumno, Apoderado
+from .models import Curso, Profesor,Asistencia, Calificacion, Informe, Observacion, Alumno, Apoderado, Curso
 from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404
 from datetime import date
 from django.utils import timezone
-from .forms import CalificacionForm, ObservacionForm 
+from .forms import CalificacionForm, ObservacionForm, AlumnoForm, ApoderadoForm 
 from django.contrib import messages
 from django.db.models import Avg
 from django.http import HttpResponse
@@ -19,6 +19,7 @@ import json
 import logging
 from django.http import JsonResponse
 from django.db.models import Q  # Agrega esta línea
+from django.db import models
 
 
 # ============================================================ MODULO LOGIN ==============================================================================
@@ -89,31 +90,39 @@ def libro_clases(request, curso_id):
 @login_required
 def registrar_asistencia(request, curso_id):
     curso = get_object_or_404(Curso, id=curso_id)
-    alumnos = curso.alumnos.all()  # Obtener los alumnos del curso
+    
+    # Filtra solo los alumnos aprobados
+    alumnos_aprobados = Alumno.objects.filter(curso=curso, estado_admision='Aprobado')
+
+    if not alumnos_aprobados.exists():
+        messages.warning(request, f"No hay alumnos aprobados asociados al curso {curso.nombre}.")
+        return redirect('profesor_cursos')  # Redirigir a otra vista si no hay alumnos aprobados
 
     if request.method == 'POST':
-        # Crear o obtener la asistencia para la fecha actual
-        asistencia, created = Asistencia.objects.get_or_create(curso=curso, fecha=timezone.now().date())
+        # Crear un nuevo objeto Asistencia
+        asistencia = Asistencia(curso=curso, fecha=date.today())
+        asistencia.save()  # Guarda el objeto Asistencia antes de agregar a los alumnos
 
-        # Limpiar las listas existentes para evitar duplicados
-        asistencia.alumnos_presentes.clear()
-        asistencia.alumnos_ausentes.clear()
-        asistencia.alumnos_justificados.clear()
-
-        # Procesar los estados de asistencia
-        for alumno in alumnos:
-            asistencia_value = request.POST.get(f'asistencia_{alumno.id}')
-            if asistencia_value == 'presente':
+        for alumno in alumnos_aprobados:
+            asistencia_estado = request.POST.get(f'asistencia_{alumno.id}')
+            if asistencia_estado == 'presente':
                 asistencia.alumnos_presentes.add(alumno)
-            elif asistencia_value == 'ausente':
+            elif asistencia_estado == 'ausente':
                 asistencia.alumnos_ausentes.add(alumno)
-            elif asistencia_value == 'justificado':
+            elif asistencia_estado == 'justificado':
                 asistencia.alumnos_justificados.add(alumno)
-        
-        asistencia.save()
-        messages.success(request, "Los cambios se han guardado exitosamente.")
-        return redirect('registrar_asistencia', curso_id=curso.id)  # Cambia aquí a la vista de registrar asistencia
-    return render(request, 'registrarAsistencia.html', {'curso': curso, 'alumnos': alumnos})
+
+        asistencia.save()  # Guarda los cambios después de agregar los alumnos
+
+        messages.success(request, "Asistencia registrada exitosamente.")
+        return redirect('registrar_asistencia', curso_id=curso.id)  # Redirigir a la misma vista con curso_id
+
+    return render(request, 'registrarAsistencia.html', {
+        'curso': curso,
+        'alumnos_aprobados': alumnos_aprobados,
+    })
+
+
 
 #=============================================================== REGISTRAR CALIFICACIONES ====================================================================
 
@@ -123,8 +132,11 @@ def registrar_calificaciones(request, curso_id):
     errores = {}
     form_list = {}
 
+    # Filtramos solo los alumnos aprobados
+    alumnos_aprobados = Alumno.objects.filter(curso=curso, estado_admision='Aprobado')
+
     if request.method == 'POST':
-        for alumno in Alumno.objects.filter(curso=curso):
+        for alumno in alumnos_aprobados:
             form = CalificacionForm(request.POST, prefix=str(alumno.id))
             if form.is_valid():
                 # Guarda la calificación usando el alumno y curso correcto
@@ -140,8 +152,8 @@ def registrar_calificaciones(request, curso_id):
             return redirect('registrar_calificaciones', curso_id=curso_id)  # Cambia aquí
 
     else:
-        # Crea formularios para cada alumno
-        form_list = {alumno: CalificacionForm(prefix=str(alumno.id)) for alumno in Alumno.objects.filter(curso=curso)}
+        # Crea formularios para cada alumno aprobado
+        form_list = {alumno: CalificacionForm(prefix=str(alumno.id)) for alumno in alumnos_aprobados}
 
     return render(request, 'registrarCalificaciones.html', {
         'curso': curso,
@@ -149,12 +161,17 @@ def registrar_calificaciones(request, curso_id):
         'errores': errores
     })
 
+
+
 # =================================================== REGISTRO ACADEMICO =====================================================================================
 
 @login_required
 def registro_academico(request, curso_id):
     curso = get_object_or_404(Curso, id=curso_id)
-    alumnos = curso.alumnos.all()
+    
+    # Filtrar solo alumnos aprobados
+    alumnos_aprobados = Alumno.objects.filter(curso=curso, estado_admision='Aprobado')
+    
     calificaciones = Calificacion.objects.filter(curso=curso)
     asistencias = Asistencia.objects.filter(curso=curso)
 
@@ -163,7 +180,8 @@ def registro_academico(request, curso_id):
     promedios_por_alumno = {}
     asistencias_por_alumno = {}
 
-    for alumno in alumnos:
+    for alumno in alumnos_aprobados:
+        # Filtrar calificaciones del alumno
         calificaciones_alumno = calificaciones.filter(alumno=alumno)
         calificaciones_por_alumno[alumno] = calificaciones_alumno
 
@@ -171,8 +189,12 @@ def registro_academico(request, curso_id):
         promedio = calificaciones_alumno.aggregate(Avg('nota'))['nota__avg'] or 0
         promedios_por_alumno[alumno] = round(promedio, 2)
 
-        # Obtener asistencias para cada alumno
-        asistencias_alumno = asistencias.filter(alumnos_presentes=alumno) | asistencias.filter(alumnos_ausentes=alumno)
+        # Obtener asistencias para cada alumno, incluyendo justificadas
+        asistencias_alumno = (
+            asistencias.filter(alumnos_presentes=alumno) |
+            asistencias.filter(alumnos_ausentes=alumno) |
+            asistencias.filter(alumnos_justificados=alumno)
+        )
         asistencias_por_alumno[alumno] = asistencias_alumno
 
     context = {
@@ -182,6 +204,8 @@ def registro_academico(request, curso_id):
         'asistencias_por_alumno': asistencias_por_alumno,
     }
     return render(request, 'registroAcademico.html', context)
+
+
 # ===============================================================================================================================================================
 
 @login_required
@@ -241,6 +265,9 @@ def observaciones(request, curso_id):
     curso = get_object_or_404(Curso, id=curso_id)
     observaciones = Observacion.objects.filter(curso=curso)
 
+    # Filtra solo los alumnos aprobados
+    alumnos_aprobados = Alumno.objects.filter(curso=curso, estado_admision='Aprobado')
+
     if request.method == 'POST':
         if 'eliminar' in request.POST:
             observacion_id = request.POST.get('observacion_id')
@@ -250,7 +277,7 @@ def observaciones(request, curso_id):
 
         # Lógica para agregar una nueva observación
         form = ObservacionForm(request.POST)
-        form.fields['alumno'].queryset = curso.alumnos.all()  
+        form.fields['alumno'].queryset = alumnos_aprobados  # Filtrar alumnos aprobados
         if form.is_valid():
             observacion = form.save(commit=False)
             observacion.curso = curso  # Asociar la observación al curso
@@ -258,13 +285,14 @@ def observaciones(request, curso_id):
             return redirect('observaciones', curso_id=curso.id)  # Redirigir después de guardar
     else:
         form = ObservacionForm()
-        form.fields['alumno'].queryset = curso.alumnos.all()  # Filtrar alumnos
+        form.fields['alumno'].queryset = alumnos_aprobados  # Filtrar alumnos aprobados
 
     return render(request, 'observaciones.html', {
         'curso': curso,
         'observaciones': observaciones,
         'form': form,
     })
+
 
 # ============================================================= DASHBOARD ALUMNOS =======================================================================
 
@@ -300,8 +328,30 @@ def alumno_consulta_asistencia(request):
 
 # =========================================================== Vista para la consulta de notas ==========================================================================
 
+@login_required
 def alumno_consulta_notas(request):
-    return render(request, 'alumnoConsuNotas.html')
+    # Obtener el alumno actual (suponiendo que el usuario esté autenticado)
+    alumno = Alumno.objects.get(user=request.user)
+
+    # Obtener los cursos del alumno
+    cursos = Curso.objects.filter(alumnos=alumno).prefetch_related('calificacion_set')
+
+    # Agregar el promedio de notas para cada curso
+    cursos_con_promedios = []
+    for curso in cursos:
+        calificaciones = Calificacion.objects.filter(curso=curso, alumno=alumno)
+        if calificaciones.exists():
+            promedio = calificaciones.aggregate(average_nota=models.Avg('nota'))['average_nota']
+        else:
+            promedio = None  # No hay notas disponibles
+        cursos_con_promedios.append({
+            'curso': curso,
+            'calificaciones': calificaciones,
+            'promedio': promedio
+        })
+
+    return render(request, 'alumnoConsuNotas.html', {'cursos_con_promedios': cursos_con_promedios})
+
 
 # ===================================================================== alumno home ====================================================================================
 @login_required
@@ -483,4 +533,66 @@ def update_curso(request):
     return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=405)
 
 
-# =======================================================================================================================================================================
+# ========================================================================== ADMISION Y MATRICULA ============================================================================================
+
+def gestionar_estudiantes(request):
+    # Filtrar alumnos con estado de admisión "Pendiente y aprobado"
+    alumnos_pendientes = Alumno.objects.filter(estado_admision='Pendiente')
+    alumnos_aprobados = Alumno.objects.filter(estado_admision='Aprobado')
+    
+    context = {
+        'alumnos_pendientes': alumnos_pendientes,
+        'alumnos_aprobados': alumnos_aprobados,
+    }
+    
+    return render(request, 'gestionar_estudiantes.html', context)
+
+
+def agregar_alumno(request):
+    if request.method == 'POST':
+        form = AlumnoForm(request.POST)
+        if form.is_valid():
+            # Primero crea el usuario
+            user = User.objects.create_user(
+                username=form.cleaned_data['email'],  # Puedes ajustar esto si quieres usar otro campo como username
+                password=form.cleaned_data['password'],  # Asegúrate de que la contraseña esté en el formulario
+                email=form.cleaned_data['email'],
+            )
+            # Luego crea el Alumno
+            alumno = Alumno(
+                user=user,
+                nombre=form.cleaned_data['nombre'],
+                apellido=form.cleaned_data['apellido'],
+                email=form.cleaned_data['email'],
+                apoderado=form.cleaned_data['apoderado'],  # Este campo ya está en el formulario
+                estado_admision=form.cleaned_data['estado_admision'],  # Este campo ya está en el formulario
+                curso=form.cleaned_data['curso'],  # Asignar el curso
+            )
+            alumno.save()  # Guarda el alumno en la base de datos
+            return redirect('gestionar_estudiantes')  # Redirige a la lista de estudiantes
+    else:
+        form = AlumnoForm()  # Si no es POST, crea un nuevo formulario
+    
+    return render(request, 'agregar_alumno.html', {'form': form})  # Renderiza la plantilla con el formulario
+
+
+def eliminar_alumno(request, alumno_id):
+    alumno = get_object_or_404(Alumno, id=alumno_id)
+    alumno.delete()  # Eliminar el alumno
+    return redirect('gestionar_estudiantes')  # Redirige a la lista de estudiantes
+
+# Vista para actualizar la matrícula
+def actualizar_matricula(request):
+    # Filtrar alumnos de "Primero Medio"
+    alumnos = Alumno.objects.filter(nivel='Primero Medio')
+    return render(request, 'actualizar_matricula.html', {'alumnos': alumnos})
+
+
+
+
+def panel_admision(request):
+    alumnos = Alumno.objects.all()  # Obtiene todos los alumnos
+    return render(request, 'panel_admision.html', {'alumnos': alumnos})
+
+
+# ===========================================================================================================================================================================================
