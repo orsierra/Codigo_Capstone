@@ -20,6 +20,9 @@ import logging
 from django.http import JsonResponse
 from django.db.models import Q  # Agrega esta línea
 from django.db import models
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from weasyprint import HTML
 
 
 # ============================================================ MODULO LOGIN ==============================================================================
