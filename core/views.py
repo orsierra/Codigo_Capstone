@@ -24,6 +24,7 @@ import json
 import logging
 from django.http import JsonResponse
 from django.db.models import Q  # Agrega esta línea
+from django.db import models
 
 
 # ============================================================ MODULO LOGIN ==============================================================================
@@ -324,8 +325,30 @@ def alumno_consulta_asistencia(request):
 
 # =========================================================== Vista para la consulta de notas ==========================================================================
 
+@login_required
 def alumno_consulta_notas(request):
-    return render(request, 'alumnoConsuNotas.html')
+    # Obtener el alumno actual (suponiendo que el usuario esté autenticado)
+    alumno = Alumno.objects.get(user=request.user)
+
+    # Obtener los cursos del alumno
+    cursos = Curso.objects.filter(alumnos=alumno).prefetch_related('calificacion_set')
+
+    # Agregar el promedio de notas para cada curso
+    cursos_con_promedios = []
+    for curso in cursos:
+        calificaciones = Calificacion.objects.filter(curso=curso, alumno=alumno)
+        if calificaciones.exists():
+            promedio = calificaciones.aggregate(average_nota=models.Avg('nota'))['average_nota']
+        else:
+            promedio = None  # No hay notas disponibles
+        cursos_con_promedios.append({
+            'curso': curso,
+            'calificaciones': calificaciones,
+            'promedio': promedio
+        })
+
+    return render(request, 'alumnoConsuNotas.html', {'cursos_con_promedios': cursos_con_promedios})
+
 
 # ===================================================================== alumno home ====================================================================================
 @login_required
@@ -408,11 +431,7 @@ def apoderadoMatri(request):
 
 
 # ==================================================================== DIRECTOR =========================================================================================
-<<<<<<< HEAD
 #@login_required
-=======
-@login_required
->>>>>>> 296154a5ce0dd4557152ba8c1ec1c89b39ada058
 def director_dashboard(request):
     return render(request, 'director.html') 
 #@login_required
