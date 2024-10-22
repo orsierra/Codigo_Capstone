@@ -325,9 +325,8 @@ def alumno_consulta_asistencia(request):
     
     # Verificar el estado de admisión del alumno
     if alumno.estado_admision != 'Aprobado':
-        # Si el estado no es "Aprobado", mostrar un mensaje de error y redirigir al alumno
         messages.error(request, 'Su estado de admisión no le permite acceder a la consulta de asistencia.')
-        return redirect('alumno_home')  # Redirigir a una página predeterminada, como el home del alumno
+        return redirect('alumno_home')
 
     # Obtener los cursos en los que está inscrito el alumno
     cursos = Curso.objects.filter(alumnos=alumno)
@@ -336,23 +335,29 @@ def alumno_consulta_asistencia(request):
     # Recorremos los cursos del alumno para obtener la información de asistencia
     for curso in cursos:
         total_clases = Asistencia.objects.filter(curso=curso).count()  # Total de clases (días)
-        asistencias_presente = Asistencia.objects.filter(curso=curso, alumnos_presentes=alumno).count()  # Total de asistencias
-        asistencias_justificado = Asistencia.objects.filter(curso=curso, alumnos_justificados=alumno).count()  # Total de justificados
+        
+        # Obtener asistencias como presente, ausente y justificado
+        asistencias_presente = Asistencia.objects.filter(curso=curso, alumnos_presentes=alumno).count()
+        asistencias_justificado = Asistencia.objects.filter(curso=curso, alumnos_justificados=alumno).count()
+        asistencias_ausente = Asistencia.objects.filter(curso=curso, alumnos_ausentes=alumno).count()
 
         # Se suma el presente con el justificado para obtener el total de asistencia válida
-        total_asistencia = asistencias_presente + asistencias_justificado
-        porcentaje_asistencia = (total_asistencia / total_clases * 100) if total_clases > 0 else 0
+        total_asistencia_valida = asistencias_presente + asistencias_justificado
+        porcentaje_asistencia = (total_asistencia_valida / total_clases * 100) if total_clases > 0 else 0
 
         asistencias_data.append({
             'curso': curso.nombre,
             'asignatura': curso.asignatura,
             'total_clases': total_clases,
-            'asistencia': total_asistencia,
+            'asistencia_valida': total_asistencia_valida,
+            'ausencias': asistencias_ausente,
             'porcentaje_asistencia': round(porcentaje_asistencia, 2)
         })
 
     # Renderizar el template con los datos de asistencia
     return render(request, 'alumnoConsuAsis.html', {'asistencias_data': asistencias_data})
+
+
 
 # =========================================================== Vista para la consulta de notas ==========================================================================
 
