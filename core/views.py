@@ -211,53 +211,43 @@ def registro_academico(request, curso_id):
 @login_required
 def generar_informes(request, curso_id):
     curso = get_object_or_404(Curso, id=curso_id)
-    alumnos = Alumno.objects.filter(curso=curso)  # Obtener los alumnos del curso
-    return render(request, 'Profe_generar_informes.html', {'curso': curso, 'alumnos': alumnos})
+    alumnos_aprobados = Alumno.objects.filter(curso=curso, estado_admision='Aprobado')
+
+    return render(request, 'Profe_generar_informes.html', {'curso': curso, 'alumnos_aprobados': alumnos_aprobados})
 
 # ============================================ generar informe en pdf para el profesor por alumno ================================================================
 @login_required
+@login_required
 def alumno_detalle(request, alumno_id):
     alumno = get_object_or_404(Alumno, id=alumno_id)
-    cursos = alumno.curso_set.all()
-    # Diccionarios para almacenar datos organizados por curso
-    calificaciones_por_curso = {}
-    promedios_por_curso = {}
-    asistencias_por_curso = {}
+    curso = alumno.curso  # Obtiene el curso al que pertenece el alumno
 
-    for curso in cursos:
-        calificaciones_curso = Calificacion.objects.filter(alumno=alumno, curso=curso)
-        calificaciones_por_curso[curso] = calificaciones_curso
+    # Filtrar calificaciones por el alumno y su curso
+    calificaciones = Calificacion.objects.filter(alumno=alumno, curso=curso)
 
-        # Calcular promedio
-        promedio = calificaciones_curso.aggregate(Avg('nota'))['nota__avg'] or 0
-        promedios_por_curso[curso] = promedio
+    # Calcular el promedio de calificaciones
+    if calificaciones.exists():
+        promedio = sum(calificacion.nota for calificacion in calificaciones) / calificaciones.count()
+    else:
+        promedio = 0  # Si no hay calificaciones, el promedio es 0
 
-        asistencias_curso = Asistencia.objects.filter(Q(alumnos_presentes=alumno) | Q(alumnos_ausentes=alumno), curso=curso)
-        asistencias_por_curso[curso] = asistencias_curso
+    # Filtrar asistencias usando los campos ManyToMany
+    asistencias = Asistencia.objects.filter(curso=curso).filter(alumnos_presentes=alumno)  # Asistencias de presentes
+    ausencias = Asistencia.objects.filter(curso=curso).filter(alumnos_ausentes=alumno)  # Asistencias de ausentes
+    justificaciones = Asistencia.objects.filter(curso=curso).filter(alumnos_justificados=alumno)  # Asistencias justificadas
 
-    # Convertir los datos a un formato adecuado para JSON
-    data = {
-        'alumno': {
-            'nombre': alumno.nombre,
-            'apellido': alumno.apellido,
-            # Agrega aquí otros campos del modelo Alumno que quieras incluir
-        },
-        'cursos': [
-            {
-                'nombre': curso.nombre,
-                'profesor': curso.profesor.nombre,  # Asumiendo que Profesor tiene un campo nombre
-                'calificaciones': [
-                    {'fecha': calificacion.fecha, 'nota': calificacion.nota} for calificacion in calificaciones_curso
-                ],
-                'promedio': promedio,
-                'asistencias': [asistencia.fecha for asistencia in asistencias_curso],  # Ejemplo de cómo incluir asistencias
-            } for curso in cursos
-        ]
+    context = {
+        'alumno': alumno,
+        'calificaciones': calificaciones,
+        'asistencias': asistencias,
+        'ausencias': ausencias,
+        'justificaciones': justificaciones,
+        'promedio': promedio,  # Añadir el promedio al contexto
     }
+    return render(request, 'alumno_detalle.html', context)
 
-    return render(request, 'Profe_generar_informes.html', {'data': data})
 
-    
+
 # =============================================================== OBSERVACIONES =========================================================================
 @login_required
 def observaciones(request, curso_id):
