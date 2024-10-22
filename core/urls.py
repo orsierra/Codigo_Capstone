@@ -37,7 +37,7 @@ urlpatterns = [
     # Asistende De admision y Matricula
     path('gestionar_estudiantes/', views.gestionar_estudiantes, name='gestionar_estudiantes'),
     path('agregar_alumno/', views.agregar_alumno, name='agregar_alumno'),
-    path('actualizar_matricula/<int:alumno_id>/', views.actualizar_matricula, name='actualizar_matricula'),
+    path('actualizar_matricula/<int:id>/', views.actualizar_matricula, name='actualizar_matricula'),
     path('panel_admision/', views.panel_admision, name='panel_admision'),
     path('eliminar_alumno/<int:alumno_id>/', views.eliminar_alumno, name='eliminar_alumno'),
 
