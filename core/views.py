@@ -20,17 +20,10 @@ import logging
 from django.http import JsonResponse
 from django.db.models import Q 
 from django.db import models
-<<<<<<< HEAD
-from django.http import HttpResponse
-from django.template.loader import render_to_string
-from weasyprint import HTML
-
-=======
 #=====================================================
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from weasyprint import HTML
->>>>>>> b77d2d2172b345d1f4828c1dde770d985ccff952
 
 # ============================================================ MODULO LOGIN ==============================================================================
 
