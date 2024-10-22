@@ -216,10 +216,9 @@ def generar_informes(request, curso_id):
 
 # ============================================ generar informe en pdf para el profesor por alumno ================================================================
 @login_required
-def detalle_alumno(request, alumno_id):
+def alumno_detalle(request, alumno_id):
     alumno = get_object_or_404(Alumno, id=alumno_id)
     cursos = alumno.curso_set.all()
-
     # Diccionarios para almacenar datos organizados por curso
     calificaciones_por_curso = {}
     promedios_por_curso = {}
