@@ -29,19 +29,38 @@ def login_view(request):
         username = request.POST['username']
         password = request.POST['password']
         user = authenticate(request, username=username, password=password)
+        
         if user is not None:
-            login(request, user)
-            # Redireccionar según el rol del usuario
-            if hasattr(user, 'alumno'):  # Verifica si el usuario tiene un perfil de alumno
+            # Verificar si es un alumno y su estado de admisión
+            if hasattr(user, 'alumno'):
+                alumno = Alumno.objects.get(user=user)
+                if alumno.estado_admision == 'Pendiente':
+                    # Si el estado es "Pendiente", no permitir el login
+                    messages.error(request, 'Su estado de admisión está pendiente. No puede acceder al sistema.')
+                    return render(request, 'login.html')  # Volver a mostrar el formulario de login
+                
+                # Si el estado no es "Pendiente", permitir el login
+                login(request, user)
                 return redirect('alumno_home')  # Redirigir al alumno
-            elif hasattr(user, 'profesor'):  # Verifica si el usuario tiene un perfil de profesor
+
+            # Verificar si es profesor
+            elif hasattr(user, 'profesor'):
+                login(request, user)
                 return redirect('profesor')  # Redirigir al profesor
-            elif hasattr(user, 'apoderado'):  # Verifica si el usuario tiene un perfil de apoderado
+
+            # Verificar si es apoderado
+            elif hasattr(user, 'apoderado'):
+                login(request, user)
                 return redirect('apoderado_view')  # Redirigir al apoderado
+
+            # Otras redirecciones según roles adicionales
             else:
-                return redirect('default')  # Redirigir a una página predeterminada
+                login(request, user)
+                return redirect('default')  # Redirigir a una página predeterminada si no es alumno, profesor o apoderado
         else:
-            messages.error(request, 'Invalid username or password')
+            # Si las credenciales son inválidas
+            messages.error(request, 'Usuario o contraseña incorrectos.')
+    
     return render(request, 'login.html')
 
 # =================================================================== DASHBOARD DE PROFESOR ==============================================================
@@ -302,8 +321,17 @@ def alumno_dashboard(request):
 # ===================================================== Vista para la consulta de asistencia ============================================================
 @login_required
 def alumno_consulta_asistencia(request):
+    # Obtener el objeto Alumno asociado al usuario actual
     alumno = get_object_or_404(Alumno, user=request.user)
-    cursos = Curso.objects.filter(alumnos=alumno)  # Obtener los cursos del alumno
+    
+    # Verificar el estado de admisión del alumno
+    if alumno.estado_admision != 'Aprobado':
+        # Si el estado no es "Aprobado", mostrar un mensaje de error y redirigir al alumno
+        messages.error(request, 'Su estado de admisión no le permite acceder a la consulta de asistencia.')
+        return redirect('alumno_home')  # Redirigir a una página predeterminada, como el home del alumno
+
+    # Obtener los cursos en los que está inscrito el alumno
+    cursos = Curso.objects.filter(alumnos=alumno)
     asistencias_data = []
 
     # Recorremos los cursos del alumno para obtener la información de asistencia
@@ -324,6 +352,7 @@ def alumno_consulta_asistencia(request):
             'porcentaje_asistencia': round(porcentaje_asistencia, 2)
         })
 
+    # Renderizar el template con los datos de asistencia
     return render(request, 'alumnoConsuAsis.html', {'asistencias_data': asistencias_data})
 
 # =========================================================== Vista para la consulta de notas ==========================================================================
