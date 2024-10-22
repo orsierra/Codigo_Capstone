@@ -1,0 +1,31 @@
+<p><strong>Nombre:</strong> {{ alumno.nombre }} {{ alumno.apellido }}</p>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Fecha</th>
+      <th>Asistencia</th>
+      <th>Calificación</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for asistencia in asistencias %}
+    <tr>
+      <td>{{ asistencia.fecha }}</td>
+      <td>{% if asistencia.presente %} Presente {% else %} Ausente {% endif %}</td>
+      <td>
+        {% for calificacion in calificaciones %}
+          {% if calificacion.fecha == asistencia.fecha %}
+            {{ calificacion.nota }}
+          {% else %}
+            No calificada
+          {% endif %}
+        {% endfor %}
+      </td>
+    </tr>
+    {% empty %}
+      <tr>
+        <td colspan="3">No hay registros de asistencia o calificaciones.</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
