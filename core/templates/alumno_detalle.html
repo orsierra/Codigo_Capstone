@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle del Alumno</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Detalle de {{ alumno.nombre }} {{ alumno.apellido }}</h1>
+
+        <h3>Información del Alumno</h3>
+        <p><strong>Email:</strong> {{ alumno.email }}</p>
+        <p><strong>Apoderado:</strong> {{ alumno.apoderado.nombre }} {{ alumno.apoderado.apellido }}</p>
+        <p><strong>Curso:</strong> {{ alumno.curso }}</p>
+        <p><strong>Estado de Admisión:</strong> {{ alumno.estado_admision }}</p>
+
+        <h3>Promedio de Calificaciones</h3>
+        <p><strong>Promedio:</strong> {{ promedio|floatformat:2 }}</p>
+
+        <h3>Calificaciones</h3>
+        <ul class="list-group">
+            {% if calificaciones %}
+                {% for calificacion in calificaciones %}
+                <li class="list-group-item">
+                    <strong>Nota:</strong> {{ calificacion.nota }} -
+                    <strong>Fecha:</strong> {{ calificacion.fecha }}
+                </li>
+                {% endfor %}
+            {% else %}
+                <li class="list-group-item">No hay calificaciones registradas.</li>
+            {% endif %}
+        </ul>
+
+        <h3>Asistencias</h3>
+        <ul class="list-group">
+            {% if asistencias %}
+                {% for asistencia in asistencias %}
+                <li class="list-group-item">
+                    <strong>Fecha:</strong> {{ asistencia.fecha }} - Presente
+                </li>
+                {% endfor %}
+            {% else %}
+                <li class="list-group-item">No hay asistencias registradas.</li>
+            {% endif %}
+        </ul>
+
+        <h3>Ausencias</h3>
+        <ul class="list-group">
+            {% if ausencias %}
+                {% for ausencia in ausencias %}
+                <li class="list-group-item">
+                    <strong>Fecha:</strong> {{ ausencia.fecha }} - Ausente
+                </li>
+                {% endfor %}
+            {% else %}
+                <li class="list-group-item">No hay ausencias registradas.</li>
+            {% endif %}
+        </ul>
+
+        <h3>Justificaciones</h3>
+        <ul class="list-group">
+            {% if justificaciones %}
+                {% for justificacion in justificaciones %}
+                <li class="list-group-item">
+                    <strong>Fecha:</strong> {{ justificacion.fecha }} - Justificado
+                </li>
+                {% endfor %}
+            {% else %}
+                <li class="list-group-item">No hay justificaciones registradas.</li>
+            {% endif %}
+        </ul>
+
+        <a href="{% url 'profesor_cursos' %}" class="btn btn-primary">Volver a Mis Cursos</a>
+    </div>
+</body>
+</html>

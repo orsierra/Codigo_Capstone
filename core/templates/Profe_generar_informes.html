@@ -143,10 +143,10 @@
   
     <div class="cursos-list">
       <ul>
-        {% for alumno in alumnos %}
+        {% for alumno in alumnos_aprobados %}
         <li>
           {{ alumno.nombre }} {{ alumno.apellido }}
-          <button data-alumno-id="{{ alumno.id }}" class="btn-generar-informe" onclick="alumnoModal.showModal()">Generar Informe</button>
+          <a href="{% url 'alumno_detalle' alumno.id %}">Ver detalle</a>
 
         </li>
         {% endfor %}
