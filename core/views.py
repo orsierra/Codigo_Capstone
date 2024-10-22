@@ -563,26 +563,23 @@ def informe_financiero_view(request):
     datos = InformeFinanciero.objects.all()
     return render(request, 'informe_financiero.html', {'datos': datos})
 
-# def descargar_pdf(request):
-#     datos = InformeFinanciero.objects.all()
-#     html_string = render_to_string('informe_financiero_pdf.html', {'datos': datos})
-#     html = HTML(string=html_string)
-#     response = HttpResponse(content_type='application/pdf')
-#     response['Content-Disposition'] = 'inline; filename=informe_financiero.pdf'
-#     html.write_pdf(response)
-#     return response
 
 def informe_financiero_view(request):
+    informes = InformeFinanciero.objects.all()
+    
     if request.method == 'POST':
         form = InformeFinancieroForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('informe_financiero')  # Redirige a la misma vista tras guardar
+            form.save()  # Guarda el nuevo informe
+            return redirect('informe_financiero')  # Redirige a la vista de informes
     else:
         form = InformeFinancieroForm()
 
-    informes = InformeFinanciero.objects.all()
-    return render(request, 'informe_financiero.html', {'form': form, 'informes': informes})
+    context = {
+        'form': form,
+        'informes': informes,
+    }
+    return render(request, 'informe_financiero.html', context)
 
 def generar_pdf_view(request):
     # Obtener todos los informes financieros del modelo
@@ -606,6 +603,8 @@ def generar_pdf_view(request):
     return response
 
 
+
+
 def editar_informe_view(request, informe_id):
     informe = get_object_or_404(InformeFinanciero, id=informe_id)
 
@@ -619,6 +618,17 @@ def editar_informe_view(request, informe_id):
         form = InformeFinancieroForm(instance=informe)
 
     return render(request, 'editar_informe.html', {'form': form, 'informe': informe})
+
+
+def eliminar_informe_view(request, informe_id):
+    informe = get_object_or_404(InformeFinanciero, id=informe_id)
+
+    if request.method == 'POST':
+        informe.delete()
+        # Redirigir a la lista de informes después de eliminar
+        return redirect('informe_financiero')
+
+    return render(request, 'confirmar_eliminacion.html', {'informe': informe})
 # ========================================================================== ADMISION Y MATRICULA ============================================================================================
 
 def gestionar_estudiantes(request):

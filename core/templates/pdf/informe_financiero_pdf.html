@@ -1,41 +1,30 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Informe Finanzas - PDF</title>
+    <title>{{ titulo }}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
+            margin: 20px;
         }
-
-        h1 {
-            text-align: center;
-            background-color: #d1ecf1;
-            padding: 10px;
-            color: #0c5460;
-        }
-
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
         }
-
         th, td {
+            padding: 10px;
             border: 1px solid #ddd;
-            padding: 8px;
+            text-align: left;
         }
-
         th {
-            background-color: #f8f9fa;
+            background-color: #f2f2f2;
         }
     </style>
 </head>
 <body>
-
-    <h1>Informe Finanzas Primer Semestre</h1>
+    <h1>{{ titulo }}</h1>
 
     <table>
         <thead>
@@ -46,15 +35,18 @@
             </tr>
         </thead>
         <tbody>
-            {% for item in datos %}
-            <tr>
-                <td>{{ item.concepto }}</td>
-                <td>{{ item.monto }}</td>
-                <td>{{ item.observaciones }}</td>
-            </tr>
+            {% for informe in informes %}
+                <tr>
+                    <td>{{ informe.concepto }}</td>
+                    <td>{{ informe.monto }}</td>
+                    <td>{{ informe.observaciones }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="3">No hay informes financieros disponibles.</td>
+                </tr>
             {% endfor %}
         </tbody>
     </table>
-
 </body>
 </html>

@@ -1,0 +1,20 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmar Eliminación - Colegio Nuevos Horizontes</title>
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">  <!-- Incluye tu CSS aquí -->
+</head>
+<body>
+    <h1>Confirmar Eliminación</h1>
+    <p>¿Está seguro de que desea eliminar el informe <strong>{{ informe.concepto }}</strong>?</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn-eliminar">Eliminar</button>
+        <a href="{% url 'informe_financiero' %}" class="btn-volver">Cancelar</a>
+    </form>
+</body>
+</html>
