@@ -115,3 +115,10 @@ class Observacion(models.Model):
     
 #==============================================================================================
 
+class InformeFinanciero(models.Model):
+    concepto = models.CharField(max_length=200)
+    monto = models.DecimalField(max_digits=10, decimal_places=2)
+    observaciones = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.concepto

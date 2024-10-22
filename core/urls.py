@@ -33,8 +33,12 @@ urlpatterns = [
     path('director/consulta-informes/', views.directorMenu, name='director_menu'),
     path('planificacion-academica/', views.director_plani, name='director_plani'),
     path('informes-academicos/', views.informes_academicos, name='informes_academicos'),
-    path('informes-finanzas/', views.informes_finanzas, name='informes_finanzas'),
     path('update-curso/', update_curso, name='update_curso'),
+    #====================================================================================================
+    path('informe-financiero/', views.informe_financiero_view, name='informe_financiero'),
+    path('informe-financiero/editar/<int:id>/', views.editar_informe_view, name='editar_informe'),
+    path('informe-financiero/eliminar/<int:id>/', views.eliminar_informe_view, name='eliminar_informe'),
+    path('informe-financiero/pdf/', views.generar_pdf_view, name='descargar_pdf'),
     # Asistende De admision y Matricula
     path('gestionar_estudiantes/', views.gestionar_estudiantes, name='gestionar_estudiantes'),
     path('agregar_alumno/', views.agregar_alumno, name='agregar_alumno'),
