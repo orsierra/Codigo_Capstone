@@ -3,12 +3,12 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Curso, Profesor,Asistencia, Calificacion, Informe, Observacion, Alumno, Apoderado, Curso
+from .models import Curso, Profesor,Asistencia, Calificacion, Informe, Observacion, Alumno, Apoderado, Curso, InformeFinanciero
 from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404
 from datetime import date
 from django.utils import timezone
-from .forms import CalificacionForm, ObservacionForm, AlumnoForm, ApoderadoForm 
+from .forms import CalificacionForm, ObservacionForm, AlumnoForm, InformeFinancieroForm, ApoderadoForm 
 from django.contrib import messages
 from django.db.models import Avg
 from django.http import HttpResponse
@@ -18,9 +18,12 @@ from collections import defaultdict
 import json
 import logging
 from django.http import JsonResponse
-from django.db.models import Q  # Agrega esta línea
+from django.db.models import Q 
 from django.db import models
-
+#=====================================================
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from weasyprint import HTML
 
 # ============================================================ MODULO LOGIN ==============================================================================
 
@@ -505,8 +508,6 @@ def informes_academicos(request):
 
     return render(request, 'direInfoAca.html', context)
 
-def informes_finanzas(request):
-    return render(request, 'direInfoFinan.html')
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -532,6 +533,68 @@ def update_curso(request):
     return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=405)
 
 
+# ========================================================================= INFORME FINANCIERO ==========================================================================================
+
+def informe_financiero_view(request):
+    datos = InformeFinanciero.objects.all()
+    return render(request, 'informe_financiero.html', {'datos': datos})
+
+# def descargar_pdf(request):
+#     datos = InformeFinanciero.objects.all()
+#     html_string = render_to_string('informe_financiero_pdf.html', {'datos': datos})
+#     html = HTML(string=html_string)
+#     response = HttpResponse(content_type='application/pdf')
+#     response['Content-Disposition'] = 'inline; filename=informe_financiero.pdf'
+#     html.write_pdf(response)
+#     return response
+
+def informe_financiero_view(request):
+    if request.method == 'POST':
+        form = InformeFinancieroForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('informe_financiero')  # Redirige a la misma vista tras guardar
+    else:
+        form = InformeFinancieroForm()
+
+    informes = InformeFinanciero.objects.all()
+    return render(request, 'informe_financiero.html', {'form': form, 'informes': informes})
+
+def generar_pdf_view(request):
+    # Obtener todos los informes financieros del modelo
+    informes = InformeFinanciero.objects.all()
+
+    # Crear el contexto con los informes
+    context = {
+        'titulo': 'Informe Finanzas Primer Semestre',
+        'informes': informes,
+    }
+
+    # Renderizar el template a un HTML
+    html_string = render_to_string('pdf/informe_financiero_pdf.html', context)
+
+    # Convertir el HTML a PDF
+    pdf = HTML(string=html_string).write_pdf()
+
+    # Crear una respuesta HTTP con el PDF
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="informe_financiero.pdf"'
+    return response
+
+
+def editar_informe_view(request, informe_id):
+    informe = get_object_or_404(InformeFinanciero, id=informe_id)
+
+    if request.method == 'POST':
+        form = InformeFinancieroForm(request.POST, instance=informe)
+        if form.is_valid():
+            form.save()
+            # Redirigir a una página de éxito o de lista de informes después de guardar
+            return redirect('informe_financiero')
+    else:
+        form = InformeFinancieroForm(instance=informe)
+
+    return render(request, 'editar_informe.html', {'form': form, 'informe': informe})
 # ========================================================================== ADMISION Y MATRICULA ============================================================================================
 
 def gestionar_estudiantes(request):
