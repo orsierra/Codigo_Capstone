@@ -16,7 +16,7 @@ urlpatterns = [
     path('registrar-calificaciones/<int:curso_id>/', registrar_calificaciones, name='registrar_calificaciones'),  
     path('registro-academico/<int:curso_id>/', registro_academico, name='registro_academico'),
     path('generar-informes/<int:curso_id>/', views.generar_informes, name='generar_informes'),
-    path('api/alumno/<int:alumno_id>/', views.alumno_detalle, name='alumno_detalle'),
+    path('alumno_detalle/<int:alumno_id>/', views.alumno_detalle, name='alumno_detalle'),
     path('observaciones/<int:curso_id>/', observaciones, name='observaciones'),
     #alumno
     path('alumno/', views.alumno_dashboard, name='alumno_dashboard'),
@@ -33,8 +33,12 @@ urlpatterns = [
     path('director/consulta-informes/', views.directorMenu, name='director_menu'),
     path('planificacion-academica/', views.director_plani, name='director_plani'),
     path('informes-academicos/', views.informes_academicos, name='informes_academicos'),
-    path('informes-finanzas/', views.informes_finanzas, name='informes_finanzas'),
     path('update-curso/', update_curso, name='update_curso'),
+    #====================================================================================================
+    path('informe-financiero/', views.informe_financiero_view, name='informe_financiero'),
+    path('informe-financiero/editar/<int:id>/', views.editar_informe_view, name='editar_informe'),
+    path('informe-financiero/eliminar/<int:informe_id>/', views.eliminar_informe_view, name='eliminar_informe'),
+    path('informe-financiero/pdf/', views.generar_pdf_view, name='descargar_pdf'),
     # Asistende De admision y Matricula
     path('gestionar_estudiantes/', views.gestionar_estudiantes, name='gestionar_estudiantes'),
     path('agregar_alumno/', views.agregar_alumno, name='agregar_alumno'),

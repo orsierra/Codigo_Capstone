@@ -3,12 +3,12 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Curso, Profesor,Asistencia, Calificacion, Informe, Observacion, Alumno, Apoderado, Curso
+from .models import Curso, Profesor,Asistencia, Calificacion, Informe, Observacion, Alumno, Apoderado, Curso, InformeFinanciero
 from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404
 from datetime import date
 from django.utils import timezone
-from .forms import CalificacionForm, ObservacionForm, AlumnoForm, ApoderadoForm 
+from .forms import CalificacionForm, ObservacionForm, AlumnoForm, InformeFinancieroForm, ApoderadoForm 
 from django.contrib import messages
 from django.db.models import Avg
 from django.http import HttpResponse
@@ -18,12 +18,19 @@ from collections import defaultdict
 import json
 import logging
 from django.http import JsonResponse
-from django.db.models import Q  # Agrega esta línea
+from django.db.models import Q 
 from django.db import models
+<<<<<<< HEAD
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from weasyprint import HTML
 
+=======
+#=====================================================
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from weasyprint import HTML
+>>>>>>> b77d2d2172b345d1f4828c1dde770d985ccff952
 
 # ============================================================ MODULO LOGIN ==============================================================================
 
@@ -233,53 +240,43 @@ def registro_academico(request, curso_id):
 @login_required
 def generar_informes(request, curso_id):
     curso = get_object_or_404(Curso, id=curso_id)
-    alumnos = Alumno.objects.filter(curso=curso)  # Obtener los alumnos del curso
-    return render(request, 'Profe_generar_informes.html', {'curso': curso, 'alumnos': alumnos})
+    alumnos_aprobados = Alumno.objects.filter(curso=curso, estado_admision='Aprobado')
+
+    return render(request, 'Profe_generar_informes.html', {'curso': curso, 'alumnos_aprobados': alumnos_aprobados})
 
 # ============================================ generar informe en pdf para el profesor por alumno ================================================================
 @login_required
+@login_required
 def alumno_detalle(request, alumno_id):
     alumno = get_object_or_404(Alumno, id=alumno_id)
-    cursos = alumno.curso_set.all()
-    # Diccionarios para almacenar datos organizados por curso
-    calificaciones_por_curso = {}
-    promedios_por_curso = {}
-    asistencias_por_curso = {}
+    curso = alumno.curso  # Obtiene el curso al que pertenece el alumno
 
-    for curso in cursos:
-        calificaciones_curso = Calificacion.objects.filter(alumno=alumno, curso=curso)
-        calificaciones_por_curso[curso] = calificaciones_curso
+    # Filtrar calificaciones por el alumno y su curso
+    calificaciones = Calificacion.objects.filter(alumno=alumno, curso=curso)
 
-        # Calcular promedio
-        promedio = calificaciones_curso.aggregate(Avg('nota'))['nota__avg'] or 0
-        promedios_por_curso[curso] = promedio
+    # Calcular el promedio de calificaciones
+    if calificaciones.exists():
+        promedio = sum(calificacion.nota for calificacion in calificaciones) / calificaciones.count()
+    else:
+        promedio = 0  # Si no hay calificaciones, el promedio es 0
 
-        asistencias_curso = Asistencia.objects.filter(Q(alumnos_presentes=alumno) | Q(alumnos_ausentes=alumno), curso=curso)
-        asistencias_por_curso[curso] = asistencias_curso
+    # Filtrar asistencias usando los campos ManyToMany
+    asistencias = Asistencia.objects.filter(curso=curso).filter(alumnos_presentes=alumno)  # Asistencias de presentes
+    ausencias = Asistencia.objects.filter(curso=curso).filter(alumnos_ausentes=alumno)  # Asistencias de ausentes
+    justificaciones = Asistencia.objects.filter(curso=curso).filter(alumnos_justificados=alumno)  # Asistencias justificadas
 
-    # Convertir los datos a un formato adecuado para JSON
-    data = {
-        'alumno': {
-            'nombre': alumno.nombre,
-            'apellido': alumno.apellido,
-            # Agrega aquí otros campos del modelo Alumno que quieras incluir
-        },
-        'cursos': [
-            {
-                'nombre': curso.nombre,
-                'profesor': curso.profesor.nombre,  # Asumiendo que Profesor tiene un campo nombre
-                'calificaciones': [
-                    {'fecha': calificacion.fecha, 'nota': calificacion.nota} for calificacion in calificaciones_curso
-                ],
-                'promedio': promedio,
-                'asistencias': [asistencia.fecha for asistencia in asistencias_curso],  # Ejemplo de cómo incluir asistencias
-            } for curso in cursos
-        ]
+    context = {
+        'alumno': alumno,
+        'calificaciones': calificaciones,
+        'asistencias': asistencias,
+        'ausencias': ausencias,
+        'justificaciones': justificaciones,
+        'promedio': promedio,  # Añadir el promedio al contexto
     }
+    return render(request, 'alumno_detalle.html', context)
 
-    return render(request, 'Profe_generar_informes.html', {'data': data})
 
-    
+
 # =============================================================== OBSERVACIONES =========================================================================
 @login_required
 def observaciones(request, curso_id):
@@ -542,8 +539,6 @@ def informes_academicos(request):
 
     return render(request, 'direInfoAca.html', context)
 
-def informes_finanzas(request):
-    return render(request, 'direInfoFinan.html')
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -569,6 +564,78 @@ def update_curso(request):
     return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=405)
 
 
+# ========================================================================= INFORME FINANCIERO ==========================================================================================
+
+def informe_financiero_view(request):
+    datos = InformeFinanciero.objects.all()
+    return render(request, 'informe_financiero.html', {'datos': datos})
+
+
+def informe_financiero_view(request):
+    informes = InformeFinanciero.objects.all()
+    
+    if request.method == 'POST':
+        form = InformeFinancieroForm(request.POST)
+        if form.is_valid():
+            form.save()  # Guarda el nuevo informe
+            return redirect('informe_financiero')  # Redirige a la vista de informes
+    else:
+        form = InformeFinancieroForm()
+
+    context = {
+        'form': form,
+        'informes': informes,
+    }
+    return render(request, 'informe_financiero.html', context)
+
+def generar_pdf_view(request):
+    # Obtener todos los informes financieros del modelo
+    informes = InformeFinanciero.objects.all()
+
+    # Crear el contexto con los informes
+    context = {
+        'titulo': 'Informe Finanzas Primer Semestre',
+        'informes': informes,
+    }
+
+    # Renderizar el template a un HTML
+    html_string = render_to_string('pdf/informe_financiero_pdf.html', context)
+
+    # Convertir el HTML a PDF
+    pdf = HTML(string=html_string).write_pdf()
+
+    # Crear una respuesta HTTP con el PDF
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="informe_financiero.pdf"'
+    return response
+
+
+
+
+def editar_informe_view(request, informe_id):
+    informe = get_object_or_404(InformeFinanciero, id=informe_id)
+
+    if request.method == 'POST':
+        form = InformeFinancieroForm(request.POST, instance=informe)
+        if form.is_valid():
+            form.save()
+            # Redirigir a una página de éxito o de lista de informes después de guardar
+            return redirect('informe_financiero')
+    else:
+        form = InformeFinancieroForm(instance=informe)
+
+    return render(request, 'editar_informe.html', {'form': form, 'informe': informe})
+
+
+def eliminar_informe_view(request, informe_id):
+    informe = get_object_or_404(InformeFinanciero, id=informe_id)
+
+    if request.method == 'POST':
+        informe.delete()
+        # Redirigir a la lista de informes después de eliminar
+        return redirect('informe_financiero')
+
+    return render(request, 'confirmar_eliminacion.html', {'informe': informe})
 # ========================================================================== ADMISION Y MATRICULA ============================================================================================
 
 def gestionar_estudiantes(request):

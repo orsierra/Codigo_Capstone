@@ -1,5 +1,5 @@
 from django import forms
-from .models import Asistencia, Alumno, Calificacion, Observacion, Apoderado, Curso
+from .models import Asistencia, Alumno, Calificacion, Observacion, Apoderado, Curso, InformeFinanciero
 from django.core.exceptions import ValidationError
 class AsistenciaForm(forms.ModelForm):
     class Meta:
@@ -74,3 +74,9 @@ class AlumnoForm(forms.ModelForm):
             'curso': forms.Select(),  # Esto generará un menú desplegable para seleccionar el curso
             'apoderado': forms.Select(),  # Esto generará un menú desplegable para seleccionar el apoderado
         }
+
+
+class InformeFinancieroForm(forms.ModelForm):
+    class Meta:
+        model = InformeFinanciero
+        fields = ['concepto', 'monto', 'observaciones']

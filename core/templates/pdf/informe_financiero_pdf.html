@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ titulo }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>{{ titulo }}</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Concepto</th>
+                <th>Monto</th>
+                <th>Observaciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for informe in informes %}
+                <tr>
+                    <td>{{ informe.concepto }}</td>
+                    <td>{{ informe.monto }}</td>
+                    <td>{{ informe.observaciones }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="3">No hay informes financieros disponibles.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
