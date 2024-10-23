@@ -18,6 +18,8 @@
             padding: 20px;
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
             height: 100vh; /* Asegurar que ocupe toda la altura de la pantalla */
+            position: sticky; /* Mantener el sidebar fijo al hacer scroll */
+            top: 0; /* Posicionarlo en la parte superior */
         }
 
         .sidebar h2 {
@@ -66,91 +68,81 @@
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
+        .row {
+            margin-top: 20px; /* Separar los nombres de los alumnos del título */
         }
 
-        th, td {
-            border: 1px solid #ccc;
-            padding: 10px;
-            text-align: center;
+        .card {
+            margin-bottom: 15px; /* Espacio entre las tarjetas */
+            border-bottom: 1px solid #ccc; /* Línea divisora inferior */
+            padding-bottom: 10px; /* Espacio interno debajo del contenido */
         }
 
-        th {
-            background-color: #007bff;
-            color: white;
+        .card-title {
+            font-size: 1.1rem; /* Reducir ligeramente el tamaño del nombre */
+            margin: 0; /* Quitar márgenes para mejor alineación */
         }
 
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        .buttons {
-            margin-top: 20px;
+        .card-body {
             display: flex;
-            justify-content: space-between;
+            justify-content: space-between; /* Separar los elementos en la línea */
+            align-items: center;
         }
 
         .btn {
             background-color: #28a745;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 4px 8px; /* Ajustar el tamaño del botón */
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s;
+            margin-left: auto; /* Empujar el botón hacia la derecha */
+            font-size: 0.8rem; /* Tamaño de fuente más pequeño para el botón */
         }
 
         .btn:hover {
             background-color: #218838;
         }
 
-        .btn-back {
-            background-color: #007bff; /* Color para el botón de regresar */
-        }
-
-        .btn-back:hover {
-            background-color: #0056b3;
-        }
-
-        .message {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            display: none; /* Ocultar por defecto */
+        hr {
+            border: none;
+            border-top: 1px solid #ccc; /* Línea divisora */
+            margin: 10px 0; /* Espacio alrededor de la línea */
         }
     </style>
 </head>
 <body>
     <div class="sidebar">
-      <h2>Menú</h2>
-      <ul>
-        <li><a href="{% url 'profesor' %}">Profesor</a></li>
-        <li><a href="{% url 'profesor_cursos' %}">Mis cursos</a></li>
-        <li><a href="{% url 'registrar_asistencia' curso.id %}">Registrar asistencia</a></li>
-        <li><a href="{% url 'registrar_calificaciones' curso.id %}">Registrar calificaciones</a></li>
-        <li><a href="{% url 'registro_academico' curso.id %}">Registro Académico</a></li>
-        <li><a href="{% url 'observaciones' curso.id %}">Observaciones</a></li>
-      </ul>
+        <h2>Menú</h2>
+        <ul>
+            <li><a href="{% url 'profesor' %}">Profesor</a></li>
+            <li><a href="{% url 'profesor_cursos' %}">Mis cursos</a></li>
+            <li><a href="{% url 'registrar_asistencia' curso.id %}">Registrar asistencia</a></li>
+            <li><a href="{% url 'registrar_calificaciones' curso.id %}">Registrar calificaciones</a></li>
+            <li><a href="{% url 'registro_academico' curso.id %}">Registro Académico</a></li>
+            <li><a href="{% url 'observaciones' curso.id %}">Observaciones</a></li>
+        </ul>
     </div>
   
-    <h1>Informe de Alumnos - {{ curso.nombre }}</h1>
-  
-    <div class="cursos-list">
-      <ul>
-        {% for alumno in alumnos_aprobados %}
-        <li>
-          {{ alumno.nombre }} {{ alumno.apellido }}
-          <a href="{% url 'alumno_detalle' alumno.id %}">Ver detalle</a>
-
-        </li>
-        {% endfor %}
-      </ul>
+    <div class="main-content">
+        <div class="container">
+            <h1 class="text-center mb-4">Informe de Alumnos - {{ curso.nombre }}</h1>
+    
+            <div class="row">
+                {% for alumno in alumnos_aprobados %}
+                <div class="col-md-12 mb-3">
+                    <div class="card">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <h5 class="card-title">{{ alumno.nombre }} {{ alumno.apellido }}</h5>
+                            <a href="{% url 'alumno_detalle' alumno.id %}" class="btn btn-primary">Ver detalle</a>
+                        </div>
+                    </div>
+                    <!-- Línea divisora  <hr>-->
+                </div>
+                {% endfor %}
+            </div>
+        </div>
     </div>
-    </body>
+</body>
 </html>

@@ -239,7 +239,6 @@ def generar_informes(request, curso_id):
 
 # ============================================ generar informe en pdf para el profesor por alumno ================================================================
 @login_required
-@login_required
 def alumno_detalle(request, alumno_id):
     alumno = get_object_or_404(Alumno, id=alumno_id)
     curso = alumno.curso  # Obtiene el curso al que pertenece el alumno
@@ -267,8 +266,49 @@ def alumno_detalle(request, alumno_id):
         'promedio': promedio,  # Añadir el promedio al contexto
     }
     return render(request, 'alumno_detalle.html', context)
+##============================================ generar pdf por alumno: asistencia y calificaciones================================
 
+@login_required
+def descargar_pdf(request, alumno_id):
+    # Obtener el alumno específico o devolver 404 si no se encuentra
+    alumno = get_object_or_404(Alumno, id=alumno_id)
+    
+    # Obtener las calificaciones y asistencias del alumno
+    calificaciones = Calificacion.objects.filter(alumno=alumno)
+    asistencias = Asistencia.objects.filter(alumnos_presentes=alumno)
+    ausencias = Asistencia.objects.filter(alumnos_ausentes=alumno)
+    justificaciones = Asistencia.objects.filter(alumnos_justificados=alumno)
 
+    # Calcular el promedio de calificaciones
+    if calificaciones:
+        promedio = sum(calificacion.nota for calificacion in calificaciones) / len(calificaciones)
+    else:
+        promedio = 0
+
+    # Preparar el contexto para la plantilla
+    context = {
+        'alumno': alumno,
+        'calificaciones': calificaciones,
+        'asistencias': asistencias,
+        'ausencias': ausencias,
+        'justificaciones': justificaciones,
+        'promedio': promedio,
+    }
+
+    # Renderizar la plantilla HTML
+    html_string = render_to_string('alumno_detalle.html', context)
+
+    # Crear el objeto PDF
+    html = HTML(string=html_string)
+
+    # Preparar la respuesta HTTP para el PDF
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{alumno.nombre}_{alumno.apellido}_detalle.pdf"'
+
+    # Generar el PDF y enviarlo en la respuesta
+    html.write_pdf(response)
+
+    return response
 
 # =============================================================== OBSERVACIONES =========================================================================
 @login_required

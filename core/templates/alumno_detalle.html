@@ -2,77 +2,93 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalle del Alumno</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <!-- Agregar Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Estilos generales */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            color: #333;
+        }
+
+        h1, h3 {
+            color: #0056b3; /* Un color que se vea bien */
+        }
+
+        ul {
+            list-style-type: none; /* Elimina los puntos de la lista */
+            padding: 0; /* Elimina el padding de la lista */
+        }
+
+        li {
+            margin: 5px 0; /* Espaciado entre elementos de la lista */
+        }
+
+        /* Estilo para ocultar botones al imprimir */
+        @media print {
+            .btn {
+                display: none; /* Oculta los botones en la impresión */
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <h1>Detalle de {{ alumno.nombre }} {{ alumno.apellido }}</h1>
-
         <h3>Información del Alumno</h3>
         <p><strong>Email:</strong> {{ alumno.email }}</p>
-        <p><strong>Apoderado:</strong> {{ alumno.apoderado.nombre }} {{ alumno.apoderado.apellido }}</p>
         <p><strong>Curso:</strong> {{ alumno.curso }}</p>
-        <p><strong>Estado de Admisión:</strong> {{ alumno.estado_admision }}</p>
-
-        <h3>Promedio de Calificaciones</h3>
-        <p><strong>Promedio:</strong> {{ promedio|floatformat:2 }}</p> 
+        <p><strong>Promedio de Calificaciones:</strong> {{ promedio|floatformat:2 }}</p>
 
         <h3>Calificaciones</h3>
-        <ul class="list-group">
-            {% if calificaciones %}
-                {% for calificacion in calificaciones %}
-                <li class="list-group-item">
-                    <strong>Nota:</strong> {{ calificacion.nota }} -
-                    <strong>Fecha:</strong> {{ calificacion.fecha }}
-                </li>
-                {% endfor %}
-            {% else %}
-                <li class="list-group-item">No hay calificaciones registradas.</li>
-            {% endif %}
+        <ul>
+            {% for calificacion in calificaciones %}
+                <li>Nota: {{ calificacion.nota }} - Fecha: {{ calificacion.fecha }}</li>
+            {% empty %}
+                <li>No hay calificaciones registradas.</li>
+            {% endfor %}
         </ul>
 
         <h3>Asistencias</h3>
-        <ul class="list-group">
-            {% if asistencias %}
-                {% for asistencia in asistencias %}
-                <li class="list-group-item">
-                    <strong>Fecha:</strong> {{ asistencia.fecha }} - Presente
-                </li>
-                {% endfor %}
-            {% else %}
-                <li class="list-group-item">No hay asistencias registradas.</li>
-            {% endif %}
+        <ul>
+            {% for asistencia in asistencias %}
+                <li>Fecha: {{ asistencia.fecha }} - Presente</li>
+            {% empty %}
+                <li>No hay asistencias registradas.</li>
+            {% endfor %}
         </ul>
 
         <h3>Ausencias</h3>
-        <ul class="list-group">
-            {% if ausencias %}
-                {% for ausencia in ausencias %}
-                <li class="list-group-item">
-                    <strong>Fecha:</strong> {{ ausencia.fecha }} - Ausente
-                </li>
-                {% endfor %}
-            {% else %}
-                <li class="list-group-item">No hay ausencias registradas.</li>
-            {% endif %}
+        <ul>
+            {% for ausencia in ausencias %}
+                <li>Fecha: {{ ausencia.fecha }} - Ausente</li>
+            {% empty %}
+                <li>No hay ausencias registradas.</li>
+            {% endfor %}
         </ul>
 
         <h3>Justificaciones</h3>
-        <ul class="list-group">
-            {% if justificaciones %}
-                {% for justificacion in justificaciones %}
-                <li class="list-group-item">
-                    <strong>Fecha:</strong> {{ justificacion.fecha }} - Justificado
-                </li>
-                {% endfor %}
-            {% else %}
-                <li class="list-group-item">No hay justificaciones registradas.</li>
-            {% endif %}
+        <ul>
+            {% for justificacion in justificaciones %}
+                <li>Fecha: {{ justificacion.fecha }} - Justificado</li>
+            {% empty %}
+                <li>No hay justificaciones registradas.</li>
+            {% endfor %}
         </ul>
 
-        <a href="{% url 'profesor_cursos' %}" class="btn btn-primary">Volver a Mis Cursos</a>
+        <!-- Botones -->
+        <div class="mt-4">
+            <a href="{% url 'profesor_cursos' %}" class="btn btn-primary">Volver a Mis Cursos</a>
+            <a href="{% url 'descargar_pdf' alumno.id %}" class="btn btn-success">Descargar PDF</a>
+        </div>
     </div>
+
+    <!-- Agregar Bootstrap JS y dependencias (opcional) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
