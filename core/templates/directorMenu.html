@@ -13,13 +13,14 @@
             padding: 0;
             display: flex;
             height: 100vh;
-            background-color: #f8f9fa; /* Fondo sólido */
+            background: url("{% static 'img/Login.jpg' %}") no-repeat center center fixed; /* Imagen de fondo */
+            background-size: cover; /* Para cubrir toda la pantalla */
         }
 
         /* Barra lateral */
         .sidebar {
             width: 250px;
-            background-color: #000000; /* Fondo negro sólido */
+            background-color: rgba(0, 0, 0, 0.8); /* Fondo negro con opacidad */
             color: white;
             padding: 20px;
             display: flex;
@@ -32,6 +33,7 @@
             text-align: center;
             margin-bottom: 30px;
             font-weight: bold;
+            font-size: 22px;
         }
 
         .sidebar ul {
@@ -51,13 +53,14 @@
         }
 
         .sidebar ul li a:hover {
-            color: #17a2b8; /* Efecto hover con color azul */
+            color: #17a2b8;
         }
 
+        /* Contenido principal */
         .main-content {
             flex-grow: 1;
             padding: 40px;
-            background-color: #ffffff; /* Fondo blanco para el contenido */
+            background-color: rgba(255, 255, 255, 0.9); /* Fondo blanco con opacidad */
             overflow-y: auto;
             box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
@@ -67,7 +70,7 @@
         h1 {
             font-size: 28px;
             text-align: center;
-            color: #343a40;
+            color: #007bff;
             margin-bottom: 40px;
             font-weight: bold;
         }
@@ -88,8 +91,8 @@
 
         /* Estilos para los botones */
         .button-container button {
-            background-color: black; /* Botones en color negro */
-            color: white; /* Texto blanco para los botones */
+            background-color: #007bff;
+            color: white;
             border: none;
             padding: 15px;
             border-radius: 8px;
@@ -101,7 +104,7 @@
         }
 
         .button-container button:hover {
-            background-color: #444; /* Color de fondo más claro al pasar el mouse */
+            background-color: #0056b3;
             transform: scale(1.02);
         }
 
@@ -130,13 +133,12 @@
     <div class="sidebar">
         <h2>Planificación Académica</h2>
         <ul>
-            <li><a href="#">Página de la Institución</a></li>
-            <li><a href="#">Perfil</a></li>
-            <li><a href="#">Salir</a></li>
+            <li><a href="{% url 'director_dashboard' %}">Director</a></li>
+
         </ul>
         <div class="footer">
-            <a href="#">Privacidad</a>
-            <a href="#">Accesibilidad</a>
+            <a href="#">Nuevos Horizontes</a>
+
         </div>
     </div>
 
@@ -146,7 +148,11 @@
         <div class="button-container">
             <a href="{% url 'director_plani' %}"><button>Planificación Académica</button></a>
             <a href="{% url 'informes_academicos' %}"><button>Informes Académicos</button></a>
+<<<<<<< HEAD
           
+=======
+            <a href="{% url 'informe_financiero' %}"><button>Informes Finanzas</button></a>
+>>>>>>> f1cc1305eab4954cc6d839d9bce78a8a891e0edb
         </div>
     </div>
 
