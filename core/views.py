@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Curso, Profesor,Asistencia, Calificacion, Informe, Observacion, Alumno, Apoderado, Curso, InformeFinanciero
+from .models import Curso, Profesor,Asistencia, Calificacion, Informe, Observacion, Alumno, Apoderado, Curso, InformeFinanciero,InformeAcademico
 from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404
 from datetime import date
@@ -20,17 +20,10 @@ import logging
 from django.http import JsonResponse
 from django.db.models import Q 
 from django.db import models
-<<<<<<< HEAD
-from django.http import HttpResponse
-from django.template.loader import render_to_string
-from weasyprint import HTML
-
-=======
 #=====================================================
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from weasyprint import HTML
->>>>>>> b77d2d2172b345d1f4828c1dde770d985ccff952
 
 # ============================================================ MODULO LOGIN ==============================================================================
 
@@ -562,6 +555,70 @@ def update_curso(request):
             return JsonResponse({'status': 'error', 'message': 'Curso no encontrado'}, status=404)
 
     return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=405)
+
+#pdf director
+def direcPdfInfoAca(request):
+    cursos = Curso.objects.all()  # Obtener todos los cursos
+    informes = []
+
+    for curso in cursos:
+        alumnos = curso.alumnos.all()  # Obtener todos los alumnos del curso
+        total_alumnos = alumnos.count()  # Contar el número de alumnos inscritos
+        
+        # Calcular el promedio de calificaciones para el curso
+        promedio_notas = Calificacion.objects.filter(alumno__in=alumnos).aggregate(Avg('nota'))['nota__avg'] or 0
+        
+        # Calcular el total de días de asistencia y asistencias
+        total_asistencias = Asistencia.objects.filter(alumnos_presentes__in=alumnos).count()
+        total_dias = Asistencia.objects.filter(curso=curso).count()
+        
+        # Verificar que no haya división por cero
+        if total_alumnos > 0 and total_dias > 0:
+            promedio_asistencia = (total_asistencias / (total_alumnos * total_dias)) * 100
+        else:
+            promedio_asistencia = 0  # Si no hay alumnos o días, el promedio de asistencia es 0
+        
+        # Crear un diccionario con la información del informe para este curso
+        informes.append({
+            'curso': curso,
+            'total_alumnos': total_alumnos,
+            'promedio_notas': round(promedio_notas, 1),  # Redondear a un decimal
+            'promedio_asistencia': round(promedio_asistencia, 1)  # Redondear a un decimal
+        })
+
+    # Crear el contexto para la plantilla PDF
+    context = {
+        'informes': informes
+    }
+
+    # Renderizar la plantilla en un string HTML
+    html_string = render_to_string('direInfoAca_pdf.html', context)
+    html = HTML(string=html_string)
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="informe_academico.pdf"'
+    
+    # Generar el PDF
+    html.write_pdf(response)
+    return response
+
+
+#informe academico
+def direcPdfPlanificacion(request):
+    # Obtener los cursos de la planificación académica
+    cursos = Curso.objects.all()
+
+    # Cargar la plantilla y renderizarla como HTML
+    html_string = render_to_string('direcPdfPlanificacion_pdf.html', {'cursos': cursos})
+
+    # Crear el PDF en un archivo temporal
+    html = HTML(string=html_string)
+    result = html.write_pdf()
+
+    # Generar la respuesta HTTP con el archivo PDF
+    response = HttpResponse(result, content_type='application/pdf')
+    response['Content-Disposition'] = 'inline; filename="planificacion_academica.pdf"'
+
+    return response
 
 
 # ========================================================================= INFORME FINANCIERO ==========================================================================================

@@ -122,3 +122,12 @@ class InformeFinanciero(models.Model):
 
     def __str__(self):
         return self.concepto
+
+class InformeAcademico(models.Model):
+    total_alumnos = models.IntegerField()
+    promedio_notas = models.DecimalField(max_digits=5, decimal_places=2)
+    promedio_asistencia = models.DecimalField(max_digits=5, decimal_places=2)
+    curso = models.ForeignKey('Curso', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'Informe de {self.curso.nombre}'

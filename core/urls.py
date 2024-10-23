@@ -1,6 +1,6 @@
 # urls.py
 from django.urls import path
-from .views import login_view, profesor_dashboard, profesor_cursos, crear_usuario_db, registrar_calificaciones, registro_academico, observaciones,libro_clases, apoderadoConsuAsis, apoderadoConsuNotas, apoderadoMatri, apoderado_view, director_dashboard, update_curso
+from .views import login_view, profesor_dashboard, profesor_cursos, crear_usuario_db, registrar_calificaciones, registro_academico, observaciones,libro_clases, apoderadoConsuAsis, apoderadoConsuNotas, apoderadoMatri, apoderado_view, director_dashboard, update_curso,direcPdfInfoAca,direcPdfPlanificacion
 from core import views
 
 
@@ -34,6 +34,8 @@ urlpatterns = [
     path('planificacion-academica/', views.director_plani, name='director_plani'),
     path('informes-academicos/', views.informes_academicos, name='informes_academicos'),
     path('update-curso/', update_curso, name='update_curso'),
+     path('informe-academico/pdf/', direcPdfInfoAca, name='direcPdfInfoAca'),
+     path('planificacion-academica/pdf/', views.direcPdfPlanificacion, name='direcPdfPlanificacion'),
     #====================================================================================================
     path('informe-financiero/', views.informe_financiero_view, name='informe_financiero'),
     path('informe-financiero/editar/<int:id>/', views.editar_informe_view, name='editar_informe'),

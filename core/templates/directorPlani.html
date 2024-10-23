@@ -110,6 +110,28 @@
             border: 1px solid #ccc;
             border-radius: 5px;
         }
+
+        /* Flexbox para alinear el botón */
+        .actions {
+            display: flex;
+            justify-content: flex-end; /* Botón alineado a la derecha */
+            margin-top: 20px; /* Espacio con el contenido superior */
+        }
+
+        .btn {
+            background-color: #2C3E50;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            display: inline-block;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        .btn:hover {
+            background-color: #1A252F;
+        }
     </style>
 </head>
 <body>
@@ -155,6 +177,11 @@
                 {% endfor %}
             </tbody>
         </table>
+
+        <!-- Botón para imprimir en PDF alineado a la derecha -->
+        <div class="actions">
+            <a href="{% url 'direcPdfPlanificacion' %}" class="btn">Imprimir en PDF</a>
+        </div>
     </div>
 
     <script>
