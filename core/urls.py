@@ -1,10 +1,6 @@
 # urls.py
 from django.urls import path
-<<<<<<< HEAD
-from .views import login_view, profesor_dashboard, profesor_cursos, crear_usuario_db, registrar_calificaciones, registro_academico, observaciones,libro_clases, apoderadoConsuAsis, apoderadoConsuNotas, apoderadoMatri, apoderado_view, director_dashboard, update_curso,direcPdfInfoAca,direcPdfPlanificacion
-=======
-from .views import login_view, profesor_dashboard, profesor_cursos, crear_usuario_db, registrar_calificaciones, registro_academico, observaciones,libro_clases, apoderadoConsuAsis, apoderadoConsuNotas, apoderadoMatri, apoderado_view, director_dashboard, update_curso, descargar_pdf
->>>>>>> f1cc1305eab4954cc6d839d9bce78a8a891e0edb
+from .views import login_view, profesor_dashboard, profesor_cursos, crear_usuario_db, registrar_calificaciones, registro_academico, observaciones,libro_clases, apoderadoConsuAsis, apoderadoConsuNotas, apoderadoMatri, apoderado_view, director_dashboard, update_curso,direcPdfInfoAca,direcPdfPlanificacion,descargar_pdf
 from core import views
 
 
