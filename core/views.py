@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Curso, Profesor,Asistencia, Calificacion, Informe, Observacion, Alumno, Apoderado, Curso, InformeFinanciero,InformeAcademico
+from .models import Curso, Profesor,Asistencia, Calificacion, Informe, Observacion, Alumno, Apoderado, Curso, InformeFinanciero,InformeAcademico,Director
 from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404
 from datetime import date
@@ -27,6 +27,7 @@ from weasyprint import HTML
 
 # ============================================================ MODULO LOGIN ==============================================================================
 
+
 def login_view(request):
     if request.method == "POST":
         username = request.POST['username']
@@ -49,17 +50,23 @@ def login_view(request):
             # Verificar si es profesor
             elif hasattr(user, 'profesor'):
                 login(request, user)
-                return redirect('profesor')  # Redirigir al profesor
+                return redirect('profesor_home')  # Redirigir al profesor
 
             # Verificar si es apoderado
             elif hasattr(user, 'apoderado'):
                 login(request, user)
-                return redirect('apoderado_view')  # Redirigir al apoderado
+                return redirect('apoderado_home')  # Redirigir al apoderado
+
+            # Verificar si es director
+            elif hasattr(user, 'director'):
+                login(request, user)
+                return redirect('director_dashboard')  # Redirigir al director
 
             # Otras redirecciones según roles adicionales
             else:
                 login(request, user)
-                return redirect('default')  # Redirigir a una página predeterminada si no es alumno, profesor o apoderado
+                return redirect('default_home')  # Redirigir a una página predeterminada si no es alumno, profesor, apoderado o director
+
         else:
             # Si las credenciales son inválidas
             messages.error(request, 'Usuario o contraseña incorrectos.')
@@ -500,10 +507,10 @@ def apoderadoMatri(request):
 
 
 # ==================================================================== DIRECTOR =========================================================================================
-#@login_required
+@login_required
 def director_dashboard(request):
     return render(request, 'director.html') 
-#@login_required
+@login_required
 def directorMenu(request):
     # Aquí podrías agregar lógica para consultar informes si es necesario
     return render(request, 'directorMenu.html')
@@ -536,7 +543,7 @@ def director_plani(request):
 
     return render(request, 'directorPlani.html', {'cursos': cursos})
 
-
+@login_required
 def informes_academicos(request):
     cursos = Curso.objects.all()  # Obtener todos los cursos
     informes = []
@@ -597,6 +604,7 @@ def update_curso(request):
     return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=405)
 
 #pdf director
+@login_required
 def direcPdfInfoAca(request):
     cursos = Curso.objects.all()  # Obtener todos los cursos
     informes = []
@@ -643,6 +651,7 @@ def direcPdfInfoAca(request):
 
 
 #informe academico
+@login_required
 def direcPdfPlanificacion(request):
     # Obtener los cursos de la planificación académica
     cursos = Curso.objects.all()
