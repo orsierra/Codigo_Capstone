@@ -12,11 +12,6 @@ from .forms import CalificacionForm, ObservacionForm, AlumnoForm, InformeFinanci
 from django.contrib import messages
 from django.db.models import Avg
 from django.http import HttpResponse
-import io 
-from io import BytesIO
-from collections import defaultdict
-import json
-import logging
 from django.http import JsonResponse
 from django.db.models import Q 
 from django.db import models
@@ -820,8 +815,8 @@ def agregar_alumno_asis(request):
         if form.is_valid():
             # Primero crea el usuario
             user = User.objects.create_user(
-                username=form.cleaned_data['email'],  # Puedes ajustar esto si quieres usar otro campo como username
-                password=form.cleaned_data['password'],  # Asegúrate de que la contraseña esté en el formulario
+                username=form.cleaned_data['email'],  
+                password=form.cleaned_data['password'],  
                 email=form.cleaned_data['email'],
             )
             # Luego crea el Alumno
@@ -830,9 +825,9 @@ def agregar_alumno_asis(request):
                 nombre=form.cleaned_data['nombre'],
                 apellido=form.cleaned_data['apellido'],
                 email=form.cleaned_data['email'],
-                apoderado=form.cleaned_data['apoderado'],  # Este campo ya está en el formulario
-                estado_admision=form.cleaned_data['estado_admision'],  # Este campo ya está en el formulario
-                curso=form.cleaned_data['curso'],  # Asignar el curso
+                apoderado=form.cleaned_data['apoderado'],  
+                estado_admision=form.cleaned_data['estado_admision'],  
+                curso=form.cleaned_data['curso'],  
             )
             alumno.save()  # Guarda el alumno en la base de datos
             return redirect('asisAdmiFinan_gestion_pagos')  # Redirige a la lista de estudiantes
