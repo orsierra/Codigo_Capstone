@@ -276,7 +276,7 @@ def alumno_detalle(request, alumno_id):
 ##============================================ generar pdf por alumno: asistencia y calificaciones================================
 
 @login_required
-def descargar_pdf(request, alumno_id):
+def descargar_pdf_alumno(request, alumno_id):
     # Obtener el alumno específico o devolver 404 si no se encuentra
     alumno = get_object_or_404(Alumno, id=alumno_id)
     
@@ -696,7 +696,7 @@ def informe_financiero_view(request):
     }
     return render(request, 'informe_financiero.html', context)
 
-
+# ===================================================================================================================================================================================
 
 def generar_pdf_view(request):
     # Obtener todos los informes financieros del modelo
@@ -801,3 +801,74 @@ def panel_admision(request):
 
 
 # ===========================================================================================================================================================================================
+
+# =================================================================== DASHBOARD DE ASISTENTE DE ADMISIÓN Y FINANZAS ==============================================================
+
+def asisAdminFinan_dashboard(request):
+    return render(request, 'asisAdminFinan.html')  # Renderiza el dashboard del profesor
+
+from django.shortcuts import render
+
+# =====================================================VISTA de ASISTENTE DE ADMISIÓN Y FINANZAS ==========================================
+def gestion_pagos_admision(request):
+    # Consulta de todos los alumnos
+    alumnos = Alumno.objects.all()
+
+    # Pasar los alumnos al contexto
+    context = {
+        'alumnos': alumnos
+    }
+
+    return render(request, 'asisAdmiFinan_gestion_pagos.html', context)
+
+# =====================================================VISTA de ASISTENTE DE ADMISIÓN Y FINANZAS PARA AGREGAR ALUMNO ==========================================
+
+def agregar_alumno_asis(request):
+    if request.method == 'POST':
+        form = AlumnoForm(request.POST)
+        if form.is_valid():
+            # Primero crea el usuario
+            user = User.objects.create_user(
+                username=form.cleaned_data['email'],  # Puedes ajustar esto si quieres usar otro campo como username
+                password=form.cleaned_data['password'],  # Asegúrate de que la contraseña esté en el formulario
+                email=form.cleaned_data['email'],
+            )
+            # Luego crea el Alumno
+            alumno = Alumno(
+                user=user,
+                nombre=form.cleaned_data['nombre'],
+                apellido=form.cleaned_data['apellido'],
+                email=form.cleaned_data['email'],
+                apoderado=form.cleaned_data['apoderado'],  # Este campo ya está en el formulario
+                estado_admision=form.cleaned_data['estado_admision'],  # Este campo ya está en el formulario
+                curso=form.cleaned_data['curso'],  # Asignar el curso
+            )
+            alumno.save()  # Guarda el alumno en la base de datos
+            return redirect('asisAdmiFinan_gestion_pagos')  # Redirige a la lista de estudiantes
+    else:
+        form = AlumnoForm()  # Si no es POST, crea un nuevo formulario
+    
+    return render(request, 'agregar_alumno_asis.html', {'form': form})  # Renderiza la plantilla con el formulario
+
+# =====================================================VISTA de ASISTENTE DE ADMISIÓN Y FINANZAS PARA ELIMINAR ALUMNO =====================
+
+def eliminar_alumno_asis(request, alumno_id):
+    alumno = get_object_or_404(Alumno, id=alumno_id)
+    alumno.delete()  # Eliminar el alumno
+    return redirect('asisAdmiFinan_gestion_pagos')  # Redirige a la lista de estudiantes
+
+# =====================================================VISTA de ASISTENTE DE ADMISIÓN Y FINANZAS PARA ACTUALIZAR ALUMNO =====================
+
+def actualizar_alumno_asis(request, id):
+    alumno = get_object_or_404(Alumno, id=id)
+
+    if request.method == 'POST':
+        form = AlumnoForm(request.POST, instance=alumno)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Matrícula actualizada con éxito.')
+            return redirect('asisAdmiFinan_gestion_pagos')  # Redirigir a la lista de estudiantes
+    else:
+        form = AlumnoForm(instance=alumno)
+
+    return render(request, 'actualizar_alumno_asis.html', {'form': form, 'alumno': alumno})
