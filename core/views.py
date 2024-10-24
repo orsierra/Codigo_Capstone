@@ -583,7 +583,7 @@ def informe_financiero_view(request):
     }
     return render(request, 'informe_financiero.html', context)
 
-
+# ===================================================================================================================================================================================
 
 def generar_pdf_view(request):
     # Obtener todos los informes financieros del modelo
