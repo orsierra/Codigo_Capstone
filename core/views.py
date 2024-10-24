@@ -16,10 +16,9 @@ from django.http import JsonResponse
 from django.db.models import Q 
 from django.db import models
 #=====================================================
-from django.http import HttpResponse
 from django.template.loader import render_to_string
 from weasyprint import HTML
-
+from django.views.decorators.csrf import csrf_exempt
 # ============================================================ MODULO LOGIN ==============================================================================
 
 
@@ -575,10 +574,6 @@ def informes_academicos(request):
     return render(request, 'direInfoAca.html', context)
 
 
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from .models import Curso  # Asegúrate de importar tu modelo
-
 @csrf_exempt  # Solo si es necesario; no recomendado para producción sin protección
 def update_curso(request):
     if request.method == 'POST':
@@ -802,10 +797,8 @@ def panel_admision(request):
 def asisAdminFinan_dashboard(request):
     return render(request, 'asisAdminFinan.html')  # Renderiza el dashboard del profesor
 
-from django.shortcuts import render
-
 # =====================================================VISTA de ASISTENTE DE ADMISIÓN Y FINANZAS ==========================================
-def gestion_pagos_admision(request):
+def ver_gestion_pagos_admision(request):
     # Consulta de todos los alumnos
     alumnos = Alumno.objects.all()
 
@@ -852,18 +845,12 @@ def eliminar_alumno_asis(request, alumno_id):
     alumno.delete()  # Eliminar el alumno
     return redirect('asisAdmiFinan_gestion_pagos')  # Redirige a la lista de estudiantes
 
-# =====================================================VISTA de ASISTENTE DE ADMISIÓN Y FINANZAS PARA ACTUALIZAR ALUMNO =====================
+# =====================================================VISTA de ASISTENTE DE ADMISIÓN Y FINANZAS PARA ACTUALIZAR INFORME=====================
 
-def actualizar_alumno_asis(request, id):
+def editar_informe_asis(request, id):
+    # Obtener el objeto relacionado con el id
     alumno = get_object_or_404(Alumno, id=id)
 
-    if request.method == 'POST':
-        form = AlumnoForm(request.POST, instance=alumno)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Matrícula actualizada con éxito.')
-            return redirect('asisAdmiFinan_gestion_pagos')  # Redirigir a la lista de estudiantes
-    else:
-        form = AlumnoForm(instance=alumno)
+    # Lógica adicional para manejar el formulario o los datos
 
-    return render(request, 'actualizar_alumno_asis.html', {'form': form, 'alumno': alumno})
+    return render(request, 'asis_edicion_info_pago.html', {'alumno': alumno})

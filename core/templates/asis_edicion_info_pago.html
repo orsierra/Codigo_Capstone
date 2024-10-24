@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Pagos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .sidebar {
+            width: 200px;
+            background-color: #000;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            padding: 15px;
+        }
+
+        .sidebar ul li:hover {
+            background-color: #333;
+        }
+
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            display: block;
+        }
+
+        .content {
+            margin-left: 200px;
+            padding: 20px;
+        }
+
+        .header {
+            background-color: black;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 800px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .student-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            border-bottom: 2px solid purple;
+            padding-bottom: 10px;
+        }
+
+        .student-info h3 {
+            margin: 0;
+        }
+
+        .payments {
+            margin: 20px 0;
+        }
+
+        .payments ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .payments ul li {
+            margin: 5px 0;
+        }
+
+        .observations {
+            margin: 20px 0;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .buttons button {
+            padding: 10px 15px;
+            background-color: black;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .buttons button:hover {
+            background-color: purple;
+        }
+
+        .back-button {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <ul>
+            <li><a href="#">Página de la Institución</a></li>
+            <li><a href="#">Perfil</a></li>
+            <li><a href="#">Salir</a></li>
+            <li><a href="#">Privacidad</a></li>
+            <li><a href="#">Accesibilidad</a></li>
+        </ul>
+    </div>
+
+    <div class="content">
+        <div class="header">
+            <h1>Registro de Pagos</h1>
+        </div>
+    
+        <div class="container">
+            
+    
+            <div class="student-info">
+                <div>
+                    <h3>Estudiante en Admisión</h3>
+                    <p><strong>Estudiante:</strong> {{ alumno.nombre }} {{ alumno.apellido }}</p>
+                    <p><strong>Apoderado:</strong> {{ alumno.apoderado }}</p>
+                    <p><strong>Asignar curso:</strong> {{ alumno.curso }}</p>
+                </div>
+                <div>
+                    <p><strong>Estado de matrícula:</strong> {{ alumno.estado_admision }}</p>
+                </div>
+            </div>
+    
+            <div class="payments">
+                <h3>Historial de Pagos:</h3>
+                <ul>
+                    <li>Enero 2024: $150,000 - Pagado el 5 de Enero 2024</li>
+                    <li>Febrero 2024: $150,000 CLP – Pendiente</li>
+                    <li>Marzo 2024: $150,000 CLP – Pendiente</li>
+                </ul>
+            </div>
+    
+            <div class="observations">
+                <h3>Observaciones:</h3>
+                <p><strong>Método de Pago:</strong> Transferencia Bancaria</p>
+                <p><strong>Fecha del Pago:</strong> 1 de Febrero 2024</p>
+                <p><strong>Referencia de Pago:</strong> TRF-1234567</p>
+                <p><strong>Monto Pagado:</strong> $150,000 CLP</p>
+            </div>
+    
+            <div class="buttons">
+                <button>IMPRIMIR EN PDF</button>
+                <button>GUARDAR CAMBIOS</button>
+            </div>
+        </div>
+    </div>
+    
+    </div>
+
+</body>
+</html>
