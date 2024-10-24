@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Curso, Profesor,Asistencia, Calificacion, Informe, Observacion, Alumno, Apoderado, Curso, InformeFinanciero
+from .models import Curso, Profesor,Asistencia, Calificacion, Informe, Observacion, Alumno, Apoderado, Curso, InformeFinanciero,InformeAcademico
 from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404
 from datetime import date
@@ -239,7 +239,6 @@ def generar_informes(request, curso_id):
 
 # ============================================ generar informe en pdf para el profesor por alumno ================================================================
 @login_required
-@login_required
 def alumno_detalle(request, alumno_id):
     alumno = get_object_or_404(Alumno, id=alumno_id)
     curso = alumno.curso  # Obtiene el curso al que pertenece el alumno
@@ -267,8 +266,49 @@ def alumno_detalle(request, alumno_id):
         'promedio': promedio,  # Añadir el promedio al contexto
     }
     return render(request, 'alumno_detalle.html', context)
+##============================================ generar pdf por alumno: asistencia y calificaciones================================
 
+@login_required
+def descargar_pdf_alumno(request, alumno_id):
+    # Obtener el alumno específico o devolver 404 si no se encuentra
+    alumno = get_object_or_404(Alumno, id=alumno_id)
+    
+    # Obtener las calificaciones y asistencias del alumno
+    calificaciones = Calificacion.objects.filter(alumno=alumno)
+    asistencias = Asistencia.objects.filter(alumnos_presentes=alumno)
+    ausencias = Asistencia.objects.filter(alumnos_ausentes=alumno)
+    justificaciones = Asistencia.objects.filter(alumnos_justificados=alumno)
 
+    # Calcular el promedio de calificaciones
+    if calificaciones:
+        promedio = sum(calificacion.nota for calificacion in calificaciones) / len(calificaciones)
+    else:
+        promedio = 0
+
+    # Preparar el contexto para la plantilla
+    context = {
+        'alumno': alumno,
+        'calificaciones': calificaciones,
+        'asistencias': asistencias,
+        'ausencias': ausencias,
+        'justificaciones': justificaciones,
+        'promedio': promedio,
+    }
+
+    # Renderizar la plantilla HTML
+    html_string = render_to_string('alumno_detalle.html', context)
+
+    # Crear el objeto PDF
+    html = HTML(string=html_string)
+
+    # Preparar la respuesta HTTP para el PDF
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{alumno.nombre}_{alumno.apellido}_detalle.pdf"'
+
+    # Generar el PDF y enviarlo en la respuesta
+    html.write_pdf(response)
+
+    return response
 
 # =============================================================== OBSERVACIONES =========================================================================
 @login_required
@@ -556,6 +596,70 @@ def update_curso(request):
 
     return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=405)
 
+#pdf director
+def direcPdfInfoAca(request):
+    cursos = Curso.objects.all()  # Obtener todos los cursos
+    informes = []
+
+    for curso in cursos:
+        alumnos = curso.alumnos.all()  # Obtener todos los alumnos del curso
+        total_alumnos = alumnos.count()  # Contar el número de alumnos inscritos
+        
+        # Calcular el promedio de calificaciones para el curso
+        promedio_notas = Calificacion.objects.filter(alumno__in=alumnos).aggregate(Avg('nota'))['nota__avg'] or 0
+        
+        # Calcular el total de días de asistencia y asistencias
+        total_asistencias = Asistencia.objects.filter(alumnos_presentes__in=alumnos).count()
+        total_dias = Asistencia.objects.filter(curso=curso).count()
+        
+        # Verificar que no haya división por cero
+        if total_alumnos > 0 and total_dias > 0:
+            promedio_asistencia = (total_asistencias / (total_alumnos * total_dias)) * 100
+        else:
+            promedio_asistencia = 0  # Si no hay alumnos o días, el promedio de asistencia es 0
+        
+        # Crear un diccionario con la información del informe para este curso
+        informes.append({
+            'curso': curso,
+            'total_alumnos': total_alumnos,
+            'promedio_notas': round(promedio_notas, 1),  # Redondear a un decimal
+            'promedio_asistencia': round(promedio_asistencia, 1)  # Redondear a un decimal
+        })
+
+    # Crear el contexto para la plantilla PDF
+    context = {
+        'informes': informes
+    }
+
+    # Renderizar la plantilla en un string HTML
+    html_string = render_to_string('direInfoAca_pdf.html', context)
+    html = HTML(string=html_string)
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="informe_academico.pdf"'
+    
+    # Generar el PDF
+    html.write_pdf(response)
+    return response
+
+
+#informe academico
+def direcPdfPlanificacion(request):
+    # Obtener los cursos de la planificación académica
+    cursos = Curso.objects.all()
+
+    # Cargar la plantilla y renderizarla como HTML
+    html_string = render_to_string('direcPdfPlanificacion_pdf.html', {'cursos': cursos})
+
+    # Crear el PDF en un archivo temporal
+    html = HTML(string=html_string)
+    result = html.write_pdf()
+
+    # Generar la respuesta HTTP con el archivo PDF
+    response = HttpResponse(result, content_type='application/pdf')
+    response['Content-Disposition'] = 'inline; filename="planificacion_academica.pdf"'
+
+    return response
+
 
 # ========================================================================= INFORME FINANCIERO ==========================================================================================
 
@@ -688,3 +792,74 @@ def panel_admision(request):
 
 
 # ===========================================================================================================================================================================================
+
+# =================================================================== DASHBOARD DE ASISTENTE DE ADMISIÓN Y FINANZAS ==============================================================
+
+def asisAdminFinan_dashboard(request):
+    return render(request, 'asisAdminFinan.html')  # Renderiza el dashboard del profesor
+
+from django.shortcuts import render
+
+# =====================================================VISTA de ASISTENTE DE ADMISIÓN Y FINANZAS ==========================================
+def gestion_pagos_admision(request):
+    # Consulta de todos los alumnos
+    alumnos = Alumno.objects.all()
+
+    # Pasar los alumnos al contexto
+    context = {
+        'alumnos': alumnos
+    }
+
+    return render(request, 'asisAdmiFinan_gestion_pagos.html', context)
+
+# =====================================================VISTA de ASISTENTE DE ADMISIÓN Y FINANZAS PARA AGREGAR ALUMNO ==========================================
+
+def agregar_alumno_asis(request):
+    if request.method == 'POST':
+        form = AlumnoForm(request.POST)
+        if form.is_valid():
+            # Primero crea el usuario
+            user = User.objects.create_user(
+                username=form.cleaned_data['email'],  # Puedes ajustar esto si quieres usar otro campo como username
+                password=form.cleaned_data['password'],  # Asegúrate de que la contraseña esté en el formulario
+                email=form.cleaned_data['email'],
+            )
+            # Luego crea el Alumno
+            alumno = Alumno(
+                user=user,
+                nombre=form.cleaned_data['nombre'],
+                apellido=form.cleaned_data['apellido'],
+                email=form.cleaned_data['email'],
+                apoderado=form.cleaned_data['apoderado'],  # Este campo ya está en el formulario
+                estado_admision=form.cleaned_data['estado_admision'],  # Este campo ya está en el formulario
+                curso=form.cleaned_data['curso'],  # Asignar el curso
+            )
+            alumno.save()  # Guarda el alumno en la base de datos
+            return redirect('asisAdmiFinan_gestion_pagos')  # Redirige a la lista de estudiantes
+    else:
+        form = AlumnoForm()  # Si no es POST, crea un nuevo formulario
+    
+    return render(request, 'agregar_alumno_asis.html', {'form': form})  # Renderiza la plantilla con el formulario
+
+# =====================================================VISTA de ASISTENTE DE ADMISIÓN Y FINANZAS PARA ELIMINAR ALUMNO =====================
+
+def eliminar_alumno_asis(request, alumno_id):
+    alumno = get_object_or_404(Alumno, id=alumno_id)
+    alumno.delete()  # Eliminar el alumno
+    return redirect('asisAdmiFinan_gestion_pagos')  # Redirige a la lista de estudiantes
+
+# =====================================================VISTA de ASISTENTE DE ADMISIÓN Y FINANZAS PARA ACTUALIZAR ALUMNO =====================
+
+def actualizar_alumno_asis(request, id):
+    alumno = get_object_or_404(Alumno, id=id)
+
+    if request.method == 'POST':
+        form = AlumnoForm(request.POST, instance=alumno)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Matrícula actualizada con éxito.')
+            return redirect('asisAdmiFinan_gestion_pagos')  # Redirigir a la lista de estudiantes
+    else:
+        form = AlumnoForm(instance=alumno)
+
+    return render(request, 'actualizar_alumno_asis.html', {'form': form, 'alumno': alumno})

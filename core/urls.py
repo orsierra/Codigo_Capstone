@@ -1,6 +1,6 @@
 # urls.py
 from django.urls import path
-from .views import login_view, profesor_dashboard, profesor_cursos, crear_usuario_db, registrar_calificaciones, registro_academico, observaciones,libro_clases, apoderadoConsuAsis, apoderadoConsuNotas, apoderadoMatri, apoderado_view, director_dashboard, update_curso
+from .views import login_view, profesor_dashboard, profesor_cursos, crear_usuario_db, registrar_calificaciones, registro_academico, observaciones,libro_clases, apoderadoConsuAsis, apoderadoConsuNotas, apoderadoMatri, apoderado_view, director_dashboard, update_curso, descargar_pdf_alumno, direcPdfInfoAca, direcPdfPlanificacion
 from core import views
 
 
@@ -17,6 +17,7 @@ urlpatterns = [
     path('registro-academico/<int:curso_id>/', registro_academico, name='registro_academico'),
     path('generar-informes/<int:curso_id>/', views.generar_informes, name='generar_informes'),
     path('alumno_detalle/<int:alumno_id>/', views.alumno_detalle, name='alumno_detalle'),
+    path('alumno_detalle/<int:alumno_id>/descargar_pdf/', descargar_pdf_alumno, name='descargar_pdf_alumno'),  # descarga detalles del alumno en pdf
     path('observaciones/<int:curso_id>/', observaciones, name='observaciones'),
     #alumno
     path('alumno/', views.alumno_dashboard, name='alumno_dashboard'),
@@ -34,6 +35,8 @@ urlpatterns = [
     path('planificacion-academica/', views.director_plani, name='director_plani'),
     path('informes-academicos/', views.informes_academicos, name='informes_academicos'),
     path('update-curso/', update_curso, name='update_curso'),
+     path('informe-academico/pdf/', direcPdfInfoAca, name='direcPdfInfoAca'),
+     path('planificacion-academica/pdf/', views.direcPdfPlanificacion, name='direcPdfPlanificacion'),
     #====================================================================================================
     path('informe-financiero/', views.informe_financiero_view, name='informe_financiero'),
     path('informe-financiero/eliminar/<int:informe_id>/', views.eliminar_informe_view, name='eliminar_informe'),
@@ -44,5 +47,12 @@ urlpatterns = [
     path('actualizar_matricula/<int:id>/', views.actualizar_matricula, name='actualizar_matricula'),
     path('panel_admision/', views.panel_admision, name='panel_admision'),
     path('eliminar_alumno/<int:alumno_id>/', views.eliminar_alumno, name='eliminar_alumno'),
+    # Asistente de admision y finanza
+    path('panel_asisAdminFinan/', views.asisAdminFinan_dashboard, name='panel_asisAdminFinan'),
+    path('gestion-pagos-admision/', views.gestion_pagos_admision, name='asisAdmiFinan_gestion_pagos'),
+    path('actualizar-alumno-asis/<int:id>/', views.actualizar_alumno_asis, name='actualizar_alumno_asis'),
+    path('eliminar-alumno-asis/<int:id>/', views.eliminar_alumno_asis, name='eliminar_alumno_asis'),
+    path('agregar-alumno-asis/', views.agregar_alumno_asis, name='agregar_alumno_asis'),
+    
 
 ]

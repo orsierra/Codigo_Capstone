@@ -64,16 +64,28 @@ class ApoderadoForm(forms.ModelForm):
         fields = ['nombre', 'apellido', 'email', 'telefono']
 
 
+from django import forms
+from .models import Alumno
+
 class AlumnoForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)  # Campo de contraseña
-    
+
     class Meta:
         model = Alumno
-        fields = ['nombre', 'apellido', 'email', 'apoderado', 'password', 'curso', 'estado_admision'] 
+        fields = ['nombre', 'apellido', 'email', 'apoderado', 'password', 'curso', 'estado_admision']
+        
+        # Opciones para el estado de admisión
+        ESTADO_ADMISION_CHOICES = [
+            ('Aprobado', 'Aprobado'),
+            ('Pendiente', 'Pendiente'),
+        ]
+
         widgets = {
-            'curso': forms.Select(),  # Esto generará un menú desplegable para seleccionar el curso
-            'apoderado': forms.Select(),  # Esto generará un menú desplegable para seleccionar el apoderado
+            'curso': forms.Select(),  # Menú desplegable para seleccionar el curso
+            'apoderado': forms.Select(),  # Menú desplegable para seleccionar el apoderado
+            'estado_admision': forms.Select(choices=ESTADO_ADMISION_CHOICES),  # Opciones de "Aprobado" y "Pendiente"
         }
+
 
 
 class InformeFinancieroForm(forms.ModelForm):
