@@ -149,8 +149,8 @@
                     <td>{{ alumno.estado_admision }}</td>
                     <td>
                         <div class="action-buttons">
-                            <!-- Botón de Actualizar -->
-                            <button class="update" onclick="window.location.href='{% url 'actualizar_alumno_asis' alumno.id %}'">Actualizar</button>
+                            <!-- Botón de edicion -->
+                            <button class="update" onclick="window.location.href='{% url 'editar_informe_asis' alumno.id %}'">Editar Informe</button>
                             
                             <!-- Botón de Eliminar -->
                             <form action="{% url 'eliminar_alumno_asis' alumno.id %}" method="POST" style="display: inline;">
