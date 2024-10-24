@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Pagos y Admisión</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .sidebar {
+            width: 200px;
+            position: fixed;
+            height: 100%;
+            background-color: #333;
+            padding-top: 20px;
+        }
+
+        .sidebar h2, .sidebar ul {
+            color: white;
+            text-align: center;
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            padding: 10px;
+            text-align: center;
+        }
+
+        .sidebar ul li a {
+            text-decoration: none;
+            color: white;
+            display: block;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: #575757;
+        }
+
+        .content {
+            margin-left: 220px;
+            padding: 20px;
+            position: relative;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: space-evenly;
+        }
+
+        .action-buttons button {
+            padding: 5px 10px;
+            background-color: #4CAF50; /* Green */
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .action-buttons button.delete {
+            background-color: #f44336; /* Red */
+        }
+
+        .action-buttons button.update {
+            background-color: #008CBA; /* Blue */
+        }
+
+        .action-buttons button:hover {
+            opacity: 0.8;
+        }
+
+        .add-student {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .add-student:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>Gestión de Pagos</h2>
+        <ul>
+            <li><a href="#">Página de la Institución</a></li>
+            <li><a href="#">Perfil</a></li>
+            <li><a href="#">Salir</a></li>
+        </ul>
+        <ul style="position: absolute; bottom: 20px;">
+            <li><a href="#">Privacidad</a></li>
+            <li><a href="#">Accesibilidad</a></li>
+        </ul>
+    </div>
+
+    <div class="content">
+        <!-- Botón de Agregar Alumno -->
+        <a href="{% url 'agregar_alumno_asis' %}" class="add-student">Agregar Alumno</a>
+
+        <h1>Gestión de Pagos y Admisión</h1>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre del Alumno</th>
+                    <th>Estado de Admisión</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for alumno in alumnos %}
+                <tr>
+                    <td>{{ alumno.nombre }} {{ alumno.apellido }}</td>
+                    <td>{{ alumno.estado_admision }}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <!-- Botón de Actualizar -->
+                            <button class="update" onclick="window.location.href='{% url 'actualizar_alumno_asis' alumno.id %}'">Actualizar</button>
+                            
+                            <!-- Botón de Eliminar -->
+                            <form action="{% url 'eliminar_alumno_asis' alumno.id %}" method="POST" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="delete">Eliminar</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar Alumno</title>
+    {% load static %}
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #222;
+            color: white;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+            height: 100vh;
+            position: fixed; /* Fija la barra lateral */
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin: 15px 0;
+        }
+
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .sidebar ul li a:hover {
+            color: #4CAF50;
+        }
+
+        .main-content {
+            margin-left: 250px; /* Espacio para la barra lateral */
+            padding: 20px;
+            background-color: #f4f4f4;
+            flex-grow: 1;
+            overflow-y: auto;
+            transition: margin-left 0.3s; /* Transición suave */
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px; /* Espacio debajo del título */
+        }
+
+        form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        fieldset {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            padding: 10px;
+        }
+
+        legend {
+            font-weight: bold;
+            padding: 0 10px;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 48%; /* Ancho reducido para los botones */
+            margin-top: 10px; /* Espacio adicional para el botón */
+            display: inline-block; /* Para alinearlos en la misma fila */
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        a.btn-back {
+            display: inline-block;
+            margin-top: 10px; /* Espacio arriba del botón */
+            text-decoration: none;
+            color: white;
+            background-color: #007bff;
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-align: center;
+            transition: background-color 0.3s;
+            width: 48%; /* Ancho reducido para los botones */
+            vertical-align: top; /* Alineación vertical */
+        }
+
+        a.btn-back:hover {
+            background-color: #0056b3;
+        }
+
+        /* Responsividad */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: relative;
+                height: auto;
+                width: 100%;
+            }
+            .main-content {
+                margin-left: 0;
+            }
+        }
+
+        /* Flexbox para botones en fila */
+        .button-container {
+            display: flex;
+            justify-content: space-between; /* Espaciado entre botones */
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Menú</h2>
+        <ul>
+            <li><a href="{% url 'panel_admision' %}">Panel de Admision</a></li>
+            <li><a href="{% url 'gestionar_estudiantes' %}">Lista de Estudiantes</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <h1>Agregar Alumno</h1>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div>
+                {{ form.non_field_errors }}  <!-- Muestra errores de validación generales -->
+            </div>
+
+            <fieldset>
+                <legend>Información Personal</legend>
+                <div>
+                    <label for="{{ form.nombre.id_for_label }}">{{ form.nombre.label }}</label>
+                    {{ form.nombre }}  
+                    {{ form.nombre.errors }}  
+                </div>
+                
+                <div>
+                    <label for="{{ form.apellido.id_for_label }}">{{ form.apellido.label }}</label>
+                    {{ form.apellido }}  
+                    {{ form.apellido.errors }}  
+                </div>
+                
+                <div>
+                    <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+                    {{ form.email }}  
+                    {{ form.email.errors }}  
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Información de Admisión</legend>
+                <div>
+                    <label for="{{ form.apoderado.id_for_label }}">{{ form.apoderado.label }}</label>
+                    {{ form.apoderado }}  
+                    {{ form.apoderado.errors }}  
+                </div>
+
+                <div>
+                    <label for="{{ form.curso.id_for_label }}">{{ form.curso.label }}</label>
+                    {{ form.curso }}  
+                    {{ form.curso.errors }}  
+                </div>
+                
+                <div>
+                    <label for="{{ form.estado_admision.id_for_label }}">{{ form.estado_admision.label }}</label>
+                    {{ form.estado_admision }}  
+                    {{ form.estado_admision.errors }}  
+                </div>
+
+                <div>
+                    <label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
+                    {{ form.password }}  
+                    {{ form.password.errors }}  
+                </div>
+            </fieldset>
+            
+            <div class="button-container">
+                <button type="submit">Agregar Alumno</button>
+                <a class="btn-back" href="{% url 'asisAdmiFinan_gestion_pagos' %}">Volver</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

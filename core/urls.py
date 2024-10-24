@@ -1,6 +1,6 @@
 # urls.py
 from django.urls import path
-from .views import login_view, profesor_dashboard, profesor_cursos, crear_usuario_db, registrar_calificaciones, registro_academico, observaciones,libro_clases, apoderadoConsuAsis, apoderadoConsuNotas, apoderadoMatri, apoderado_view, director_dashboard, update_curso, descargar_pdf
+from .views import login_view, profesor_dashboard, profesor_cursos, crear_usuario_db, registrar_calificaciones, registro_academico, observaciones,libro_clases, apoderadoConsuAsis, apoderadoConsuNotas, apoderadoMatri, apoderado_view, director_dashboard, update_curso, descargar_pdf_alumno
 from core import views
 
 
@@ -17,7 +17,7 @@ urlpatterns = [
     path('registro-academico/<int:curso_id>/', registro_academico, name='registro_academico'),
     path('generar-informes/<int:curso_id>/', views.generar_informes, name='generar_informes'),
     path('alumno_detalle/<int:alumno_id>/', views.alumno_detalle, name='alumno_detalle'),
-    path('alumno_detalle/<int:alumno_id>/descargar_pdf/', descargar_pdf, name='descargar_pdf'),  # Nueva ruta para descargar PDF
+    path('alumno_detalle/<int:alumno_id>/descargar_pdf/', descargar_pdf_alumno, name='descargar_pdf_alumno'),  # descarga detalles del alumno en pdf
     path('observaciones/<int:curso_id>/', observaciones, name='observaciones'),
     #alumno
     path('alumno/', views.alumno_dashboard, name='alumno_dashboard'),
@@ -45,5 +45,12 @@ urlpatterns = [
     path('actualizar_matricula/<int:id>/', views.actualizar_matricula, name='actualizar_matricula'),
     path('panel_admision/', views.panel_admision, name='panel_admision'),
     path('eliminar_alumno/<int:alumno_id>/', views.eliminar_alumno, name='eliminar_alumno'),
+    # Asistente de admision y finanza
+    path('panel_asisAdminFinan/', views.asisAdminFinan_dashboard, name='panel_asisAdminFinan'),
+    path('gestion-pagos-admision/', views.gestion_pagos_admision, name='asisAdmiFinan_gestion_pagos'),
+    path('actualizar-alumno-asis/<int:id>/', views.actualizar_alumno_asis, name='actualizar_alumno_asis'),
+    path('eliminar-alumno-asis/<int:id>/', views.eliminar_alumno_asis, name='eliminar_alumno_asis'),
+    path('agregar-alumno-asis/', views.agregar_alumno_asis, name='agregar_alumno_asis'),
+    
 
 ]
