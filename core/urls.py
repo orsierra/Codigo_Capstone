@@ -35,8 +35,8 @@ urlpatterns = [
     path('planificacion-academica/', views.director_plani, name='director_plani'),
     path('informes-academicos/', views.informes_academicos, name='informes_academicos'),
     path('update-curso/', update_curso, name='update_curso'),
-     path('informe-academico/pdf/', direcPdfInfoAca, name='direcPdfInfoAca'),
-     path('planificacion-academica/pdf/', views.direcPdfPlanificacion, name='direcPdfPlanificacion'),
+    path('informe-academico/pdf/', direcPdfInfoAca, name='direcPdfInfoAca'),
+    path('planificacion-academica/pdf/', views.direcPdfPlanificacion, name='direcPdfPlanificacion'),
     #====================================================================================================
     path('informe-financiero/', views.informe_financiero_view, name='informe_financiero'),
     path('informe-financiero/eliminar/<int:informe_id>/', views.eliminar_informe_view, name='eliminar_informe'),

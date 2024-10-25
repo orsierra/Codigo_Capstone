@@ -39,27 +39,27 @@ def login_view(request):
                 
                 # Si el estado no es "Pendiente", permitir el login
                 login(request, user)
-                return redirect('alumno_home')  # Redirigir al alumno
+                return redirect('alumno_dashboard')  # Redirigir al alumno
 
             # Verificar si es profesor
             elif hasattr(user, 'profesor'):
                 login(request, user)
-                return redirect('profesor_home')  # Redirigir al profesor
+                return redirect('profesor')  # Redirigir al profesor
 
             # Verificar si es apoderado
             elif hasattr(user, 'apoderado'):
                 login(request, user)
-                return redirect('apoderado_home')  # Redirigir al apoderado
+                return redirect('apoderado')  # Redirigir al apoderado
 
             # Verificar si es director
             elif hasattr(user, 'director'):
                 login(request, user)
-                return redirect('director_dashboard')  # Redirigir al director
+                return redirect('director')  # Redirigir al director
 
             # Otras redirecciones según roles adicionales
             else:
                 login(request, user)
-                return redirect('default_home')  # Redirigir a una página predeterminada si no es alumno, profesor, apoderado o director
+                return redirect('login')  # Redirigir a una página predeterminada si no es alumno, profesor, apoderado o director
 
         else:
             # Si las credenciales son inválidas

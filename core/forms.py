@@ -64,9 +64,6 @@ class ApoderadoForm(forms.ModelForm):
         fields = ['nombre', 'apellido', 'email', 'telefono']
 
 
-from django import forms
-from .models import Alumno
-
 class AlumnoForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)  # Campo de contraseña
 
