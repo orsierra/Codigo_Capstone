@@ -49,12 +49,12 @@ def login_view(request):
             # Verificar si es apoderado
             elif hasattr(user, 'apoderado'):
                 login(request, user)
-                return redirect('apoderado')  # Redirigir al apoderado
+                return redirect('apoderado_view')  # Redirigir al apoderado
 
             # Verificar si es director
             elif hasattr(user, 'director'):
                 login(request, user)
-                return redirect('director')  # Redirigir al director
+                return redirect('director_dashboard')  # Redirigir al director
 
             # Otras redirecciones según roles adicionales
             else:
