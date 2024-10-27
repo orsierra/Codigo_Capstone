@@ -6,7 +6,7 @@
     <title>Registro de Pagos</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 0;
             background-color: #f4f4f4;
@@ -14,12 +14,13 @@
 
         .sidebar {
             width: 200px;
-            background-color: #000;
+            background-color: #343a40;
             color: white;
             height: 100vh;
             position: fixed;
             top: 0;
             left: 0;
+            transition: background-color 0.3s;
         }
 
         .sidebar ul {
@@ -32,7 +33,7 @@
         }
 
         .sidebar ul li:hover {
-            background-color: #333;
+            background-color: #495057;
         }
 
         .sidebar ul li a {
@@ -47,48 +48,32 @@
         }
 
         .header {
-            background-color: black;
+            background-color: #343a40;
             color: white;
             padding: 20px;
             text-align: center;
+            margin-bottom: 20px;
+            border-radius: 8px;
         }
 
         .container {
             background-color: white;
-            padding: 20px;
+            padding: 20px;  /* Ajustar padding para un diseño más compacto */
             margin: 20px auto;
             max-width: 800px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        .student-info {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            border-bottom: 2px solid purple;
-            padding-bottom: 10px;
+        .info-box {
+            margin-bottom: 15px;  /* Reducir el margen entre las cajas */
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
         }
 
-        .student-info h3 {
-            margin: 0;
-        }
-
-        .payments {
-            margin: 20px 0;
-        }
-
-        .payments ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .payments ul li {
-            margin: 5px 0;
-        }
-
-        .observations {
-            margin: 20px 0;
+        .info-box h3 {
+            margin: 0 0 10px;  /* Espacio abajo del título */
         }
 
         .buttons {
@@ -98,22 +83,22 @@
             margin-top: 20px;
         }
 
-        .buttons button {
+        .buttons button,
+        .buttons a {
             padding: 10px 15px;
             background-color: black;
             color: white;
             border: none;
             cursor: pointer;
             border-radius: 5px;
+            text-decoration: none;
+            text-align: center;
+            transition: background-color 0.3s;
         }
 
-        .buttons button:hover {
+        .buttons button:hover,
+        .buttons a:hover {
             background-color: purple;
-        }
-
-        .back-button {
-            font-size: 24px;
-            margin-bottom: 20px;
         }
     </style>
 </head>
@@ -128,47 +113,25 @@
             <li><a href="#">Accesibilidad</a></li>
         </ul>
     </div>
+
     <div class="content">
         <div class="header">
-            <h1>Registro de Contrato</h1>
+            <h1>Editar Informe</h1>
         </div>
-    
-        <div class="container">
-            <div class="student-info">
-                <h3>Información del Estudiante:</h3>
-                <p><strong>Estudiante:</strong> {{ alumno.nombre }} {{ alumno.apellido }}</p>
-                <p><strong>Apoderado:</strong> {{ alumno.apoderado }}</p>
-            </div>
-            <form method="POST">
-                {% csrf_token %}
-              
-                <div>
-                    <label for="fecha">Fecha:</label>
-                    {{ form.fecha }}  <!-- Solo muestra el año -->
-                </div>
-                
-                <div>
-                    <label for="valor_total">Valor Total:</label>
-                    {{ form.valor_total }}  <!-- Este campo es de solo lectura -->
-                </div>
-                
-                <div>
-                    <label for="forma_pago">Forma de Pago:</label>
-                    {{ form.forma_pago }}
-                </div>
-                
-                <div>
-                    <label for="observaciones">Observaciones:</label>
-                    {{ form.observaciones }}
-                </div>
-                
-                <div class="buttons">
-                    <button type="submit" class="btn btn-secondary">Guardar</button>
-                </div>
         
+        <div class="container">
+            
+            <form method="post" action="{% url 'editar_informe_asis' alumno.id %}">
+                {% csrf_token %}
+                {{ form.as_p }}  <!-- Renderiza todos los campos del formulario como párrafos -->
+                <div class="buttons">
+                    <button type="submit">Actualizar Contrato</button>
+                    <a href="{% url 'generar_pdf_contrato' alumno.id %}" class="btn btn-primary" target="_blank">Imprimir PDF</a>
+                    <a href="{% url 'asisAdmiFinan_gestion_pagos' %}" class="btn btn-primary" target="_blank">Volver</a>
+                </div>
             </form>
         </div>
     </div>
-</body>
 
+</body>
 </html>

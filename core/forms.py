@@ -89,11 +89,16 @@ class InformeFinancieroForm(forms.ModelForm):
     class Meta:
         model = InformeFinanciero
         fields = ['concepto', 'monto', 'observaciones']
-        
-        
+
+
 class ContratoForm(forms.ModelForm):
-    # Mantener el campo valor_total como un campo de solo lectura
-    valor_total = forms.DecimalField(initial=1500000, widget=forms.TextInput(attrs={'readonly': 'readonly'}))
+    valor_total = forms.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        label='Valor Total',
+        initial=1500000,  # Establece el valor predeterminado en 1500000
+        widget=forms.NumberInput(attrs={'readonly': 'readonly'})  # Mantener como solo lectura
+    )
 
     # Limitar las opciones de forma_pago
     FORMA_PAGO_CHOICES = [
@@ -104,13 +109,50 @@ class ContratoForm(forms.ModelForm):
     
     forma_pago = forms.ChoiceField(choices=FORMA_PAGO_CHOICES, initial='efectivo')
 
-    # Modificar el campo de fecha para que solo muestre años
-    fecha = forms.ChoiceField(
-        choices=[(year, year) for year in range(2010, 2031)],  # Ajusta el rango de años según sea necesario
-        label='Año'
+    # Cambiar el campo fecha a DateField
+    fecha = forms.DateField(
+        widget=forms.TextInput(attrs={'placeholder': 'YYYY-MM-DD'}),
+        input_formats=['%Y-%m-%d'],  # Formato que acepta el input
+        label='Fecha'
+    )
+
+    # Campo oculto para el ID del alumno
+    alumno_id = forms.IntegerField(widget=forms.HiddenInput())
+    
+    # Mostrar el nombre y apellido del alumno pero que sea solo lectura
+    alumno_nombre = forms.CharField(
+        label='Alumno',
+        widget=forms.TextInput(attrs={'readonly': 'readonly'})
+    )
+
+    # Campo oculto para el ID del apoderado
+    apoderado_id = forms.IntegerField(widget=forms.HiddenInput())
+
+    # Mostrar el nombre y apellido del apoderado pero que sea solo lectura
+    apoderado_nombre = forms.CharField(
+        label='Apoderado',
+        widget=forms.TextInput(attrs={'readonly': 'readonly'})
     )
 
     class Meta:
         model = Contrato
-        fields = ['apoderado', 'alumno', 'fecha', 'valor_total', 'forma_pago', 'observaciones']
+        fields = ['alumno_id', 'alumno_nombre', 'apoderado_id', 'apoderado_nombre', 'fecha', 'valor_total', 'forma_pago', 'observaciones']
+
+    def __init__(self, *args, **kwargs):
+        alumno_instance = kwargs.pop('alumno_instance', None)
+        apoderado_instance = kwargs.pop('apoderado_instance', None)
+        super(ContratoForm, self).__init__(*args, **kwargs)
+
+        if alumno_instance:
+            self.fields['alumno_id'].initial = alumno_instance.id  # Guardar el ID del alumno
+            self.fields['alumno_nombre'].initial = f"{alumno_instance.nombre} {alumno_instance.apellido}"  # Mostrar nombre completo
         
+        if apoderado_instance:
+            # Asignamos el id del apoderado al campo oculto
+            self.fields['apoderado_id'].initial = apoderado_instance.id
+            # Mostramos el nombre y apellido del apoderado en el campo de solo lectura
+            self.fields['apoderado_nombre'].initial = f"{apoderado_instance.nombre} {apoderado_instance.apellido}"
+
+
+
+

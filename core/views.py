@@ -846,38 +846,59 @@ def eliminar_alumno_asis(request, alumno_id):
     return redirect('asisAdmiFinan_gestion_pagos')  # Redirige a la lista de estudiantes
 
 # =====================================================VISTA de ASISTENTE DE ADMISIÓN Y FINANZAS PARA ACTUALIZAR INFORME=====================
+
 def editar_informe_asis(request, id):
-    # Obtener el alumno
-    alumno = get_object_or_404(Alumno, id=id)
+    # Obtener el alumno por ID
+    alumno_instance = get_object_or_404(Alumno, id=id)
     
-    # Buscar el contrato relacionado con el alumno
-    contrato = Contrato.objects.filter(alumno=alumno).first()
+    # Obtener el contrato relacionado con el alumno (si existe)
+    contrato_instance = Contrato.objects.filter(alumno=alumno_instance).first()
+
+    # Obtener el apoderado del alumno
+    apoderado_instance = alumno_instance.apoderado  # Asegúrate de que el modelo Alumno tenga relación con Apoderado
 
     if request.method == 'POST':
-        # Si el formulario ha sido enviado, procesar los datos
-        if contrato:  # Si existe un contrato, lo editamos
-            form = ContratoForm(request.POST, instance=contrato)
-        else:  # Si no existe un contrato, creamos uno nuevo
-            form = ContratoForm(request.POST)
-            form.instance.alumno = alumno  # Asociar el contrato nuevo con el alumno
-
+        form = ContratoForm(request.POST, instance=contrato_instance, alumno_instance=alumno_instance, apoderado_instance=apoderado_instance)
+        
         if form.is_valid():
-            form.save()  # Guardar los cambios en el contrato
-            messages.success(request, 'Los cambios han sido guardados con éxito.')
-            return redirect('asis_pago', id=alumno.id)  # Redirigir a la nueva vista 'asis_pago'
+            # Recuperar el apoderado por su ID del campo oculto
+            apoderado_id = form.cleaned_data['apoderado_id']
+            apoderado = Apoderado.objects.get(id=apoderado_id)
+
+            # Asignar la instancia del apoderado al contrato
+            contrato = form.save(commit=False)
+            contrato.apoderado = apoderado
+            contrato.alumno = alumno_instance
+            contrato.save()
+
+            # Redirigir a la URL de éxito
+            return redirect('editar_informe_asis', id=alumno_instance.id)
     else:
-        # Si es un GET, cargar el formulario con los datos existentes del contrato
-        form = ContratoForm(instance=contrato) if contrato else ContratoForm()
+        form = ContratoForm(instance=contrato_instance, alumno_instance=alumno_instance, apoderado_instance=apoderado_instance)
 
-    # Renderizar la plantilla con el formulario y los datos del alumno
-    return render(request, 'asis_edicion_info_pago.html', {'alumno': alumno, 'form': form})
+    return render(request, 'asis_edicion_info_pago.html', {'form': form, 'alumno': alumno_instance})
 
-def asis_pago(request, id):
+def generar_pdf_contrato(request, id):
     # Obtener el alumno y el contrato correspondiente
     alumno = get_object_or_404(Alumno, id=id)
     contrato = Contrato.objects.filter(alumno=alumno).first()
 
-    # Renderizar la plantilla 'asis_pago.html' con el contrato
-    return render(request, 'asis_pago.html', {'alumno': alumno, 'contrato': contrato})
+    # Verificar si el contrato existe
+    if contrato is None:
+        return HttpResponse("No se encontró el contrato asociado al alumno.", status=404)
+
+    # Cargar la plantilla HTML
+    context = {'alumno': alumno, 'contrato': contrato}
+    html_string = render_to_string('pdf/asis_pago.html', context)
+
+    # Crear el PDF
+    pdf = HTML(string=html_string).write_pdf()
+
+    # Crear la respuesta HTTP con el PDF
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="pago_{alumno.nombre}_{alumno.apellido}.pdf"'
+
+    return response
+
 
 
