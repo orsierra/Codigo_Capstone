@@ -53,5 +53,7 @@ urlpatterns = [
     path('eliminar-alumno-asis/<int:id>/', views.eliminar_alumno_asis, name='eliminar_alumno_asis'),
     path('agregar-alumno-asis/', views.agregar_alumno_asis, name='agregar_alumno_asis'),
     path('editar-informe-asis/<int:id>/', views.editar_informe_asis, name='editar_informe_asis'),
+    path('asis-pago/<int:id>/', views.asis_pago, name='asis_pago'),
+
 
 ]

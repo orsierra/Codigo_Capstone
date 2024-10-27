@@ -142,11 +142,9 @@ class InformeAcademico(models.Model):
         return f'Informe de {self.curso.nombre}'
     
 class Contrato(models.Model):
-    apoderado = models.ForeignKey(Apoderado, related_name='contratos', on_delete=models.CASCADE)  
-    fecha_firma = models.DateField()
-    valor_total = models.DecimalField(max_digits=10, decimal_places=2)
-    forma_pago = models.CharField(max_length=100)  #puede ser: "Transferencia", "Efectivo", "Cheque", etc.
-    fecha_inicio = models.DateField()
-
-    def __str__(self):
-        return f"Contrato de {self.apoderado.nombre} {self.apoderado.apellido} - Valor: {self.valor_total}"
+    apoderado = models.ForeignKey(Apoderado, related_name='contratos', on_delete=models.CASCADE)
+    alumno = models.OneToOneField(Alumno, related_name='contrato', on_delete=models.CASCADE, null=True)
+    fecha = models.DateField()
+    valor_total = models.DecimalField(max_digits=11, decimal_places=2)
+    forma_pago = models.CharField(max_length=100)
+    observaciones = models.TextField(blank=True, null=True)

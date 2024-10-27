@@ -1,0 +1,21 @@
+<div class="content">
+    <div class="header">
+        <h1>Detalles del Contrato</h1>
+    </div>
+    
+    <div class="container">
+        <div class="student-info">
+            <h3>Información del Estudiante:</h3>
+            <p><strong>Estudiante:</strong> {{ alumno.nombre }} {{ alumno.apellido }}</p>
+            <p><strong>Apoderado:</strong> {{ alumno.apoderado }}</p>
+        </div>
+        
+        <div class="contract-info">
+            <h3>Detalles del Contrato:</h3>
+            <p><strong>Fecha:</strong> {{ contrato.fecha }}</p>
+            <p><strong>Valor Total:</strong> {{ contrato.valor_total }}</p>
+            <p><strong>Forma de Pago:</strong> {{ contrato.forma_pago }}</p>
+            <p><strong>Observaciones:</strong> {{ contrato.observaciones }}</p>
+        </div>
+    </div>
+</div>

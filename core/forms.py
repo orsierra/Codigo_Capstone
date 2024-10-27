@@ -1,5 +1,5 @@
 from django import forms
-from .models import Asistencia, Alumno, Calificacion, Observacion, Apoderado, Curso, InformeFinanciero
+from .models import Asistencia, Alumno, Calificacion, Observacion, Apoderado, Curso, InformeFinanciero, Contrato
 from django.core.exceptions import ValidationError
 class AsistenciaForm(forms.ModelForm):
     class Meta:
@@ -89,3 +89,28 @@ class InformeFinancieroForm(forms.ModelForm):
     class Meta:
         model = InformeFinanciero
         fields = ['concepto', 'monto', 'observaciones']
+        
+        
+class ContratoForm(forms.ModelForm):
+    # Mantener el campo valor_total como un campo de solo lectura
+    valor_total = forms.DecimalField(initial=1500000, widget=forms.TextInput(attrs={'readonly': 'readonly'}))
+
+    # Limitar las opciones de forma_pago
+    FORMA_PAGO_CHOICES = [
+        ('efectivo', 'Efectivo'),
+        ('transferencia', 'Transferencia'),
+        ('cheque', 'Cheque'),
+    ]
+    
+    forma_pago = forms.ChoiceField(choices=FORMA_PAGO_CHOICES, initial='efectivo')
+
+    # Modificar el campo de fecha para que solo muestre años
+    fecha = forms.ChoiceField(
+        choices=[(year, year) for year in range(2010, 2031)],  # Ajusta el rango de años según sea necesario
+        label='Año'
+    )
+
+    class Meta:
+        model = Contrato
+        fields = ['apoderado', 'alumno', 'fecha', 'valor_total', 'forma_pago', 'observaciones']
+        

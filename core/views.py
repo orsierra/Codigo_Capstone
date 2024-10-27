@@ -3,12 +3,12 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Curso, Profesor,Asistencia, Calificacion, Informe, Observacion, Alumno, Apoderado, Curso, InformeFinanciero,InformeAcademico,Director
+from .models import Curso, Profesor,Asistencia, Calificacion, Informe, Observacion, Alumno, Apoderado, Curso, InformeFinanciero,InformeAcademico,Director, Contrato
 from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404
 from datetime import date
 from django.utils import timezone
-from .forms import CalificacionForm, ObservacionForm, AlumnoForm, InformeFinancieroForm, ApoderadoForm 
+from .forms import CalificacionForm, ObservacionForm, AlumnoForm, InformeFinancieroForm, ApoderadoForm, ContratoForm
 from django.contrib import messages
 from django.db.models import Avg
 from django.http import HttpResponse
@@ -846,11 +846,38 @@ def eliminar_alumno_asis(request, alumno_id):
     return redirect('asisAdmiFinan_gestion_pagos')  # Redirige a la lista de estudiantes
 
 # =====================================================VISTA de ASISTENTE DE ADMISIÓN Y FINANZAS PARA ACTUALIZAR INFORME=====================
-
 def editar_informe_asis(request, id):
-    # Obtener el objeto relacionado con el id
+    # Obtener el alumno
     alumno = get_object_or_404(Alumno, id=id)
+    
+    # Buscar el contrato relacionado con el alumno
+    contrato = Contrato.objects.filter(alumno=alumno).first()
 
-    # Lógica adicional para manejar el formulario o los datos
+    if request.method == 'POST':
+        # Si el formulario ha sido enviado, procesar los datos
+        if contrato:  # Si existe un contrato, lo editamos
+            form = ContratoForm(request.POST, instance=contrato)
+        else:  # Si no existe un contrato, creamos uno nuevo
+            form = ContratoForm(request.POST)
+            form.instance.alumno = alumno  # Asociar el contrato nuevo con el alumno
 
-    return render(request, 'asis_edicion_info_pago.html', {'alumno': alumno})
+        if form.is_valid():
+            form.save()  # Guardar los cambios en el contrato
+            messages.success(request, 'Los cambios han sido guardados con éxito.')
+            return redirect('asis_pago', id=alumno.id)  # Redirigir a la nueva vista 'asis_pago'
+    else:
+        # Si es un GET, cargar el formulario con los datos existentes del contrato
+        form = ContratoForm(instance=contrato) if contrato else ContratoForm()
+
+    # Renderizar la plantilla con el formulario y los datos del alumno
+    return render(request, 'asis_edicion_info_pago.html', {'alumno': alumno, 'form': form})
+
+def asis_pago(request, id):
+    # Obtener el alumno y el contrato correspondiente
+    alumno = get_object_or_404(Alumno, id=id)
+    contrato = Contrato.objects.filter(alumno=alumno).first()
+
+    # Renderizar la plantilla 'asis_pago.html' con el contrato
+    return render(request, 'asis_pago.html', {'alumno': alumno, 'contrato': contrato})
+
+

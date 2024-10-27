@@ -128,52 +128,47 @@
             <li><a href="#">Accesibilidad</a></li>
         </ul>
     </div>
-
     <div class="content">
         <div class="header">
-            <h1>Registro de Pagos</h1>
+            <h1>Registro de Contrato</h1>
         </div>
     
         <div class="container">
-            
-    
             <div class="student-info">
+                <h3>Información del Estudiante:</h3>
+                <p><strong>Estudiante:</strong> {{ alumno.nombre }} {{ alumno.apellido }}</p>
+                <p><strong>Apoderado:</strong> {{ alumno.apoderado }}</p>
+            </div>
+            <form method="POST">
+                {% csrf_token %}
+              
                 <div>
-                    <h3>Estudiante en Admisión</h3>
-                    <p><strong>Estudiante:</strong> {{ alumno.nombre }} {{ alumno.apellido }}</p>
-                    <p><strong>Apoderado:</strong> {{ alumno.apoderado }}</p>
-                    <p><strong>Asignar curso:</strong> {{ alumno.curso }}</p>
+                    <label for="fecha">Fecha:</label>
+                    {{ form.fecha }}  <!-- Solo muestra el año -->
                 </div>
+                
                 <div>
-                    <p><strong>Estado de matrícula:</strong> {{ alumno.estado_admision }}</p>
+                    <label for="valor_total">Valor Total:</label>
+                    {{ form.valor_total }}  <!-- Este campo es de solo lectura -->
                 </div>
-            </div>
-    
-            <div class="payments">
-                <h3>Historial de Pagos:</h3>
-                <ul>
-                    <li>Enero 2024: $150,000 - Pagado el 5 de Enero 2024</li>
-                    <li>Febrero 2024: $150,000 CLP – Pendiente</li>
-                    <li>Marzo 2024: $150,000 CLP – Pendiente</li>
-                </ul>
-            </div>
-    
-            <div class="observations">
-                <h3>Observaciones:</h3>
-                <p><strong>Método de Pago:</strong> Transferencia Bancaria</p>
-                <p><strong>Fecha del Pago:</strong> 1 de Febrero 2024</p>
-                <p><strong>Referencia de Pago:</strong> TRF-1234567</p>
-                <p><strong>Monto Pagado:</strong> $150,000 CLP</p>
-            </div>
-    
-            <div class="buttons">
-                <button>IMPRIMIR EN PDF</button>
-                <button>GUARDAR CAMBIOS</button>
-            </div>
+                
+                <div>
+                    <label for="forma_pago">Forma de Pago:</label>
+                    {{ form.forma_pago }}
+                </div>
+                
+                <div>
+                    <label for="observaciones">Observaciones:</label>
+                    {{ form.observaciones }}
+                </div>
+                
+                <div class="buttons">
+                    <button type="submit" class="btn btn-secondary">Guardar</button>
+                </div>
+        
+            </form>
         </div>
     </div>
-    
-    </div>
-
 </body>
+
 </html>
