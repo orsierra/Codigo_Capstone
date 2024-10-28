@@ -147,4 +147,4 @@ class Contrato(models.Model):
     fecha = models.DateField()
     valor_total = models.DecimalField(max_digits=11, decimal_places=2)
     forma_pago = models.CharField(max_length=100)
-    observaciones = models.TextField(blank=True, null=True)
+    observaciones = models.TextField(blank=True, null=True) 
