@@ -1,0 +1,91 @@
+<!-- templates/quienes_somos.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiénes Somos - Nuevos Horizontes</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Estilos personalizados */
+        .titulo-seccion {
+            background-color: #f8f9fa; /* Gris claro */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .titulo-seccion h1 {
+            font-size: 2.5rem; /* Tamaño de fuente grande */
+            font-weight: bold;
+            color: #343a40; /* Color de texto oscuro */
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <header class="bg-primary text-white text-center py-4">
+        <h1>Bienvenidos al Colegio Nuevos Horizontes</h1>
+    </header>
+    <main class="container my-5">
+        <section class="titulo-seccion text-center mb-4">
+            <h1>¿Quiénes Somos?</h1>
+        </section>
+        <section class="introduccion mb-4">
+            <h2 class="text-success">El Colegio Nuevos Horizontes</h2>
+            <p>
+                El colegio “Nuevos Horizontes” es una institución educacional que, en el transcurso de sus 10 años, ha logrado el reconocimiento y validación de los estudiantes, apoderados y profesores. Durante estos años, ha fortalecido el proyecto educativo introduciendo innovaciones que le han permitido el reconocimiento de otras instituciones y el crecimiento sostenido en su matrícula.
+            </p>
+        </section>
+        
+        <section class="infraestructura mb-4">
+            <h2 class="text-success">Infraestructura</h2>
+            <p>
+                El colegio cuenta con 3 establecimientos educacionales ubicados en 3 regiones del país, alcanzando una superficie de 10.770 metros cuadrados, acondicionados con altos estándares de calidad y proyectando, para los próximos 5 años, la creación de dos establecimientos más.
+            </p>
+        </section>
+        
+        <section class="matriculas mb-4">
+            <h2 class="text-success">Matrículas</h2>
+            <p>
+                Actualmente, el colegio cuenta con 3.850 estudiantes, de los cuales el 56% son mujeres y el 44% son hombres, provenientes de familias de distintos contextos socioeconómicos.
+            </p>
+        </section>
+        
+        <section class="capital-humano mb-4">
+            <h2 class="text-success">Capital Humano</h2>
+            <p>
+                El colegio cuenta con 135 profesores y profesionales de distintas áreas del conocimiento y especialidades, responsables de la entrega del conocimiento y la formación de los estudiantes. Para la gestión administrativa y académica de los establecimientos, hay 60 empleados.
+            </p>
+        </section>
+        
+        <section class="financiamiento mb-4">
+            <h2 class="text-success">Fuentes de Ingreso</h2>
+            <p>
+                Las fuentes principales de ingreso del establecimiento están basadas en la matrícula que se paga una vez al año y el arancel anual, el cual se paga en 10 cuotas mensuales. Además, existen aportes estatales y de empresas privadas que contribuyen en base a indicadores de gestión y académicos que debe cumplir el establecimiento.
+            </p>
+        </section>
+        
+        <section class="educacion mb-4">
+            <h2 class="text-success">Educación</h2>
+            <p>
+                El negocio principal del colegio es la formación de jóvenes entre los 4 y 17 años, con niveles de educación parvularia hasta la media. En cuanto a los niveles de educación especial diferencial y de adultos, no son parte del negocio principal, pero no se descarta su implementación en un futuro próximo.
+            </p>
+        </section>
+
+        <!-- Botón para volver a la página de inicio -->
+        <div class="text-center mt-4">
+            <a href="{% url 'inicio' %}" class="btn btn-primary">Volver a Inicio</a>
+        </div>
+    </main>
+    <footer class="bg-light text-center py-3">
+        <p>&copy; 2024 Colegio Nuevos Horizontes</p>
+    </footer>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

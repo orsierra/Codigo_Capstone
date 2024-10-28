@@ -19,7 +19,18 @@ from django.db import models
 from django.template.loader import render_to_string
 from weasyprint import HTML
 from django.views.decorators.csrf import csrf_exempt
-# ============================================================ MODULO LOGIN ==============================================================================
+
+
+# ============================================================ MODULO INICIO ==============================================================================
+
+
+def inicio(request):
+    return render(request, 'inicio.html')
+
+def quienes_somos(request):
+    return render(request, 'quienes_somos.html')
+
+# ============================================================ MODULO LOGIN ===============================================================================
 
 
 def login_view(request):
