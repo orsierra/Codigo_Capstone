@@ -146,7 +146,6 @@ class Contrato(models.Model):
     fecha = models.DateField()
     valor_total = models.DecimalField(max_digits=11, decimal_places=2)
     forma_pago = models.CharField(max_length=100)
-<<<<<<< HEAD
     observaciones = models.TextField(blank=True, null=True) 
 
 class AsisFinanza(models.Model):
@@ -166,6 +165,3 @@ class AsisMatricula(models.Model):
     
     def __str__(self):
         return f'{self.nombre} {self.apellido}'
-=======
-    observaciones = models.TextField(blank=True, null=True)
->>>>>>> 6a848b756943ad255768e1284450d48b4c03cf4e
