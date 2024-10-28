@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenido al Sistema de Gestión Escolar</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Custom CSS */
+        body {
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            background-color: #343a40;
+        }
+        .navbar-brand, .nav-link {
+            color: #fff !important;
+        }
+        .jumbotron {
+            background-color: #ffffff;
+            padding: 2rem 1rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .section-card {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin: 1rem 0;
+        }
+        .section-icon {
+            font-size: 3rem;
+            color: #007bff;
+            margin-bottom: 0.5rem;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            transition: background-color 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <a class="navbar-brand mx-auto" href="{% url 'inicio' %}">Colegio Nuevos Horizontes</a>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item"><a class="nav-link" href="{% url 'quienes_somos' %}">Quienes Somos</a></li>
+
+        </ul>
+    </div>
+</nav>
+
+
+<!-- Main Content -->
+<div class="container mt-5">
+    <div class="jumbotron text-center">
+        <h1 class="display-4">Bienvenido al Sistema de Nuevos Horizontes</h1>
+        <p class="lead">Accede a todas las herramientas de gestión para la comunidad educativa.</p>
+        <hr class="my-4">
+        <p>Para comenzar, inicia sesión en el sistema.</p>
+        <a class="btn btn-primary btn-lg" href="{% url 'login' %}" role="button">Iniciar Sesión</a>
+    </div>
+
+    <!-- Visual Descriptions -->
+    <div class="row">
+        <!-- Profesor Section -->
+        <div class="col-md-4">
+            <div class="section-card">
+                <div class="section-icon">
+                    <i class="fas fa-chalkboard-teacher"></i> <!-- Icono de profesor -->
+                </div>
+                <h3>Profesores</h3>
+                <p>Gestiona cursos, asiste a los alumnos y registra calificaciones.</p>
+            </div>
+        </div>
+
+        <!-- Alumno Section -->
+        <div class="col-md-4">
+            <div class="section-card">
+                <div class="section-icon">
+                    <i class="fas fa-user-graduate"></i> <!-- Icono de alumno -->
+                </div>
+                <h3>Alumnos</h3>
+                <p>Accede a tu asistencia y notas desde cualquier dispositivo.</p>
+            </div>
+        </div>
+
+        <!-- Apoderado Section -->
+        <div class="col-md-4">
+            <div class="section-card">
+                <div class="section-icon">
+                    <i class="fas fa-users"></i> <!-- Icono de apoderado -->
+                </div>
+                <h3>Apoderados</h3>
+                <p>Consulta informes académicos y realiza trámites de matrícula.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Descriptions Row -->
+    <div class="row mt-4">
+        <!-- Director Section -->
+        <div class="col-md-6">
+            <div class="section-card">
+                <div class="section-icon">
+                    <i class="fas fa-user-tie"></i> <!-- Icono de director -->
+                </div>
+                <h3>Directores</h3>
+                <p>Accede a informes académicos y financieros del colegio.</p>
+            </div>
+        </div>
+
+        <!-- Informes Financieros Section -->
+        <div class="col-md-6">
+            <div class="section-card">
+                <div class="section-icon">
+                    <i class="fas fa-file-invoice-dollar"></i> <!-- Icono de informe financiero -->
+                </div>
+                <h3>Informes Financieros</h3>
+                <p>Consulta y descarga los informes financieros semestrales.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="text-center mt-5 py-4">
+    <p>&copy; 2024 Nuevos Horizontes. Todos los derechos reservados.</p>
+</footer>
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://kit.fontawesome.com/a076d05399.js"></script> <!-- Para íconos FontAwesome -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

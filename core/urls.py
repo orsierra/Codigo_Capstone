@@ -5,7 +5,9 @@ from core import views
 
 
 urlpatterns = [
+    path('', views.inicio, name='inicio'),
     path('login/', login_view, name='login'),
+    path('quienes-somos/', views.quienes_somos, name='quienes_somos'),
   #  path('dashboard/', dashboard_view, name='dashboard'),  # Aquí iría la vista del dashboard
     path('profesor/', profesor_dashboard, name='profesor'),
     path('profesor/cursos/', profesor_cursos, name='profesor_cursos'),  # Ruta para "Mis cursos"
