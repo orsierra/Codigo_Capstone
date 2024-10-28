@@ -1,5 +1,7 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,52 +15,64 @@
         }
 
         .sidebar {
-            width: 200px;
+            width: 250px;
             position: fixed;
             height: 100%;
-            background-color: #333;
+            background-color: #222;
+            color: white;
             padding-top: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
         }
 
-        .sidebar h2, .sidebar ul {
+        .sidebar h2 {
             color: white;
-            text-align: center;
+            text-align: center; /* Centrar el título */
+            margin-bottom: 20px;
         }
 
         .sidebar ul {
             list-style-type: none;
             padding: 0;
+            margin: 0;
         }
 
         .sidebar ul li {
-            padding: 10px;
-            text-align: center;
+            padding: 10px 20px;
         }
 
         .sidebar ul li a {
             text-decoration: none;
             color: white;
             display: block;
+            transition: color 0.3s;
+            text-align: left;
         }
 
         .sidebar ul li a:hover {
-            background-color: #575757;
+            color: #4CAF50;
         }
 
         .content {
-            margin-left: 220px;
-            padding: 20px;
-            position: relative;
+            margin-left: 270px;
+            padding: 40px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            max-height: 100vh;
         }
 
         h1 {
             text-align: center;
+            color: #333;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         th, td {
@@ -78,18 +92,20 @@
 
         .action-buttons button {
             padding: 5px 10px;
-            background-color: #4CAF50; /* Green */
+            background-color: #4CAF50;
             color: white;
             border: none;
             cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
         }
 
         .action-buttons button.delete {
-            background-color: #f44336; /* Red */
+            background-color: #f44336;
         }
 
         .action-buttons button.update {
-            background-color: #008CBA; /* Blue */
+            background-color: #008CBA;
         }
 
         .action-buttons button:hover {
@@ -106,25 +122,44 @@
             border: none;
             cursor: pointer;
             text-decoration: none;
+            border-radius: 4px;
         }
 
         .add-student:hover {
             opacity: 0.8;
         }
+
+        /* Botón de volver */
+        .btn-volver {
+            display: inline-block;
+            margin-top: 20px;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-volver:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
+
 <body>
 
     <div class="sidebar">
-        <h2>Gestión de Pagos</h2>
+        <h2>Menú</h2>
         <ul>
-            <li><a href="#">Página de la Institución</a></li>
-            <li><a href="#">Perfil</a></li>
+            <li><a href="{% url 'panel_asisAdminFinan' %}">Inicio</a></li>
             <li><a href="#">Salir</a></li>
         </ul>
-        <ul style="position: absolute; bottom: 20px;">
-            <li><a href="#">Privacidad</a></li>
-            <li><a href="#">Accesibilidad</a></li>
+        <ul style="position: absolute; bottom: 20px; width: 100%; padding-left: 20px;">
+            <li><a href="#">Nuevos Horizontes</a></li>
         </ul>
     </div>
 
@@ -149,10 +184,7 @@
                     <td>{{ alumno.estado_admision }}</td>
                     <td>
                         <div class="action-buttons">
-                            <!-- Botón de edicion -->
                             <button class="update" onclick="window.location.href='{% url 'editar_informe_asis' alumno.id %}'">Editar Informe</button>
-                            
-                            <!-- Botón de Eliminar -->
                             <form action="{% url 'eliminar_alumno_asis' alumno.id %}" method="POST" style="display: inline;">
                                 {% csrf_token %}
                                 <button type="submit" class="delete">Eliminar</button>
@@ -163,7 +195,11 @@
                 {% endfor %}
             </tbody>
         </table>
+
+        <!-- Botón de volver -->
+        <a href="javascript:history.back()" class="btn-volver">Volver</a>
     </div>
 
 </body>
+
 </html>

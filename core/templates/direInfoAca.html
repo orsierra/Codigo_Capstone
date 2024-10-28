@@ -1,6 +1,6 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,183 +9,171 @@
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 0;
             display: flex;
-            min-height: 100vh;
+            height: 100vh;
             background-color: #f4f4f4;
         }
+
         /* Barra lateral */
         .sidebar {
             width: 250px;
-            background-color: #000000; /* Fondo negro para la barra lateral */
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+            background-color: #222;
+            color: white;
             padding: 20px;
-            color: white;
-        }
-        .sidebar a {
-            color: white;
-            text-decoration: none;
-            padding: 15px;
-            font-size: 18px;
-            display: block;
-            margin-bottom: 10px;
-        }
-        .sidebar a:hover {
-            background-color: #333;
-        }
-        .sidebar .logo {
-            font-size: 22px;
-            font-weight: bold;
-            margin-bottom: 40px;
-        }
-        .sidebar .bottom-links {
-            font-size: 14px;
+            position: fixed;
+            height: 100%;
+            top: 0;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
         }
 
-        /* Título y flecha */
-        .header {
-            background-color: #000000; /* Fondo negro para el título */
-            color: white;
-            padding: 20px;
+        .sidebar h2 {
             text-align: center;
-            font-size: 28px;
-        }
-        .back-arrow {
-            text-align: left;
-            margin: 20px;
-        }
-        .back-arrow a {
-            color: #2C3E50;
-            text-decoration: none;
-            font-size: 20px;
-            font-weight: bold;
-        }
-
-        .main-content {
-            flex-grow: 1;
-            padding: 20px;
-        }
-
-        .container {
-            margin: 20px auto;
-            width: 80%;
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        h2 {
-            text-align: center;
-            color: #34495E;
             margin-bottom: 20px;
         }
 
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin: 15px 0;
+        }
+
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .sidebar ul li a:hover {
+            color: #4CAF50;
+        }
+
+        /* Contenido principal */
+        .main-content {
+            flex-grow: 1;
+            margin-left: 270px;
+            padding: 40px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            max-height: 100vh;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #007bff;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.8em;
+            margin: 0;
+        }
+
+        /* Tabla de informe académico */
         table {
             width: 100%;
             border-collapse: collapse;
-            margin: 20px 0;
+            margin-top: 20px;
         }
 
         table th, table td {
-            border: 1px solid #ddd;
             padding: 12px;
             text-align: center;
+            border-bottom: 1px solid #ddd;
         }
 
         table th {
-            background-color: #2980B9;
+            background-color: #007bff;
             color: white;
         }
 
-        table td {
-            font-size: 16px;
-            color: #2C3E50;
-        }
-
-        /* Ajustes del botón usando flexbox */
         .actions {
             display: flex;
-            justify-content: flex-end; /* Alinea el botón a la derecha */
-            margin-top: 20px; /* Margen superior para separación del contenido */
+            justify-content: flex-end;
+            margin-top: 20px;
         }
 
-        .btn {
-            background-color: #2C3E50;
+        .btn, .back-button {
+            background-color: #007bff;
             color: white;
             padding: 10px 20px;
             text-align: center;
-            display: inline-block;
             border-radius: 5px;
             text-decoration: none;
             font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
         }
 
-        .btn:hover {
-            background-color: #1A252F;
+        .btn:hover, .back-button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Botón de regresar */
+        .back-button {
+            margin-top: 20px;
         }
     </style>
 </head>
+
 <body>
 
-    <!-- Barra lateral izquierda sin imágenes -->
     <div class="sidebar">
-        <div class="logo">Colegio Nuevos Horizontes</div>
-        <div class="menu">
-            <a href="{% url 'director_menu' %}">Planificación Académica</a>
-            <a href="#">Perfil</a>
-            <a href="{% url 'informes_academicos' %}">Informes y Finanzas</a>
-            <a>Salir</a>
-        </div>
-        <div class="bottom-links">
-            <p><a href="#">Privacidad</a> | <a href="#">Accesibilidad</a></p>
-        </div>
+        <h2>Menú</h2>
+        <ul>
+            <li><a href="{% url 'director_plani' %}">Planificación Académica</a></li>
+            <li><a href="{% url 'informes_academicos' %}">Informes Académicos</a></li>
+            <li><a href="{% url 'informe_financiero' %}">Informe Financiero</a></li>
+        </ul>
     </div>
 
-    <!-- Contenido principal -->
     <div class="main-content">
-        <!-- Título -->
         <div class="header">
-            Informe Académico Primer Semestre
+            <h1>Informe Académico - Primer Semestre</h1>
         </div>
 
-        <!-- Flecha para volver -->
-        <div class="back-arrow">
-            <a href="{% url 'director_menu' %}">← </a>
+        <table>
+            <thead>
+                <tr>
+                    <th>Estudiantes Inscritos</th>
+                    <th>Promedio de Notas</th>
+                    <th>% Asistencia</th>
+                    <th>Curso</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for informe in informes %}
+                <tr>
+                    <td>{{ informe.total_alumnos }}</td>
+                    <td>{{ informe.promedio_notas }}</td>
+                    <td>{{ informe.promedio_asistencia }}%</td>
+                    <td>{{ informe.curso.nombre }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" style="text-align: center; color: #ff0000;">No hay informes académicos disponibles.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="actions">
+            <a href="{% url 'direcPdfInfoAca' %}" class="btn">Imprimir en PDF</a>
         </div>
 
-        <!-- Contenedor principal -->
-        <div class="container">
-            <h2>Informe Académico</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Estudiantes Inscritos</th>
-                        <th>Promedio</th>
-                        <th>% Asistencia</th>
-                        <th>Curso</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for informe in informes %}
-                    <tr>
-                        <td>{{ informe.total_alumnos }}</td>
-                        <td>{{ informe.promedio_notas }}</td>
-                        <td>{{ informe.promedio_asistencia }}%</td>
-                        <td>{{ informe.curso.nombre }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-
-            <!-- Botón para imprimir en PDF dentro del contenedor alineado a la derecha -->
-            <div class="actions">
-                <a href="{% url 'direcPdfInfoAca' %}" class="btn">Imprimir en PDF</a>
-            </div>
-        </div>
+        <a href="javascript:history.back()" class="back-button">Volver</a>
     </div>
 
 </body>
+
 </html>
