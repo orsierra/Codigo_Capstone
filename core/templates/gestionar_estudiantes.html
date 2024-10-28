@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -78,6 +79,25 @@
             background-color: #e7f3ff;
         }
 
+        /* Botón de volver */
+        .btn-volver {
+            display: inline-block;
+            margin-top: 20px;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-volver:hover {
+            background-color: #0056b3;
+        }
+
         /* Responsividad */
         @media (max-width: 768px) {
             table {
@@ -112,6 +132,7 @@
         }
     </style>
 </head>
+
 <body>
     <h1>Gestionar Estudiantes</h1>
 
@@ -182,5 +203,9 @@
             {% endfor %}
         </tbody>
     </table>
+
+    <!-- Botón de volver -->
+    <a href="javascript:history.back()" class="btn-volver">Volver</a>
 </body>
+
 </html>
