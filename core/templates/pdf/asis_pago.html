@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalles del Contrato</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            letter-spacing: 0.5px; /* Espaciado entre letras */
+        }
+
+        .content {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .header h1 {
+            text-align: center;
+            color: #007bff;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column; /* Cambiado a columna */
+            align-items: stretch; /* Permitir que los cuadros se estiren al ancho disponible */
+            gap: 20px; /* Espacio entre cada cuadro */
+        }
+
+        .info-box {
+            background-color: #f9f9f9;
+            border: 1px solid #e1e1e1;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: left; /* Alinear texto a la izquierda para mejorar la lectura */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .info-box h3 {
+            color: #007bff;
+            margin-bottom: 10px;
+            font-size: 18px;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 5px;
+        }
+
+        .info-box p {
+            color: #555;
+            font-size: 16px;
+            margin: 5px 0;
+        }
+
+        .info-box strong {
+            color: #222;
+        }
+    </style>
+</head>
+<body>
+
+<div class="content">
+    <div class="header">
+        <h1>Detalles del Contrato</h1>
+    </div>
+    
+    <div class="container">
+        <!-- Primer cuadro: Información del Estudiante -->
+        <div class="info-box">
+            <h3>Información del Estudiante:</h3>
+            <p><strong>Estudiante:</strong> {{ alumno.nombre }} {{ alumno.apellido }}</p>
+            <p><strong>Apoderado:</strong> {{ alumno.apoderado }}</p>
+        </div>
+        
+        <!-- Segundo cuadro: Detalles del Contrato -->
+        <div class="info-box">
+            <h3>Detalles del Contrato:</h3>
+            <p><strong>Fecha:</strong> {{ contrato.fecha }}</p>
+            <p><strong>Valor Total:</strong> {{ contrato.valor_total }}</p>
+            <p><strong>Forma de Pago:</strong> {{ contrato.forma_pago }}</p>
+            <p><strong>Observaciones:</strong> {{ contrato.observaciones }}</p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

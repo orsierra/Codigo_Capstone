@@ -3,29 +3,24 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Curso, Profesor,Asistencia, Calificacion, Informe, Observacion, Alumno, Apoderado, Curso, InformeFinanciero,InformeAcademico
+from .models import Curso, Profesor,Asistencia, Calificacion, Informe, Observacion, Alumno, Apoderado, Curso, InformeFinanciero,InformeAcademico,Director, Contrato
 from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404
 from datetime import date
 from django.utils import timezone
-from .forms import CalificacionForm, ObservacionForm, AlumnoForm, InformeFinancieroForm, ApoderadoForm 
+from .forms import CalificacionForm, ObservacionForm, AlumnoForm, InformeFinancieroForm, ApoderadoForm, ContratoForm
 from django.contrib import messages
 from django.db.models import Avg
 from django.http import HttpResponse
-import io 
-from io import BytesIO
-from collections import defaultdict
-import json
-import logging
 from django.http import JsonResponse
 from django.db.models import Q 
 from django.db import models
 #=====================================================
-from django.http import HttpResponse
 from django.template.loader import render_to_string
 from weasyprint import HTML
-
+from django.views.decorators.csrf import csrf_exempt
 # ============================================================ MODULO LOGIN ==============================================================================
+
 
 def login_view(request):
     if request.method == "POST":
@@ -44,7 +39,7 @@ def login_view(request):
                 
                 # Si el estado no es "Pendiente", permitir el login
                 login(request, user)
-                return redirect('alumno_home')  # Redirigir al alumno
+                return redirect('alumno_dashboard')  # Redirigir al alumno
 
             # Verificar si es profesor
             elif hasattr(user, 'profesor'):
@@ -56,10 +51,16 @@ def login_view(request):
                 login(request, user)
                 return redirect('apoderado_view')  # Redirigir al apoderado
 
+            # Verificar si es director
+            elif hasattr(user, 'director'):
+                login(request, user)
+                return redirect('director_dashboard')  # Redirigir al director
+
             # Otras redirecciones según roles adicionales
             else:
                 login(request, user)
-                return redirect('default')  # Redirigir a una página predeterminada si no es alumno, profesor o apoderado
+                return redirect('login')  # Redirigir a una página predeterminada si no es alumno, profesor, apoderado o director
+
         else:
             # Si las credenciales son inválidas
             messages.error(request, 'Usuario o contraseña incorrectos.')
@@ -500,10 +501,10 @@ def apoderadoMatri(request):
 
 
 # ==================================================================== DIRECTOR =========================================================================================
-#@login_required
+@login_required
 def director_dashboard(request):
     return render(request, 'director.html') 
-#@login_required
+@login_required
 def directorMenu(request):
     # Aquí podrías agregar lógica para consultar informes si es necesario
     return render(request, 'directorMenu.html')
@@ -536,7 +537,7 @@ def director_plani(request):
 
     return render(request, 'directorPlani.html', {'cursos': cursos})
 
-
+@login_required
 def informes_academicos(request):
     cursos = Curso.objects.all()  # Obtener todos los cursos
     informes = []
@@ -573,10 +574,6 @@ def informes_academicos(request):
     return render(request, 'direInfoAca.html', context)
 
 
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from .models import Curso  # Asegúrate de importar tu modelo
-
 @csrf_exempt  # Solo si es necesario; no recomendado para producción sin protección
 def update_curso(request):
     if request.method == 'POST':
@@ -597,6 +594,7 @@ def update_curso(request):
     return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=405)
 
 #pdf director
+@login_required
 def direcPdfInfoAca(request):
     cursos = Curso.objects.all()  # Obtener todos los cursos
     informes = []
@@ -643,6 +641,7 @@ def direcPdfInfoAca(request):
 
 
 #informe academico
+@login_required
 def direcPdfPlanificacion(request):
     # Obtener los cursos de la planificación académica
     cursos = Curso.objects.all()
@@ -798,10 +797,8 @@ def panel_admision(request):
 def asisAdminFinan_dashboard(request):
     return render(request, 'asisAdminFinan.html')  # Renderiza el dashboard del profesor
 
-from django.shortcuts import render
-
 # =====================================================VISTA de ASISTENTE DE ADMISIÓN Y FINANZAS ==========================================
-def gestion_pagos_admision(request):
+def ver_gestion_pagos_admision(request):
     # Consulta de todos los alumnos
     alumnos = Alumno.objects.all()
 
@@ -820,8 +817,8 @@ def agregar_alumno_asis(request):
         if form.is_valid():
             # Primero crea el usuario
             user = User.objects.create_user(
-                username=form.cleaned_data['email'],  # Puedes ajustar esto si quieres usar otro campo como username
-                password=form.cleaned_data['password'],  # Asegúrate de que la contraseña esté en el formulario
+                username=form.cleaned_data['email'],  
+                password=form.cleaned_data['password'],  
                 email=form.cleaned_data['email'],
             )
             # Luego crea el Alumno
@@ -830,9 +827,9 @@ def agregar_alumno_asis(request):
                 nombre=form.cleaned_data['nombre'],
                 apellido=form.cleaned_data['apellido'],
                 email=form.cleaned_data['email'],
-                apoderado=form.cleaned_data['apoderado'],  # Este campo ya está en el formulario
-                estado_admision=form.cleaned_data['estado_admision'],  # Este campo ya está en el formulario
-                curso=form.cleaned_data['curso'],  # Asignar el curso
+                apoderado=form.cleaned_data['apoderado'],  
+                estado_admision=form.cleaned_data['estado_admision'],  
+                curso=form.cleaned_data['curso'],  
             )
             alumno.save()  # Guarda el alumno en la base de datos
             return redirect('asisAdmiFinan_gestion_pagos')  # Redirige a la lista de estudiantes
@@ -848,18 +845,60 @@ def eliminar_alumno_asis(request, alumno_id):
     alumno.delete()  # Eliminar el alumno
     return redirect('asisAdmiFinan_gestion_pagos')  # Redirige a la lista de estudiantes
 
-# =====================================================VISTA de ASISTENTE DE ADMISIÓN Y FINANZAS PARA ACTUALIZAR ALUMNO =====================
+# =====================================================VISTA de ASISTENTE DE ADMISIÓN Y FINANZAS PARA ACTUALIZAR INFORME=====================
 
-def actualizar_alumno_asis(request, id):
-    alumno = get_object_or_404(Alumno, id=id)
+def editar_informe_asis(request, id):
+    # Obtener el alumno por ID
+    alumno_instance = get_object_or_404(Alumno, id=id)
+    
+    # Obtener el contrato relacionado con el alumno (si existe)
+    contrato_instance = Contrato.objects.filter(alumno=alumno_instance).first()
+
+    # Obtener el apoderado del alumno
+    apoderado_instance = alumno_instance.apoderado  # Asegúrate de que el modelo Alumno tenga relación con Apoderado
 
     if request.method == 'POST':
-        form = AlumnoForm(request.POST, instance=alumno)
+        form = ContratoForm(request.POST, instance=contrato_instance, alumno_instance=alumno_instance, apoderado_instance=apoderado_instance)
+        
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Matrícula actualizada con éxito.')
-            return redirect('asisAdmiFinan_gestion_pagos')  # Redirigir a la lista de estudiantes
-    else:
-        form = AlumnoForm(instance=alumno)
+            # Recuperar el apoderado por su ID del campo oculto
+            apoderado_id = form.cleaned_data['apoderado_id']
+            apoderado = Apoderado.objects.get(id=apoderado_id)
 
-    return render(request, 'actualizar_alumno_asis.html', {'form': form, 'alumno': alumno})
+            # Asignar la instancia del apoderado al contrato
+            contrato = form.save(commit=False)
+            contrato.apoderado = apoderado
+            contrato.alumno = alumno_instance
+            contrato.save()
+
+            # Redirigir a la URL de éxito
+            return redirect('editar_informe_asis', id=alumno_instance.id)
+    else:
+        form = ContratoForm(instance=contrato_instance, alumno_instance=alumno_instance, apoderado_instance=apoderado_instance)
+
+    return render(request, 'asis_edicion_info_pago.html', {'form': form, 'alumno': alumno_instance})
+
+def generar_pdf_contrato(request, id):
+    # Obtener el alumno y el contrato correspondiente
+    alumno = get_object_or_404(Alumno, id=id)
+    contrato = Contrato.objects.filter(alumno=alumno).first()
+
+    # Verificar si el contrato existe
+    if contrato is None:
+        return HttpResponse("No se encontró el contrato asociado al alumno.", status=404)
+
+    # Cargar la plantilla HTML
+    context = {'alumno': alumno, 'contrato': contrato}
+    html_string = render_to_string('pdf/asis_pago.html', context)
+
+    # Crear el PDF
+    pdf = HTML(string=html_string).write_pdf()
+
+    # Crear la respuesta HTTP con el PDF
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="pago_{alumno.nombre}_{alumno.apellido}.pdf"'
+
+    return response
+
+
+

@@ -38,6 +38,15 @@ class Alumno(models.Model):
 
     def __str__(self):
         return f"{self.nombre} {self.apellido}"
+    
+class Director(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)  # Asociación con el modelo User de Django
+    nombre = models.CharField(max_length=100)
+    apellido = models.CharField(max_length=200, default='Sin apellido')
+    email = models.EmailField(unique=True)
+
+    def __str__(self):
+        return f"{self.nombre} {self.apellido}"
 
 
 
@@ -131,3 +140,11 @@ class InformeAcademico(models.Model):
 
     def __str__(self):
         return f'Informe de {self.curso.nombre}'
+    
+class Contrato(models.Model):
+    apoderado = models.ForeignKey(Apoderado, related_name='contratos', on_delete=models.CASCADE)
+    alumno = models.OneToOneField(Alumno, related_name='contrato', on_delete=models.CASCADE, null=True)
+    fecha = models.DateField()
+    valor_total = models.DecimalField(max_digits=11, decimal_places=2)
+    forma_pago = models.CharField(max_length=100)
+    observaciones = models.TextField(blank=True, null=True)
