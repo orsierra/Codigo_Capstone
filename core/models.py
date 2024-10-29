@@ -78,7 +78,7 @@ class Asistencia(models.Model):
 
 
 
-#modelo CALIFICACION, se relaciona con el libro de clases del profe
+# Modelo CALIFICACION, se relaciona con el libro de clases del profe
 class Calificacion(models.Model):
     curso = models.ForeignKey(Curso, on_delete=models.CASCADE)
     alumno = models.ForeignKey('Alumno', on_delete=models.CASCADE)

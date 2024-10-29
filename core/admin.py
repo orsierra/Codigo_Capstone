@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Profesor, Curso, Alumno, Apoderado, Asistencia, Calificacion, InformeFinanciero, Contrato, AsisFinanza, AsisMatricula
+from .models import Profesor, Curso, Alumno, Apoderado, Asistencia, Calificacion, InformeFinanciero, Contrato, AsisFinanza, AsisMatricula, Director
 
 # Registro del modelo Profesor
 admin.site.register(Profesor)
@@ -10,7 +10,9 @@ admin.site.register(Calificacion)
 admin.site.register(InformeFinanciero)
 admin.site.register(AsisFinanza)
 admin.site.register(AsisMatricula)
-# Configuración del modelo Curso en el admin
+admin.site.register(Director)
+
+# Configuración del modelo Curso en el admin  Director
 @admin.register(Curso)
 class CursoAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'asignatura', 'profesor', 'dias', 'hora')

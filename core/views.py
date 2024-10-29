@@ -1,9 +1,9 @@
 # views.py
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Curso, Profesor,Asistencia, Calificacion, Informe, Observacion, Alumno, Apoderado, Curso, InformeFinanciero,InformeAcademico,Director, Contrato,AsisFinanza
+from .models import Curso, Profesor,Asistencia, Calificacion, Informe, Observacion, Alumno, Apoderado, Curso, InformeFinanciero,InformeAcademico,Director, Contrato,AsisFinanza, AsisMatricula
 from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404
 from datetime import date
@@ -87,6 +87,11 @@ def login_view(request):
             messages.error(request, 'Usuario o contraseña incorrectos.')
     
     return render(request, 'login.html')
+# =================================================================== LOGOUT =============================================================
+def logout_view(request):
+    logout(request)
+    return redirect('inicio') 
+
 
 # =================================================================== DASHBOARD DE PROFESOR ==============================================================
 
