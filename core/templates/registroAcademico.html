@@ -1,4 +1,5 @@
 {% load custom_filters %}
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -6,30 +7,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro Académico - {{ curso.nombre }}</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: Arial, sans-serif;
-            margin: 0;
             display: flex;
-            height: 100vh; /* Asegura que la altura sea completa */
+            height: 100vh;
+            background-color: #f8f9fa;
         }
 
         .sidebar {
             width: 250px;
-            background-color: #222;
+            background-color: #343a40;
             color: white;
             padding: 20px;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
-            overflow-y: auto; /* Permite el desplazamiento si el contenido excede la altura */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: fixed;
+            height: 100%;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
         }
 
         .sidebar h2 {
             text-align: center;
+            font-size: 1.5em;
+            color: #ffc107;
             margin-bottom: 20px;
+            font-weight: bold;
         }
 
         .sidebar ul {
             list-style: none;
             padding: 0;
+            flex-grow: 1;
         }
 
         .sidebar ul li {
@@ -37,20 +52,40 @@
         }
 
         .sidebar ul li a {
-            color: white;
+            color: #ced4da;
             text-decoration: none;
-            transition: color 0.3s;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+            display: block;
         }
 
         .sidebar ul li a:hover {
-            color: #4CAF50;
+            background-color: #495057;
+            color: white;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: auto;
+            font-size: 14px;
+        }
+
+        .footer a {
+            color: #ffc107;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
         }
 
         .main-content {
             flex-grow: 1;
             padding: 20px;
+            margin-left: 250px;
             background-color: #f4f4f4;
-            overflow-y: auto; /* Permite el desplazamiento si el contenido excede la altura */
+            overflow-y: auto;
         }
 
         h1 {
@@ -134,19 +169,6 @@
         .btn-back:hover {
             background-color: #0056b3;
         }
-
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 100%; /* Full width on small screens */
-                height: auto; /* Adjust height */
-                position: relative; /* Change position */
-                box-shadow: none; /* Remove shadow */
-            }
-
-            .main-content {
-                padding: 10px; /* Reduce padding */
-            }
-        }
     </style>
     <script>
         function togglePanel(panelId) {
@@ -166,6 +188,9 @@
             <li><a href="{% url 'registro_academico' curso.id %}">Registro Académico</a></li>
             <li><a href="{% url 'observaciones' curso.id %}">Observaciones</a></li>
         </ul>
+        <div class="footer">
+            <a href="#">Nuevos horizontes</a>
+        </div>
     </div>
 
     <div class="main-content">

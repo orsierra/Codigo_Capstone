@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consulta de Notas - Apoderado</title>
+    <title>Observaciones de Alumnos - Apoderado</title>
     <style>
         /* Reset básico */
         * {
@@ -13,9 +13,9 @@
         }
 
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             display: flex;
-            height: 100vh;
+            min-height: 100vh;
             background-color: #f8f9fa;
         }
 
@@ -42,6 +42,7 @@
 
         .sidebar ul {
             list-style: none;
+            padding: 0;
             flex-grow: 1;
         }
 
@@ -84,7 +85,7 @@
         .main-content {
             margin-left: 270px;
             padding: 20px;
-            width: 100%;
+            width: calc(100% - 270px);
             overflow-y: auto;
         }
 
@@ -95,39 +96,18 @@
             margin-bottom: 20px;
         }
 
-        .accordion {
-            max-width: 800px;
-            margin: 0 auto;
+        .alumno-section {
+            margin-bottom: 30px;
         }
 
-        .panel {
-            border: 1px solid #ccc;
-            margin: 10px 0;
-            border-radius: 5px;
-            overflow: hidden;
-        }
-
-        .panel-heading {
+        .alumno-section h2 {
+            color: #495057;
+            font-size: 1.4em;
             background-color: #007bff;
-            color: white;
-            cursor: pointer;
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: bold;
-            font-size: 1.1em;
-        }
-
-        .panel-heading:hover {
-            background-color: #0056b3;
-        }
-
-        .panel-content {
-            display: none;
-            padding: 20px;
-            background-color: #fff;
-            border-top: 1px solid #ddd;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
         }
 
         table {
@@ -135,20 +115,20 @@
             border-collapse: collapse;
             margin-top: 10px;
             background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
         th, td {
-            padding: 12px;
+            padding: 15px;
             text-align: center;
             border-bottom: 1px solid #dee2e6;
         }
 
         th {
             background-color: #007bff;
-            color: white;
+            color: #fff;
             font-weight: bold;
         }
 
@@ -161,7 +141,7 @@
             margin-top: 20px;
         }
 
-        .btn-back {
+        .btn {
             background-color: #007bff;
             color: #fff;
             padding: 10px 20px;
@@ -173,7 +153,7 @@
             transition: background-color 0.3s;
         }
 
-        .btn-back:hover {
+        .btn:hover {
             background-color: #0056b3;
         }
 
@@ -183,15 +163,29 @@
             font-style: italic;
             padding: 15px;
         }
-    </style>
-    <script>
-        function togglePanel(panelId) {
-            var panel = document.getElementById(panelId);
-            panel.style.display = (panel.style.display === 'block') ? 'none' : 'block';
-        }
-    </script>
-</head>
 
+        /* Responsividad para pantallas pequeñas */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                flex-direction: row;
+                justify-content: space-around;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 10px;
+                width: 100%;
+            }
+
+            .footer {
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
 <body>
 
     <div class="sidebar">
@@ -208,49 +202,43 @@
     </div>
 
     <div class="main-content">
-        <h1>Consulta de Notas</h1>
+        <h1>Observaciones de Alumnos</h1>
 
-        <div class="accordion">
-            {% for alumno_data in alumnos_data %}
-            <div class="panel">
-                <div class="panel-heading" onclick="togglePanel('panel-{{ alumno_data.alumno.id }}')">
-                    <span>{{ alumno_data.alumno.nombre }} {{ alumno_data.alumno.apellido }}</span>
-                    <span>&#x25BC;</span>
-                </div>
-                <div id="panel-{{ alumno_data.alumno.id }}" class="panel-content">
-                    {% for curso_data in alumno_data.cursos %}
-                    <div>
-                        <h3>{{ curso_data.curso.nombre }}</h3>
+        {% if observaciones_data %}
+            {% for data in observaciones_data %}
+                <div class="alumno-section">
+                    <h2>{{ data.alumno.nombre }} {{ data.alumno.apellido }}</h2>
+                    
+                    {% if data.observaciones %}
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Parciales</th>
-                                    <th>Nota</th>
+                                    <th>Curso</th>
+                                    <th>Fecha</th>
+                                    <th>Observación</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for calificacion in curso_data.calificaciones %}
-                                <tr>
-                                    <td>Nota {{ calificacion.numero }}</td>
-                                    <td>{{ calificacion.nota }}</td>
-                                </tr>
+                                {% for observacion in data.observaciones %}
+                                    <tr>
+                                        <td>{{ observacion.curso.nombre }}</td>
+                                        <td>{{ observacion.fecha }}</td>
+                                        <td>{{ observacion.contenido }}</td>
+                                    </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
-                        <p><strong>Promedio:</strong> {{ curso_data.promedio }}</p>
-                    </div>
-                    {% empty %}
-                    <p class="no-data">No hay cursos disponibles para este alumno.</p>
-                    {% endfor %}
+                    {% else %}
+                        <p class="no-data">No hay observaciones registradas para este alumno.</p>
+                    {% endif %}
                 </div>
-            </div>
-            {% empty %}
-            <p class="no-data">No hay alumnos asociados.</p>
             {% endfor %}
-        </div>
-
+        {% else %}
+            <p class="no-data">No tienes alumnos asociados con observaciones registradas.</p>
+        {% endif %}
+        
         <div class="buttons">
-            <button class="btn-back" onclick="window.history.back()">Regresar</button>
+            <a href="{% url 'apoderado_view' %}" class="btn">Regresar</a>
         </div>
     </div>
 

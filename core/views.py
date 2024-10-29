@@ -19,7 +19,8 @@ from django.db import models
 from django.template.loader import render_to_string
 from weasyprint import HTML
 from django.views.decorators.csrf import csrf_exempt
-
+from django.db import IntegrityError
+from django.db.models import Count
 
 # ============================================================ MODULO INICIO ==============================================================================
 
@@ -363,6 +364,10 @@ def alumno_dashboard(request):
     return render(request, 'alumno.html')
 
 # ===================================================== Vista para la consulta de asistencia ============================================================
+
+
+
+
 @login_required
 def alumno_consulta_asistencia(request):
     # Obtener el objeto Alumno asociado al usuario actual
@@ -373,34 +378,38 @@ def alumno_consulta_asistencia(request):
         messages.error(request, 'Su estado de admisión no le permite acceder a la consulta de asistencia.')
         return redirect('alumno_home')
 
-    # Obtener los cursos en los que está inscrito el alumno
-    cursos = Curso.objects.filter(alumnos=alumno)
     asistencias_data = []
 
-    # Recorremos los cursos del alumno para obtener la información de asistencia
+    # Obtener los cursos en los que está inscrito el alumno
+    cursos = alumno.cursos_asignados.all()
+
     for curso in cursos:
-        total_clases = Asistencia.objects.filter(curso=curso).count()  # Total de clases (días)
-        
-        # Obtener asistencias como presente, ausente y justificado
-        asistencias_presente = Asistencia.objects.filter(curso=curso, alumnos_presentes=alumno).count()
-        asistencias_justificado = Asistencia.objects.filter(curso=curso, alumnos_justificados=alumno).count()
-        asistencias_ausente = Asistencia.objects.filter(curso=curso, alumnos_ausentes=alumno).count()
+        # Recuperar todas las fechas en las que el alumno estuvo presente, ausente o justificado para el curso
+        fechas_presentes = set(Asistencia.objects.filter(curso=curso, alumnos_presentes=alumno).values_list('fecha', flat=True))
+        fechas_ausentes = set(Asistencia.objects.filter(curso=curso, alumnos_ausentes=alumno).values_list('fecha', flat=True))
+        fechas_justificados = set(Asistencia.objects.filter(curso=curso, alumnos_justificados=alumno).values_list('fecha', flat=True))
 
-        # Se suma el presente con el justificado para obtener el total de asistencia válida
-        total_asistencia_valida = asistencias_presente + asistencias_justificado
-        porcentaje_asistencia = (total_asistencia_valida / total_clases * 100) if total_clases > 0 else 0
+        # Combinar las fechas para obtener fechas únicas
+        fechas_totales = fechas_presentes | fechas_ausentes | fechas_justificados
+        total_clases = len(fechas_totales)  # Cuenta de fechas únicas
 
+        # Calcular la asistencia
+        total_asistencia = len(fechas_presentes) + len(fechas_justificados)
+        porcentaje_asistencia = (total_asistencia / total_clases * 100) if total_clases > 0 else 0
+
+        # Agregar datos al contexto
         asistencias_data.append({
             'curso': curso.nombre,
             'asignatura': curso.asignatura,
             'total_clases': total_clases,
-            'asistencia_valida': total_asistencia_valida,
-            'ausencias': asistencias_ausente,
-            'porcentaje_asistencia': round(porcentaje_asistencia, 2)
+            'asistencia': total_asistencia,
+            'porcentaje_asistencia': round(porcentaje_asistencia, 2),
         })
 
     # Renderizar el template con los datos de asistencia
     return render(request, 'alumnoConsuAsis.html', {'asistencias_data': asistencias_data})
+
+
 
 
 
@@ -446,36 +455,53 @@ def alumno_home(request):
 def apoderado_view(request):
     return render(request, 'apoderado.html')
 
+#============================================================================= APODERADO ASISTENCIA =========================================================================================
+
+
+
 @login_required
 def apoderadoConsuAsis(request):
+    # Obtiene el apoderado actual
     apoderado = get_object_or_404(Apoderado, user=request.user)
-    alumnos = Alumno.objects.filter(apoderado=apoderado)  # Obtener los alumnos del apoderado
-    asistencias_data = []
-    # Recorremos los alumnos para obtener la información de asistencia
-    for alumno in alumnos:
-        cursos = Curso.objects.filter(alumnos=alumno)  # Obtener los cursos del alumno
-        
-        for curso in cursos:
-            total_clases = Asistencia.objects.filter(curso=curso).count()  # Total de clases (días)
-            asistencias_presente = Asistencia.objects.filter(curso=curso, alumnos_presentes=alumno).count()  # Total de asistencias
-            asistencias_justificado = Asistencia.objects.filter(curso=curso, alumnos_justificados=alumno).count()  # Total de justificados
+    
+    # Obtiene los alumnos asociados al apoderado con estado de admisión "Aprobado"
+    alumnos = Alumno.objects.filter(apoderado=apoderado, estado_admision='Aprobado')
+    asistencias_data = {}
 
-            # la asistencia toma como presente el justificado
-            total_asistencia = asistencias_presente + asistencias_justificado
+    for alumno in alumnos:
+        cursos = alumno.cursos_asignados.all()
+        asistencias_data[alumno] = []
+
+        for curso in cursos:
+            # Recupera todas las fechas en las que el alumno estuvo en algún estado de asistencia para el curso
+            fechas_presentes = set(Asistencia.objects.filter(curso=curso, alumnos_presentes=alumno).values_list('fecha', flat=True))
+            fechas_ausentes = set(Asistencia.objects.filter(curso=curso, alumnos_ausentes=alumno).values_list('fecha', flat=True))
+            fechas_justificados = set(Asistencia.objects.filter(curso=curso, alumnos_justificados=alumno).values_list('fecha', flat=True))
+
+            # Combina las fechas para obtener fechas únicas
+            fechas_totales = fechas_presentes | fechas_ausentes | fechas_justificados
+            total_clases = len(fechas_totales)  # Cuenta de fechas únicas
+
+            # Calcula la asistencia
+            total_asistencia = len(fechas_presentes) + len(fechas_justificados)
             porcentaje_asistencia = (total_asistencia / total_clases * 100) if total_clases > 0 else 0
 
-            asistencias_data.append({
-                'nombre_alumno': alumno.nombre,  
-                'curso': curso.nombre,
-                'asignatura': curso.asignatura,
+            asistencias_data[alumno].append({
+                'curso': curso,
                 'total_clases': total_clases,
                 'asistencia': total_asistencia,
-                'porcentaje_asistencia': round(porcentaje_asistencia, 2)
+                'porcentaje_asistencia': round(porcentaje_asistencia, 2),
             })
 
-    return render(request, 'apoderadoConsuAsis.html', {'asistencias_data': asistencias_data})
+    context = {
+        'alumnos': alumnos,
+        'asistencias_data': asistencias_data,
+    }
+    return render(request, 'apoderadoConsuAsis.html', context)
 
-# =====================================================================================================================================================================
+
+
+# ============================================================================== APODERADO NOTAS ========================================================================================================
 
 @login_required
 def apoderadoConsuNotas(request):
@@ -484,31 +510,73 @@ def apoderadoConsuNotas(request):
     except Apoderado.DoesNotExist:
         return render(request, 'error.html', {'mensaje': 'No se encontró apoderado para este usuario.'})
 
-    try:
-        alumno = Alumno.objects.get(apoderado=apoderado)
-    except Alumno.DoesNotExist:
+    alumnos = Alumno.objects.filter(apoderado=apoderado, estado_admision="Aprobado")
+    if not alumnos.exists():
         return render(request, 'error.html', {'mensaje': 'No se encontró un alumno asociado con este apoderado.'})
 
-    calificaciones = Calificacion.objects.filter(alumno=alumno)
-    cursos = Curso.objects.filter(calificacion__alumno=alumno).distinct()
+    # Estructura de datos para almacenar calificaciones organizadas
+    alumnos_data = []
 
-    # Se calcula el promedio de notas de los alumnos
-    for curso in cursos:
-        calificaciones_curso = calificaciones.filter(curso=curso)
-        total_notas = sum(c.nota for c in calificaciones_curso if c.nota is not None)
-        count_notas = calificaciones_curso.count()
-        curso.promedio = round(total_notas / count_notas, 2) if count_notas > 0 else 0  # Redondea a 2 decimales
+    for alumno in alumnos:
+        alumno_info = {
+            'alumno': alumno,
+            'cursos': []
+        }
 
+        # Obtener los cursos únicos en base a las calificaciones del alumno
+        cursos = Curso.objects.filter(calificacion__alumno=alumno).distinct()
+        
+        for curso in cursos:
+            calificaciones_curso = Calificacion.objects.filter(alumno=alumno, curso=curso)
+            # Calcular el promedio de notas
+            total_notas = sum(c.nota for c in calificaciones_curso if c.nota is not None)
+            count_notas = calificaciones_curso.count()
+            promedio = round(total_notas / count_notas, 2) if count_notas > 0 else 0
+
+            # Crear una lista numerada de calificaciones
+            calificaciones_numeradas = [{'numero': i + 1, 'nota': calificacion.nota} for i, calificacion in enumerate(calificaciones_curso)]
+            
+            curso_info = {
+                'curso': curso,
+                'calificaciones': calificaciones_numeradas,
+                'promedio': promedio
+            }
+            alumno_info['cursos'].append(curso_info)
+
+        alumnos_data.append(alumno_info)
+
+    # Pasar los datos al contexto para renderizar en la plantilla
     context = {
-        'calificaciones': calificaciones,
-        'cursos': cursos,
-        'alumno': alumno
+        'alumnos_data': alumnos_data,
     }
     return render(request, 'apoderadoConsuNotas.html', context)
 
+
+# ======================================================================= APODERADO OBSERVACIONES ================================================================================================
+
 @login_required
-def apoderadoMatri(request):
-    return render(request, 'apoderadoMatri.html')
+def apoderado_observaciones(request):
+    # Obtiene el apoderado actual
+    apoderado = get_object_or_404(Apoderado, user=request.user)
+    
+    # Obtiene los alumnos asociados al apoderado con estado de admisión aprobado
+    alumnos_aprobados = Alumno.objects.filter(apoderado=apoderado, estado_admision="Aprobado")
+    
+    # Obtiene las observaciones asociadas a estos alumnos en sus respectivos cursos
+    observaciones_data = []
+    
+    for alumno in alumnos_aprobados:
+        observaciones_alumno = Observacion.objects.filter(alumno=alumno).select_related('curso')
+        observaciones_data.append({
+            'alumno': alumno,
+            'observaciones': observaciones_alumno
+        })
+
+    context = {
+        'observaciones_data': observaciones_data
+    }
+
+    return render(request, 'apoderadoObservaciones.html', context)
 
 
 # ==================================================================== DIRECTOR =========================================================================================
@@ -690,7 +758,7 @@ def informe_financiero_view(request):
     # Obtener todos los informes financieros
     informes = InformeFinanciero.objects.all()
 
-    # Pasar el contexto al template
+
     context = {
         'form': form,
         'informes': informes,
@@ -750,28 +818,45 @@ def agregar_alumno(request):
     if request.method == 'POST':
         form = AlumnoForm(request.POST)
         if form.is_valid():
-            # Primero crea el usuario
-            user = User.objects.create_user(
-                username=form.cleaned_data['email'],  # Puedes ajustar esto si quieres usar otro campo como username
-                password=form.cleaned_data['password'],  # Asegúrate de que la contraseña esté en el formulario
-                email=form.cleaned_data['email'],
-            )
-            # Luego crea el Alumno
-            alumno = Alumno(
-                user=user,
-                nombre=form.cleaned_data['nombre'],
-                apellido=form.cleaned_data['apellido'],
-                email=form.cleaned_data['email'],
-                apoderado=form.cleaned_data['apoderado'],  # Este campo ya está en el formulario
-                estado_admision=form.cleaned_data['estado_admision'],  # Este campo ya está en el formulario
-                curso=form.cleaned_data['curso'],  # Asignar el curso
-            )
-            alumno.save()  # Guarda el alumno en la base de datos
-            return redirect('gestionar_estudiantes')  # Redirige a la lista de estudiantes
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
+            if User.objects.filter(username=email).exists():
+                form.add_error('email', 'Este correo electrónico ya está en uso.')
+            else:
+                try:
+                    user = User.objects.create_user(
+                        username=email,
+                        password=password,
+                        email=email,
+                    )
+                    
+                    # Crear el Alumno asociado al usuario
+                    alumno = Alumno(
+                        user=user,
+                        nombre=form.cleaned_data['nombre'],
+                        apellido=form.cleaned_data['apellido'],
+                        email=email,
+                        apoderado=form.cleaned_data['apoderado'],
+                        estado_admision=form.cleaned_data['estado_admision'],
+                        curso=form.cleaned_data['curso'],
+                    )
+                    alumno.save()  # Guarda el alumno en la base de datos
+
+                    # Asignar el alumno al curso
+                    curso = form.cleaned_data['curso']
+                    curso.alumnos.add(alumno)  # Añade el alumno al curso
+                    
+                    return redirect('gestionar_estudiantes')  # Redirige a la lista de estudiantes
+
+                except IntegrityError:
+                    form.add_error(None, 'Ocurrió un error al crear el usuario. Intenta nuevamente.')
+
     else:
         form = AlumnoForm()  # Si no es POST, crea un nuevo formulario
     
     return render(request, 'agregar_alumno.html', {'form': form})  # Renderiza la plantilla con el formulario
+
+
 
 
 def eliminar_alumno(request, alumno_id):
@@ -801,14 +886,12 @@ def panel_admision(request):
     return render(request, 'panel_admision.html', {'alumnos': alumnos})
 
 
-# ===========================================================================================================================================================================================
-
 # =================================================================== DASHBOARD DE ASISTENTE DE ADMISIÓN Y FINANZAS ==============================================================
 
 def asisAdminFinan_dashboard(request):
     return render(request, 'asisAdminFinan.html')  # Renderiza el dashboard del profesor
 
-# =====================================================VISTA de ASISTENTE DE ADMISIÓN Y FINANZAS ==========================================
+# ===================================================== VISTA de ASISTENTE DE ADMISIÓN Y FINANZAS ==========================================
 def ver_gestion_pagos_admision(request):
     # Consulta de todos los alumnos
     alumnos = Alumno.objects.all()
@@ -820,7 +903,7 @@ def ver_gestion_pagos_admision(request):
 
     return render(request, 'asisAdmiFinan_gestion_pagos.html', context)
 
-# =====================================================VISTA de ASISTENTE DE ADMISIÓN Y FINANZAS PARA AGREGAR ALUMNO ==========================================
+# ===================================================== VISTA de ASISTENTE DE ADMISIÓN Y FINANZAS PARA AGREGAR ALUMNO ==========================================
 
 def agregar_alumno_asis(request):
     if request.method == 'POST':

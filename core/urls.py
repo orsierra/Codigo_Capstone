@@ -1,6 +1,6 @@
 # urls.py
 from django.urls import path
-from .views import login_view, profesor_dashboard, profesor_cursos, crear_usuario_db, registrar_calificaciones, registro_academico, observaciones,libro_clases, apoderadoConsuAsis, apoderadoConsuNotas, apoderadoMatri, apoderado_view, director_dashboard, update_curso, descargar_pdf_alumno, direcPdfInfoAca, direcPdfPlanificacion
+from .views import login_view, profesor_dashboard, profesor_cursos, crear_usuario_db, registrar_calificaciones, registro_academico, observaciones,libro_clases, apoderadoConsuAsis, apoderadoConsuNotas, apoderado_view, director_dashboard, update_curso, descargar_pdf_alumno, direcPdfInfoAca, direcPdfPlanificacion
 from core import views
 
 
@@ -30,7 +30,7 @@ urlpatterns = [
     path('apoderado/', apoderado_view, name='apoderado_view'),  # Dashboard del apoderado
     path('consulta-asistencia/', apoderadoConsuAsis, name='apoderadoConsuAsis'),  # Consulta de asistencia
     path('apoderado/consulta-notas/', apoderadoConsuNotas, name='apoderadoConsuNotas'),  # Consulta de notas
-    path('apoderado/matricula/', apoderadoMatri, name='apoderadoMatri'),
+    path('observaciones/', views.apoderado_observaciones, name='apoderadoObservaciones'),
     #Director
     path('director/', director_dashboard, name='director_dashboard'),
     path('director/consulta-informes/', views.directorMenu, name='director_menu'),
@@ -39,7 +39,6 @@ urlpatterns = [
     path('update-curso/', update_curso, name='update_curso'),
     path('informe-academico/pdf/', direcPdfInfoAca, name='direcPdfInfoAca'),
     path('planificacion-academica/pdf/', views.direcPdfPlanificacion, name='direcPdfPlanificacion'),
-    #====================================================================================================
     path('informe-financiero/', views.informe_financiero_view, name='informe_financiero'),
     path('informe-financiero/eliminar/<int:informe_id>/', views.eliminar_informe_view, name='eliminar_informe'),
     path('informe-financiero/pdf/', views.generar_pdf_view, name='descargar_pdf'),
