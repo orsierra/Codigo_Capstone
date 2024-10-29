@@ -1,6 +1,6 @@
 # urls.py
 from django.urls import path
-from .views import login_view, profesor_dashboard, profesor_cursos, crear_usuario_db, registrar_calificaciones, registro_academico, observaciones,libro_clases, apoderadoConsuAsis, apoderadoConsuNotas, apoderadoMatri, apoderado_view, director_dashboard, update_curso, descargar_pdf_alumno, direcPdfInfoAca, direcPdfPlanificacion
+from .views import login_view, profesor_dashboard, profesor_cursos, crear_usuario_db, registrar_calificaciones, registro_academico, observaciones,libro_clases, apoderadoConsuAsis, apoderadoConsuNotas, apoderadoMatri, apoderado_view, director_dashboard, update_curso, descargar_pdf_alumno, direcPdfInfoAca, direcPdfPlanificacion,subdirector_home,consulta_informes_academicos,gestion_recursos_academicos,detalle_curso,detalle_curso_pdf
 from core import views
 
 
@@ -56,7 +56,13 @@ urlpatterns = [
     path('agregar-alumno-asis/', views.agregar_alumno_asis, name='agregar_alumno_asis'),
     path('editar-informe-asis/<int:id>/', views.editar_informe_asis, name='editar_informe_asis'),
     path('generar_pdf_contrato/<int:id>/', views.generar_pdf_contrato, name='generar_pdf_contrato'),
-
+    
+    #SUBDIRECTOR
+    path('subdirector/', views.subdirector_home, name='subdirector_home'),
+    path('subdirector/informes/', views.consulta_informes_academicos, name='consulta_informes_academicos'),
+    path('subdirector/recursos/', views.gestion_recursos_academicos, name='gestion_recursos_academicos'),
+    path('subdirector/curso/<int:curso_id>/', views.detalle_curso, name='detalle_curso'),
+    path('curso/<int:curso_id>/pdf/', views.detalle_curso_pdf, name='detalle_curso_pdf'),
 
 
 ]

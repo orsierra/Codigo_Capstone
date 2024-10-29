@@ -911,5 +911,77 @@ def generar_pdf_contrato(request, id):
 
     return response
 
+#SUBDIRECTOR
+def subdirector_home(request):
+    return render(request, 'subdirector.html')
+
+def consulta_informes_academicos(request):
+    cursos = Curso.objects.all()  # Obtén todos los cursos de la base de datos
+    return render(request, 'subdire_consulta_informes_academicos.html', {'cursos': cursos})
+
+def gestion_recursos_academicos(request):
+    cursos = Curso.objects.select_related('profesor').all()  # Trae todos los cursos y sus profesores asociados
+    return render(request, 'gestion_recursos_academicos.html', {'cursos': cursos})
+
+
+def detalle_curso(request, curso_id):
+    curso = get_object_or_404(Curso, id=curso_id)
+    estudiantes = curso.alumnos.all()  # Obtiene todos los alumnos del curso
+
+    # Crear una lista de estudiantes con sus promedios de calificaciones
+    estudiantes_con_promedio = []
+    for estudiante in estudiantes:
+        # Calcula el promedio de notas en las calificaciones asociadas al estudiante y curso
+        promedio_calificaciones = Calificacion.objects.filter(
+            alumno=estudiante,
+            curso=curso
+        ).aggregate(promedio=Avg('nota'))['promedio']
+
+        # Redondea el promedio a 2 decimales si no es None
+        promedio_redondeado = round(promedio_calificaciones, 2) if promedio_calificaciones is not None else "-"
+
+        estudiantes_con_promedio.append({
+            'nombre': estudiante.nombre,
+            'apellido': estudiante.apellido,
+            'promedio_notas': promedio_redondeado
+        })
+
+    return render(request, 'detalle_curso.html', {'curso': curso, 'estudiantes': estudiantes_con_promedio})
+
+def detalle_curso_pdf(request, curso_id):
+    curso = get_object_or_404(Curso, id=curso_id)
+    estudiantes = curso.alumnos.all()
+
+    # Calcular el promedio de notas y preparar datos para el PDF
+    estudiantes_con_promedio = []
+    for estudiante in estudiantes:
+        promedio_calificaciones = Calificacion.objects.filter(
+            alumno=estudiante,
+            curso=curso
+        ).aggregate(promedio=Avg('nota'))['promedio']
+        
+        promedio_redondeado = round(promedio_calificaciones, 2) if promedio_calificaciones is not None else "-"
+        
+        estudiantes_con_promedio.append({
+            'nombre': estudiante.nombre,
+            'apellido': estudiante.apellido,
+            'promedio_notas': promedio_redondeado
+        })
+
+    # Renderizar la plantilla HTML a un string
+    html_string = render_to_string('detalle_curso_pdf.html', {'curso': curso, 'estudiantes': estudiantes_con_promedio})
+
+    # Crear el PDF usando WeasyPrint
+    pdf = HTML(string=html_string).write_pdf()
+
+    # Enviar el PDF como respuesta HTTP
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{curso.nombre}_reporte.pdf"'
+    return response
+
+
+
+
+
 
 
