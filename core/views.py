@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Curso, Profesor,Asistencia, Calificacion, Informe, Observacion, Alumno, Apoderado, Curso, InformeFinanciero,InformeAcademico,Director, Contrato
+from .models import Curso, Profesor,Asistencia, Calificacion, Informe, Observacion, Alumno, Apoderado, Curso, InformeFinanciero,InformeAcademico,Director, Contrato,AsisFinanza
 from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404
 from datetime import date
@@ -67,7 +67,17 @@ def login_view(request):
             elif hasattr(user, 'director'):
                 login(request, user)
                 return redirect('director_dashboard')  # Redirigir al director
-
+            
+            #Verificar si es asisfinanza
+            elif hasattr(user, 'asisfinanza'):
+                login(request, user)
+                return redirect('panel_asisAdminFinan')  # Redirigir al asisfinanza
+            
+                #Verificar si es asisMatricula
+            elif hasattr(user, 'asismatricula'):
+                login(request, user)
+                return redirect('panel_admision')  # Redirigir al asisMatricula
+            
             # Otras redirecciones según roles adicionales
             else:
                 login(request, user)
@@ -740,12 +750,12 @@ def direcPdfPlanificacion(request):
 
 
 # ========================================================================= INFORME FINANCIERO ==========================================================================================
-
+@login_required
 def informe_financiero_view(request):
     datos = InformeFinanciero.objects.all()
     return render(request, 'informe_financiero.html', {'datos': datos})
 
-
+@login_required
 def informe_financiero_view(request):
     if request.method == 'POST':
         form = InformeFinancieroForm(request.POST)
@@ -766,7 +776,7 @@ def informe_financiero_view(request):
     return render(request, 'informe_financiero.html', context)
 
 # ===================================================================================================================================================================================
-
+@login_required
 def generar_pdf_view(request):
     # Obtener todos los informes financieros del modelo
     informes = InformeFinanciero.objects.all()
@@ -789,7 +799,7 @@ def generar_pdf_view(request):
     return response
 
 
-
+@login_required
 def eliminar_informe_view(request, informe_id):
     informe = get_object_or_404(InformeFinanciero, id=informe_id)
 
@@ -800,7 +810,7 @@ def eliminar_informe_view(request, informe_id):
 
     return render(request, 'confirmar_eliminacion.html', {'informe': informe})
 # ========================================================================== ADMISION Y MATRICULA ============================================================================================
-
+@login_required
 def gestionar_estudiantes(request):
     alumnos_pendientes = Alumno.objects.filter(estado_admision='Pendiente')
     alumnos_aprobados = Alumno.objects.filter(estado_admision='Aprobado')
@@ -813,7 +823,7 @@ def gestionar_estudiantes(request):
     return render(request, 'gestionar_estudiantes.html', context)
 
 
-
+@login_required
 def agregar_alumno(request):
     if request.method == 'POST':
         form = AlumnoForm(request.POST)
@@ -856,14 +866,19 @@ def agregar_alumno(request):
     
     return render(request, 'agregar_alumno.html', {'form': form})  # Renderiza la plantilla con el formulario
 
+<<<<<<< HEAD
 
 
 
+=======
+@login_required
+>>>>>>> 6aa563cc2a4074ce2dbf15ae410f9ca576c168c0
 def eliminar_alumno(request, alumno_id):
     alumno = get_object_or_404(Alumno, id=alumno_id)
     alumno.delete()  # Eliminar el alumno
     return redirect('gestionar_estudiantes')  # Redirige a la lista de estudiantes
 
+@login_required
 def actualizar_matricula(request, id):
     alumno = get_object_or_404(Alumno, id=id)
 
@@ -880,18 +895,23 @@ def actualizar_matricula(request, id):
 
 
 
-
+@login_required
 def panel_admision(request):
     alumnos = Alumno.objects.all()  # Obtiene todos los alumnos
     return render(request, 'panel_admision.html', {'alumnos': alumnos})
 
 
 # =================================================================== DASHBOARD DE ASISTENTE DE ADMISIÓN Y FINANZAS ==============================================================
-
+@login_required
 def asisAdminFinan_dashboard(request):
     return render(request, 'asisAdminFinan.html')  # Renderiza el dashboard del profesor
 
+<<<<<<< HEAD
 # ===================================================== VISTA de ASISTENTE DE ADMISIÓN Y FINANZAS ==========================================
+=======
+# =====================================================VISTA de ASISTENTE DE ADMISIÓN Y FINANZAS ==========================================
+@login_required
+>>>>>>> 6aa563cc2a4074ce2dbf15ae410f9ca576c168c0
 def ver_gestion_pagos_admision(request):
     # Consulta de todos los alumnos
     alumnos = Alumno.objects.all()
@@ -903,8 +923,13 @@ def ver_gestion_pagos_admision(request):
 
     return render(request, 'asisAdmiFinan_gestion_pagos.html', context)
 
+<<<<<<< HEAD
 # ===================================================== VISTA de ASISTENTE DE ADMISIÓN Y FINANZAS PARA AGREGAR ALUMNO ==========================================
 
+=======
+# =====================================================VISTA de ASISTENTE DE ADMISIÓN Y FINANZAS PARA AGREGAR ALUMNO ==========================================
+@login_required
+>>>>>>> 6aa563cc2a4074ce2dbf15ae410f9ca576c168c0
 def agregar_alumno_asis(request):
     if request.method == 'POST':
         form = AlumnoForm(request.POST)
@@ -933,14 +958,14 @@ def agregar_alumno_asis(request):
     return render(request, 'agregar_alumno_asis.html', {'form': form})  # Renderiza la plantilla con el formulario
 
 # =====================================================VISTA de ASISTENTE DE ADMISIÓN Y FINANZAS PARA ELIMINAR ALUMNO =====================
-
+@login_required
 def eliminar_alumno_asis(request, alumno_id):
     alumno = get_object_or_404(Alumno, id=alumno_id)
     alumno.delete()  # Eliminar el alumno
     return redirect('asisAdmiFinan_gestion_pagos')  # Redirige a la lista de estudiantes
 
 # =====================================================VISTA de ASISTENTE DE ADMISIÓN Y FINANZAS PARA ACTUALIZAR INFORME=====================
-
+@login_required
 def editar_informe_asis(request, id):
     # Obtener el alumno por ID
     alumno_instance = get_object_or_404(Alumno, id=id)
@@ -971,7 +996,8 @@ def editar_informe_asis(request, id):
         form = ContratoForm(instance=contrato_instance, alumno_instance=alumno_instance, apoderado_instance=apoderado_instance)
 
     return render(request, 'asis_edicion_info_pago.html', {'form': form, 'alumno': alumno_instance})
-
+#==================================================  Generar contrato PDF =================================================================
+@login_required
 def generar_pdf_contrato(request, id):
     # Obtener el alumno y el contrato correspondiente
     alumno = get_object_or_404(Alumno, id=id)
@@ -994,5 +1020,81 @@ def generar_pdf_contrato(request, id):
 
     return response
 
+<<<<<<< HEAD
+#SUBDIRECTOR
+def subdirector_home(request):
+    return render(request, 'subdirector.html')
 
+def consulta_informes_academicos(request):
+    cursos = Curso.objects.all()  # Obtén todos los cursos de la base de datos
+    return render(request, 'subdire_consulta_informes_academicos.html', {'cursos': cursos})
+
+def gestion_recursos_academicos(request):
+    cursos = Curso.objects.select_related('profesor').all()  # Trae todos los cursos y sus profesores asociados
+    return render(request, 'gestion_recursos_academicos.html', {'cursos': cursos})
+
+
+def detalle_curso(request, curso_id):
+    curso = get_object_or_404(Curso, id=curso_id)
+    estudiantes = curso.alumnos.all()  # Obtiene todos los alumnos del curso
+
+    # Crear una lista de estudiantes con sus promedios de calificaciones
+    estudiantes_con_promedio = []
+    for estudiante in estudiantes:
+        # Calcula el promedio de notas en las calificaciones asociadas al estudiante y curso
+        promedio_calificaciones = Calificacion.objects.filter(
+            alumno=estudiante,
+            curso=curso
+        ).aggregate(promedio=Avg('nota'))['promedio']
+
+        # Redondea el promedio a 2 decimales si no es None
+        promedio_redondeado = round(promedio_calificaciones, 2) if promedio_calificaciones is not None else "-"
+
+        estudiantes_con_promedio.append({
+            'nombre': estudiante.nombre,
+            'apellido': estudiante.apellido,
+            'promedio_notas': promedio_redondeado
+        })
+
+    return render(request, 'detalle_curso.html', {'curso': curso, 'estudiantes': estudiantes_con_promedio})
+
+def detalle_curso_pdf(request, curso_id):
+    curso = get_object_or_404(Curso, id=curso_id)
+    estudiantes = curso.alumnos.all()
+
+    # Calcular el promedio de notas y preparar datos para el PDF
+    estudiantes_con_promedio = []
+    for estudiante in estudiantes:
+        promedio_calificaciones = Calificacion.objects.filter(
+            alumno=estudiante,
+            curso=curso
+        ).aggregate(promedio=Avg('nota'))['promedio']
+        
+        promedio_redondeado = round(promedio_calificaciones, 2) if promedio_calificaciones is not None else "-"
+        
+        estudiantes_con_promedio.append({
+            'nombre': estudiante.nombre,
+            'apellido': estudiante.apellido,
+            'promedio_notas': promedio_redondeado
+        })
+
+    # Renderizar la plantilla HTML a un string
+    html_string = render_to_string('detalle_curso_pdf.html', {'curso': curso, 'estudiantes': estudiantes_con_promedio})
+
+    # Crear el PDF usando WeasyPrint
+    pdf = HTML(string=html_string).write_pdf()
+
+    # Enviar el PDF como respuesta HTTP
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{curso.nombre}_reporte.pdf"'
+    return response
+
+
+
+
+
+
+=======
+#=================================================== FIN ASISTENTE DE ADMISION Y FINANZAS ==============================================###
+>>>>>>> 1cc4112500e3d37cb249048e698fe0adf990e5f9
 

@@ -1,6 +1,10 @@
 # urls.py
 from django.urls import path
+<<<<<<< HEAD
 from .views import login_view, profesor_dashboard, profesor_cursos, crear_usuario_db, registrar_calificaciones, registro_academico, observaciones,libro_clases, apoderadoConsuAsis, apoderadoConsuNotas, apoderado_view, director_dashboard, update_curso, descargar_pdf_alumno, direcPdfInfoAca, direcPdfPlanificacion
+=======
+from .views import login_view, profesor_dashboard, profesor_cursos, crear_usuario_db, registrar_calificaciones, registro_academico, observaciones,libro_clases, apoderadoConsuAsis, apoderadoConsuNotas, apoderadoMatri, apoderado_view, director_dashboard, update_curso, descargar_pdf_alumno, direcPdfInfoAca, direcPdfPlanificacion,subdirector_home,consulta_informes_academicos,gestion_recursos_academicos,detalle_curso,detalle_curso_pdf
+>>>>>>> 6aa563cc2a4074ce2dbf15ae410f9ca576c168c0
 from core import views
 
 
@@ -42,7 +46,7 @@ urlpatterns = [
     path('informe-financiero/', views.informe_financiero_view, name='informe_financiero'),
     path('informe-financiero/eliminar/<int:informe_id>/', views.eliminar_informe_view, name='eliminar_informe'),
     path('informe-financiero/pdf/', views.generar_pdf_view, name='descargar_pdf'),
-    # Asistende De admision y Matricula
+    # Asistente De admision y Matricula
     path('gestionar_estudiantes/', views.gestionar_estudiantes, name='gestionar_estudiantes'),
     path('agregar_alumno/', views.agregar_alumno, name='agregar_alumno'),
     path('actualizar_matricula/<int:id>/', views.actualizar_matricula, name='actualizar_matricula'),
@@ -55,7 +59,13 @@ urlpatterns = [
     path('agregar-alumno-asis/', views.agregar_alumno_asis, name='agregar_alumno_asis'),
     path('editar-informe-asis/<int:id>/', views.editar_informe_asis, name='editar_informe_asis'),
     path('generar_pdf_contrato/<int:id>/', views.generar_pdf_contrato, name='generar_pdf_contrato'),
-
+    
+    #SUBDIRECTOR
+    path('subdirector/', views.subdirector_home, name='subdirector_home'),
+    path('subdirector/informes/', views.consulta_informes_academicos, name='consulta_informes_academicos'),
+    path('subdirector/recursos/', views.gestion_recursos_academicos, name='gestion_recursos_academicos'),
+    path('subdirector/curso/<int:curso_id>/', views.detalle_curso, name='detalle_curso'),
+    path('curso/<int:curso_id>/pdf/', views.detalle_curso_pdf, name='detalle_curso_pdf'),
 
 
 ]

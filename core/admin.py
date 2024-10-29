@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Profesor, Curso, Alumno, Apoderado, Asistencia, Calificacion, InformeFinanciero, Contrato
+from .models import Profesor, Curso, Alumno, Apoderado, Asistencia, Calificacion, InformeFinanciero, Contrato, AsisFinanza, AsisMatricula
 
 # Registro del modelo Profesor
 admin.site.register(Profesor)
@@ -8,8 +8,8 @@ admin.site.register(Apoderado)
 admin.site.register(Asistencia)
 admin.site.register(Calificacion)
 admin.site.register(InformeFinanciero)
-
-
+admin.site.register(AsisFinanza)
+admin.site.register(AsisMatricula)
 # Configuración del modelo Curso en el admin
 @admin.register(Curso)
 class CursoAdmin(admin.ModelAdmin):
