@@ -7,7 +7,11 @@ from django.contrib.auth.views import LogoutView
 urlpatterns = [
     path('', views.inicio, name='inicio'),
     path('login/', login_view, name='login'),
+<<<<<<< HEAD
     path('logout/', LogoutView.as_view(), name='logout'),
+=======
+    path('logout/', views.logout_view, name='logout'),  # Ruta para el logout
+>>>>>>> d7516eb152a69e4f1cddc20eecb426233bb2d7bf
     path('quienes-somos/', views.quienes_somos, name='quienes_somos'),
   #  path('dashboard/', dashboard_view, name='dashboard'),  # Aquí iría la vista del dashboard
     path('profesor/', profesor_dashboard, name='profesor'),
