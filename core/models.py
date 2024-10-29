@@ -12,7 +12,7 @@ class Profesor(models.Model):
     apellido = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
 
-    def _str_(self):
+    def __str__(self):
         return f"{self.nombre} {self.apellido}"
 
 class Apoderado(models.Model):
@@ -22,7 +22,7 @@ class Apoderado(models.Model):
     email = models.EmailField(unique=True)
     telefono = models.CharField(max_length=15, blank=True, null=True)
 
-    def _str_(self):
+    def __str__(self):
         return f"{self.nombre} {self.apellido}"
 
 class Alumno(models.Model):
@@ -35,7 +35,7 @@ class Alumno(models.Model):
     curso = models.ForeignKey('Curso', related_name='alumnos_inscritos', on_delete=models.SET_NULL, null=True)
 
 
-    def _str_(self):
+    def __str__(self):
         return f"{self.nombre} {self.apellido}"
     
 class Director(models.Model):
@@ -44,7 +44,7 @@ class Director(models.Model):
     apellido = models.CharField(max_length=200, default='Sin apellido')
     email = models.EmailField(unique=True)
 
-    def _str_(self):
+    def __str__(self):
         return f"{self.nombre} {self.apellido}"
 
 
@@ -59,7 +59,7 @@ class Curso(models.Model):
     hora = models.TimeField()
     sala = models.CharField(max_length=50, default='Sala por asignar')
 
-    def _str_(self):
+    def __str__(self):
         return self.nombre
 
 
@@ -73,7 +73,7 @@ class Asistencia(models.Model):
     alumnos_ausentes = models.ManyToManyField('Alumno', related_name='asistencias_ausentes', blank=True)
     alumnos_justificados = models.ManyToManyField('Alumno', related_name='asistencias_justificados', blank=True)
 
-    def _str_(self):
+    def __str__(self):
         return f"Asistencia para {self.curso} el {self.fecha}"
 
 
@@ -85,7 +85,7 @@ class Calificacion(models.Model):
     fecha = models.DateField(default=timezone.now)
     nota = models.DecimalField(max_digits=5, decimal_places=2)
 
-    def _str_(self):
+    def __str__(self):
         return f"Calificación de {self.alumno} en {self.curso}: {self.nota}"
 
     def is_valid_nota(self):
@@ -99,7 +99,7 @@ class RegistroAcademico(models.Model):
     fecha = models.DateField()
     observaciones = models.TextField(blank=True, null=True)
 
-    def _str_(self):
+    def __str__(self):
         return f"Registro académico de {self.alumno} en {self.curso}"
 
 
@@ -108,7 +108,7 @@ class Informe(models.Model):
     fecha = models.DateField()
     contenido = models.TextField()
 
-    def _str_(self):
+    def __str__(self):
         return f"Informe de {self.curso} para {self.fecha}"
 
 
@@ -118,7 +118,7 @@ class Observacion(models.Model):
     fecha = models.DateField()
     contenido = models.TextField()
 
-    def _str_(self):
+    def __str__(self):
         return f"Observación de {self.alumno} en {self.curso} el {self.fecha}"
     
 #==============================================================================================
@@ -128,7 +128,7 @@ class InformeFinanciero(models.Model):
     monto = models.DecimalField(max_digits=10, decimal_places=2)
     observaciones = models.TextField(blank=True, null=True)
 
-    def _str_(self):
+    def __str__(self):
         return self.concepto
 
 class InformeAcademico(models.Model):
@@ -137,7 +137,7 @@ class InformeAcademico(models.Model):
     promedio_asistencia = models.DecimalField(max_digits=5, decimal_places=2)
     curso = models.ForeignKey('Curso', on_delete=models.CASCADE)
 
-    def _str_(self):
+    def __str__(self):
         return f'Informe de {self.curso.nombre}'
     
 class Contrato(models.Model):

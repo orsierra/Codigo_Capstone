@@ -2,11 +2,12 @@
 from django.urls import path
 from .views import login_view, profesor_dashboard, profesor_cursos, crear_usuario_db, registrar_calificaciones, registro_academico, observaciones,libro_clases, apoderadoConsuAsis, apoderadoConsuNotas, apoderado_view, director_dashboard, update_curso, descargar_pdf_alumno, direcPdfInfoAca
 from core import views
-
+from django.contrib.auth.views import LogoutView
 
 urlpatterns = [
     path('', views.inicio, name='inicio'),
     path('login/', login_view, name='login'),
+    path('logout/', LogoutView.as_view(), name='logout'),
     path('quienes-somos/', views.quienes_somos, name='quienes_somos'),
   #  path('dashboard/', dashboard_view, name='dashboard'),  # Aquí iría la vista del dashboard
     path('profesor/', profesor_dashboard, name='profesor'),

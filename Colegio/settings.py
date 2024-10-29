@@ -134,3 +134,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # settings.py
 LOGIN_URL = '/login/'  # Aquí defines la ruta que llevará al login
 
+# settings.py
+LOGOUT_REDIRECT_URL = 'inicio'  # Cambia esto a la URL a la que quieres redirigir después del logout

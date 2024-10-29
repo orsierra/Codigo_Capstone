@@ -1,10 +1,10 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agregar Alumno</title>
-    {% load static %}
     <style>
         /* Reset básico */
         * {
@@ -171,6 +171,24 @@
             background-color: #0056b3;
         }
 
+        /* Estilos específicos para el botón de Cerrar sesión */
+        .logout-button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            text-align: center;
+        }
+
+        .logout-button:hover {
+            background-color: #0056b3;
+        }
+
         /* Responsividad */
         @media (max-width: 768px) {
             .sidebar {
@@ -196,9 +214,18 @@
         <ul>
             <li><a href="{% url 'panel_admision' %}">Panel de Admision</a></li>
             <li><a href="{% url 'gestionar_estudiantes' %}">Lista de Estudiantes</a></li>
+            <li>
+                <!-- Formulario de logout estilizado como un botón -->
+                <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="logout-button">
+                        Cerrar sesión
+                    </button>
+                </form>
+            </li>
         </ul>
         <div class="footer">
-            <a href="#">Nuevos horizontes</a>
+            <a href="#">Nuevos Horizontes</a>
         </div>
     </div>
 
