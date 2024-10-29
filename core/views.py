@@ -866,13 +866,9 @@ def agregar_alumno(request):
     
     return render(request, 'agregar_alumno.html', {'form': form})  # Renderiza la plantilla con el formulario
 
-<<<<<<< HEAD
 
 
-
-=======
 @login_required
->>>>>>> 6aa563cc2a4074ce2dbf15ae410f9ca576c168c0
 def eliminar_alumno(request, alumno_id):
     alumno = get_object_or_404(Alumno, id=alumno_id)
     alumno.delete()  # Eliminar el alumno
@@ -906,12 +902,8 @@ def panel_admision(request):
 def asisAdminFinan_dashboard(request):
     return render(request, 'asisAdminFinan.html')  # Renderiza el dashboard del profesor
 
-<<<<<<< HEAD
-# ===================================================== VISTA de ASISTENTE DE ADMISIÓN Y FINANZAS ==========================================
-=======
 # =====================================================VISTA de ASISTENTE DE ADMISIÓN Y FINANZAS ==========================================
 @login_required
->>>>>>> 6aa563cc2a4074ce2dbf15ae410f9ca576c168c0
 def ver_gestion_pagos_admision(request):
     # Consulta de todos los alumnos
     alumnos = Alumno.objects.all()
@@ -923,13 +915,8 @@ def ver_gestion_pagos_admision(request):
 
     return render(request, 'asisAdmiFinan_gestion_pagos.html', context)
 
-<<<<<<< HEAD
-# ===================================================== VISTA de ASISTENTE DE ADMISIÓN Y FINANZAS PARA AGREGAR ALUMNO ==========================================
-
-=======
 # =====================================================VISTA de ASISTENTE DE ADMISIÓN Y FINANZAS PARA AGREGAR ALUMNO ==========================================
 @login_required
->>>>>>> 6aa563cc2a4074ce2dbf15ae410f9ca576c168c0
 def agregar_alumno_asis(request):
     if request.method == 'POST':
         form = AlumnoForm(request.POST)
@@ -1020,7 +1007,6 @@ def generar_pdf_contrato(request, id):
 
     return response
 
-<<<<<<< HEAD
 #SUBDIRECTOR
 def subdirector_home(request):
     return render(request, 'subdirector.html')
@@ -1094,7 +1080,4 @@ def detalle_curso_pdf(request, curso_id):
 
 
 
-=======
-#=================================================== FIN ASISTENTE DE ADMISION Y FINANZAS ==============================================###
->>>>>>> 1cc4112500e3d37cb249048e698fe0adf990e5f9
 
