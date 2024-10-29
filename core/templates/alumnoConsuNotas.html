@@ -1,254 +1,233 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consulta de Notas - Apoderado</title>
+    <title>Consulta de Notas</title>
     <style>
+        /* Reset básico */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: Arial, sans-serif;
-            margin: 0;
             display: flex;
             height: 100vh;
-            background-color: #f4f4f4;
+            background-color: #f8f9fa;
         }
 
         .sidebar {
             width: 250px;
-            background-color: #222;
+            background-color: #343a40;
             color: white;
             padding: 20px;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
-            height: 100%;
             position: fixed;
-            top: 0;
+            height: 100%;
+            overflow-y: auto;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
         .sidebar h2 {
             text-align: center;
-            margin-bottom: 20px;
+            font-size: 1.5em;
+            margin-bottom: 30px;
+            color: #ffc107;
         }
 
         .sidebar ul {
             list-style: none;
-            padding: 0;
+            flex-grow: 1;
         }
 
         .sidebar ul li {
-            margin: 15px 0;
+            margin: 20px 0;
         }
 
         .sidebar ul li a {
-            color: white;
+            color: #ced4da;
+            text-decoration: none;
+            font-weight: bold;
+            display: block;
+            padding: 8px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: #ffc107;
+            color: #343a40;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 14px;
+            color: #ffc107;
+            margin-top: 20px;
+        }
+
+        .footer a {
+            color: #ffc107;
             text-decoration: none;
             transition: color 0.3s;
         }
 
-        .sidebar ul li a:hover {
-            color: #4CAF50;
+        .footer a:hover {
+            text-decoration: underline;
         }
 
-        .content {
-            flex-grow: 1;
+        .main-content {
             margin-left: 270px;
             padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            width: calc(100% - 270px);
             overflow-y: auto;
         }
 
-        .header {
-            width: 100%;
-            max-width: 1200px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        h1 {
+            font-size: 2em;
+            text-align: center;
+            color: #343a40;
+            margin-bottom: 20px;
             background-color: #007bff;
             color: white;
             padding: 15px;
             border-radius: 8px;
-            margin-bottom: 20px;
         }
 
-        .header h1 {
-            font-size: 1.8em;
-            margin: 0;
-        }
-
-        .profile h3 {
-            margin: 0;
-        }
-
-        .accordion {
+        .asignatura {
             background-color: #e0e0e0;
-            border-radius: 5px;
             padding: 15px;
-            margin-bottom: 10px;
-            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 15px;
             font-size: 18px;
             font-weight: bold;
-            cursor: pointer;
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            max-width: 1200px;
+            cursor: pointer;
+            transition: background-color 0.3s;
         }
 
-        .accordion:hover {
-            background-color: #d0d0d0;
+        .asignatura:hover {
+            background-color: #ccc;
         }
 
-        .accordion:after {
-            content: '\25BC';
-            font-size: 20px;
-            color: #000;
-        }
-
-        .accordion.active:after {
-            content: '\25B2';
-        }
-
-        .panel {
-            padding: 0 15px;
+        .notas {
             display: none;
             background-color: #f9f9f9;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            width: 100%;
-            max-width: 1200px;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 10px;
         }
 
-        .panel table {
+        .notas table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
-            text-align: left;
         }
 
-        .panel th, .panel td {
-            border: 1px solid #ccc;
-            padding: 10px;
+        .notas th, .notas td {
+            padding: 12px;
+            border: 1px solid #ddd;
             text-align: center;
         }
 
-        .panel th {
+        .notas th {
             background-color: #007bff;
             color: white;
         }
 
-        .panel td {
-            background-color: #fff;
-        }
-
-        .promedio {
+        .promedio td {
             font-weight: bold;
-            text-align: right;
-            margin-top: 10px;
+            color: #343a40;
         }
 
-        .no-data {
-            text-align: center;
-            font-weight: bold;
-            color: #ff0000;
-            margin-top: 20px;
-            font-size: 1.2em;
-        }
+        /* Responsividad */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
 
-        .back-button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            font-size: 1em;
-        }
-
-        .back-button:hover {
-            background-color: #0056b3;
-        }
-
-        * {
-            box-sizing: border-box;
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
         }
     </style>
 </head>
-
 <body>
 
+    <!-- Barra lateral de navegación -->
     <div class="sidebar">
         <h2>Menú</h2>
         <ul>
-            <li><a href="{% url 'apoderado_view' %}">Apoderado</a></li>
-            <li><a href="{% url 'apoderadoConsuAsis' %}">Asistencia</a></li>
-            <li><a href="{% url 'apoderadoConsuNotas' %}">Notas</a></li>
-            <li><a href="{% url 'apoderadoMatri' %}">Matrícula</a></li>
+            <li><a href="{% url 'alumno_dashboard' %}">Inicio</a></li>
+            <li><a href="{% url 'alumnoConsuAsis' %}">Consulta de Asistencia</a></li>
+            <li><a href="{% url 'alumnoConsuNotas' %}">Consulta de Notas</a></li>
         </ul>
+        <div class="footer">
+            <a href="#">Nuevos horizontes</a>
+        </div>
     </div>
 
-    <div class="content">
-        <div class="header">
-            <h1>Consulta de Notas</h1>
-            <div class="profile">
-                <h3>{{ alumno.nombre }}</h3>
-            </div>
-        </div>
+    <div class="main-content">
+        <h1>Asignaturas y Notas</h1>
 
-        <div>
-            {% if cursos %}
-            {% for curso in cursos %}
-            <div class="accordion">
-                {{ curso.nombre }}
-            </div>
-            <div class="panel">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Parciales</th>
-                            <th>Nota</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for calificacion in calificaciones %}
-                        {% if calificacion.curso == curso %}
-                        <tr>
-                            <td>Nota {{ forloop.counter }}</td>
-                            <td>{{ calificacion.nota }}</td>
-                        </tr>
-                        {% endif %}
-                        {% endfor %}
-                    </tbody>
-                </table>
-                <div class="promedio">Promedio: {{ curso.promedio }}</div>
-            </div>
-            {% endfor %}
-            {% else %}
-            <p class="no-data">No hay calificaciones disponibles.</p>
-            {% endif %}
+        <!-- Iteración por las asignaturas -->
+        {% for item in cursos_con_promedios %}
+        <div class="asignatura" data-curso-id="{{ item.curso.id }}">
+            <span>{{ item.curso.asignatura }}</span>
+            <i class="fas fa-chevron-down"></i>
         </div>
-
-        <button onclick="window.history.back();" class="back-button" style="margin-top: 20px;">Regresar</button>
+        <div class="notas" id="notas-{{ item.curso.id }}">
+            <h2>Notas de {{ item.curso.asignatura }}</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parciales</th>
+                        <th>Nota</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for calificacion in item.calificaciones %}
+                    <tr>
+                        <td>Nota {{ forloop.counter }}</td>
+                        <td>{{ calificacion.nota }}</td>
+                    </tr>
+                    {% endfor %}
+                    <!-- Cálculo del promedio -->
+                    <tr class="promedio">
+                        <td>Promedio</td>
+                        <td>
+                            {% if item.promedio %}
+                                {{ item.promedio|floatformat:2 }}
+                            {% else %}
+                                No disponible
+                            {% endif %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        {% endfor %}
     </div>
 
     <script>
-        var accordions = document.getElementsByClassName("accordion");
-        for (var i = 0; i < accordions.length; i++) {
-            accordions[i].addEventListener("click", function () {
-                this.classList.toggle("active");
-                var panel = this.nextElementSibling;
-                if (panel.style.display === "block") {
-                    panel.style.display = "none";
-                } else {
-                    panel.style.display = "block";
-                }
+        document.querySelectorAll('.asignatura').forEach(function (asignatura) {
+            asignatura.addEventListener('click', function () {
+                var cursoId = this.getAttribute('data-curso-id');
+                var notasDiv = document.getElementById('notas-' + cursoId);
+
+                notasDiv.style.display = notasDiv.style.display === 'none' || notasDiv.style.display === '' ? 'block' : 'none';
             });
-        }
+        });
     </script>
 
 </body>
-
 </html>

@@ -1,6 +1,6 @@
 # urls.py
 from django.urls import path
-from .views import login_view, profesor_dashboard, profesor_cursos, crear_usuario_db, registrar_calificaciones, registro_academico, observaciones,libro_clases, apoderadoConsuAsis, apoderadoConsuNotas, apoderadoMatri, apoderado_view, director_dashboard, update_curso, descargar_pdf_alumno, direcPdfInfoAca, direcPdfPlanificacion
+from .views import login_view, profesor_dashboard, profesor_cursos, crear_usuario_db, registrar_calificaciones, registro_academico, observaciones,libro_clases, apoderadoConsuAsis, apoderadoConsuNotas, apoderado_view, director_dashboard, update_curso, descargar_pdf_alumno, direcPdfInfoAca
 from core import views
 
 
@@ -31,7 +31,7 @@ urlpatterns = [
     path('apoderado/', apoderado_view, name='apoderado_view'),  # Dashboard del apoderado
     path('consulta-asistencia/', apoderadoConsuAsis, name='apoderadoConsuAsis'),  # Consulta de asistencia
     path('apoderado/consulta-notas/', apoderadoConsuNotas, name='apoderadoConsuNotas'),  # Consulta de notas
-    path('apoderado/matricula/', apoderadoMatri, name='apoderadoMatri'),
+    path('observaciones/', views.apoderado_observaciones, name='apoderadoObservaciones'),
     #Director
     path('director/', director_dashboard, name='director_dashboard'),
     path('director/consulta-informes/', views.directorMenu, name='director_menu'),
@@ -40,7 +40,6 @@ urlpatterns = [
     path('update-curso/', update_curso, name='update_curso'),
     path('informe-academico/pdf/', direcPdfInfoAca, name='direcPdfInfoAca'),
     path('planificacion-academica/pdf/', views.direcPdfPlanificacion, name='direcPdfPlanificacion'),
-    #====================================================================================================
     path('informe-financiero/', views.informe_financiero_view, name='informe_financiero'),
     path('informe-financiero/eliminar/<int:informe_id>/', views.eliminar_informe_view, name='eliminar_informe'),
     path('informe-financiero/pdf/', views.generar_pdf_view, name='descargar_pdf'),
@@ -57,7 +56,13 @@ urlpatterns = [
     path('agregar-alumno-asis/', views.agregar_alumno_asis, name='agregar_alumno_asis'),
     path('editar-informe-asis/<int:id>/', views.editar_informe_asis, name='editar_informe_asis'),
     path('generar_pdf_contrato/<int:id>/', views.generar_pdf_contrato, name='generar_pdf_contrato'),
-
+    
+    #SUBDIRECTOR
+    path('subdirector/', views.subdirector_home, name='subdirector_home'),
+    path('subdirector/informes/', views.consulta_informes_academicos, name='consulta_informes_academicos'),
+    path('subdirector/recursos/', views.gestion_recursos_academicos, name='gestion_recursos_academicos'),
+    path('subdirector/curso/<int:curso_id>/', views.detalle_curso, name='detalle_curso'),
+    path('curso/<int:curso_id>/pdf/', views.detalle_curso_pdf, name='detalle_curso_pdf'),
 
 
 ]

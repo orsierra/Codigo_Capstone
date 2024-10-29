@@ -1,26 +1,104 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestionar Estudiantes - Colegio Nuevos Horizontes</title>
     <style>
+        /* Reset básico */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
+            display: flex;
+            height: 100vh;
             background-color: #f4f4f4;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #343a40;
+            color: white;
+            padding: 20px;
+            position: fixed;
+            height: 100%;
+            overflow-y: auto;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            font-size: 1.5em;
+            color: #ffc107;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            flex-grow: 1;
+        }
+
+        .sidebar ul li {
+            margin: 15px 0;
+        }
+
+        .sidebar ul li a {
+            color: #ced4da;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+            display: block;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: #ffc107;
+            color: #343a40;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 14px;
+            color: #ffc107;
+            margin-top: 20px;
+        }
+
+        .footer a {
+            color: #ffc107;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .main-content {
+            margin-left: 270px;
+            padding: 20px;
+            width: 100%;
+            overflow-y: auto;
         }
 
         h1 {
             text-align: center;
             color: #333;
+            margin-bottom: 20px;
         }
 
         h2 {
             color: #444;
+            margin-top: 20px;
         }
 
         .alert {
@@ -79,19 +157,20 @@
             background-color: #e7f3ff;
         }
 
-        /* Botón de volver */
         .btn-volver {
-            display: inline-block;
-            margin-top: 20px;
             background-color: #007bff;
             color: white;
             padding: 10px 20px;
             border-radius: 5px;
-            text-align: center;
             text-decoration: none;
             font-size: 16px;
             cursor: pointer;
             transition: background-color 0.3s;
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            width: 150px;
+            margin: 20px auto;
         }
 
         .btn-volver:hover {
@@ -100,112 +179,114 @@
 
         /* Responsividad */
         @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                padding: 10px;
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: 10px;
+            }
+
             table {
                 display: block;
                 overflow-x: auto;
                 white-space: nowrap;
-            }
-
-            th, td {
-                display: block;
-                text-align: right;
-                border: none;
-            }
-
-            th {
-                display: none; /* Esconde los encabezados para pantallas pequeñas */
-            }
-
-            td {
-                border-bottom: 1px solid #ddd; /* Separación entre filas */
-                position: relative;
-                padding-left: 50%; /* Espacio para los datos */
-            }
-
-            td::before {
-                content: attr(data-label); /* Usa el atributo data-label para mostrar encabezados */
-                position: absolute;
-                left: 10px;
-                text-align: left;
-                font-weight: bold;
             }
         }
     </style>
 </head>
 
 <body>
-    <h1>Gestionar Estudiantes</h1>
 
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert">{{ message }}</div>
-        {% endfor %}
-    {% endif %}
+    <div class="sidebar">
+        <h2>Menú</h2>
+        <ul>
+            <li><a href="{% url 'panel_admision' %}">Panel de Admision</a></li>
+            <li><a href="{% url 'agregar_alumno' %}">Agregar Alumno</a></li>
+        </ul>
+        <div class="footer">
+            <a href="#">Nuevos horizontes</a>
+        </div>
+    </div>
 
-    <h2>Lista de Estudiantes Pendientes</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Apellido</th>
-                <th>Estado de Admisión</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for alumno in alumnos_pendientes %}
-                <tr>
-                    <td data-label="ID">{{ alumno.id }}</td>
-                    <td data-label="Nombre">{{ alumno.nombre }}</td>
-                    <td data-label="Apellido">{{ alumno.apellido }}</td>
-                    <td data-label="Estado de Admisión">{{ alumno.estado_admision }}</td>
-                    <td data-label="Acciones">
-                        <a class="btn-actualizar" href="{% url 'actualizar_matricula' alumno.id %}">Actualizar</a>
-                        <a class="btn-eliminar" href="{% url 'eliminar_alumno' alumno.id %}">Eliminar</a>
-                    </td>
-                </tr>
-            {% empty %}
-                <tr>
-                    <td colspan="5">No hay estudiantes pendientes.</td>
-                </tr>
+    <div class="main-content">
+        <h1>Gestionar Estudiantes</h1>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert">{{ message }}</div>
             {% endfor %}
-        </tbody>
-    </table>
+        {% endif %}
 
-    <h2>Lista de Estudiantes Aprobados</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Apellido</th>
-                <th>Estado de Admisión</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for alumno in alumnos_aprobados %}
+        <h2>Lista de Estudiantes Pendientes</h2>
+        <table>
+            <thead>
                 <tr>
-                    <td data-label="ID">{{ alumno.id }}</td>
-                    <td data-label="Nombre">{{ alumno.nombre }}</td>
-                    <td data-label="Apellido">{{ alumno.apellido }}</td>
-                    <td data-label="Estado de Admisión">{{ alumno.estado_admision }}</td>
-                    <td data-label="Acciones">
-                        <a class="btn-actualizar" href="{% url 'actualizar_matricula' alumno.id %}">Actualizar</a>
-                        <a class="btn-eliminar" href="{% url 'eliminar_alumno' alumno.id %}">Eliminar</a>
-                    </td>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Estado de Admisión</th>
+                    <th>Acciones</th>
                 </tr>
-            {% empty %}
-                <tr>
-                    <td colspan="5">No hay estudiantes aprobados.</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for alumno in alumnos_pendientes %}
+                    <tr>
+                        <td data-label="ID">{{ alumno.id }}</td>
+                        <td data-label="Nombre">{{ alumno.nombre }}</td>
+                        <td data-label="Apellido">{{ alumno.apellido }}</td>
+                        <td data-label="Estado de Admisión">{{ alumno.estado_admision }}</td>
+                        <td data-label="Acciones">
+                            <a class="btn-actualizar" href="{% url 'actualizar_matricula' alumno.id %}">Actualizar</a>
+                            <a class="btn-eliminar" href="{% url 'eliminar_alumno' alumno.id %}">Eliminar</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5">No hay estudiantes pendientes.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
-    <!-- Botón de volver -->
-    <a href="javascript:history.back()" class="btn-volver">Volver</a>
+        <h2>Lista de Estudiantes Aprobados</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Estado de Admisión</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for alumno in alumnos_aprobados %}
+                    <tr>
+                        <td data-label="ID">{{ alumno.id }}</td>
+                        <td data-label="Nombre">{{ alumno.nombre }}</td>
+                        <td data-label="Apellido">{{ alumno.apellido }}</td>
+                        <td data-label="Estado de Admisión">{{ alumno.estado_admision }}</td>
+                        <td data-label="Acciones">
+                            <a class="btn-actualizar" href="{% url 'actualizar_matricula' alumno.id %}">Actualizar</a>
+                            <a class="btn-eliminar" href="{% url 'eliminar_alumno' alumno.id %}">Eliminar</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5">No hay estudiantes aprobados.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <a href="{% url 'panel_admision' %}" class="btn-volver">Volver</a>
+    </div>
+
 </body>
-
 </html>

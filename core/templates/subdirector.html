@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apoderado - Colegio Nuevos Horizontes</title>
+    <title>Subdirector - Colegio Nuevos Horizontes</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -15,8 +15,8 @@
             align-items: center;
             height: 100vh;
             background-image: url("{% static 'img/fondo.jpg' %}");
-            background-size: cover; /* Cubrir toda la pantalla */
-            background-position: center; /* Centrar la imagen */
+            background-size: cover;
+            background-position: center;
         }
         .dashboard-container {
             display: flex;
@@ -24,11 +24,11 @@
             align-items: center;
             text-align: center;
             background-color: white;
-            padding: 80px; /* Aumentar el padding para hacer el cuadro más grande */
+            padding: 80px;
             border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Sombra más prominente */
-            max-width: 600px; /* Establecer un ancho máximo */
-            width: 100%; /* Hacer que ocupe el 100% del contenedor */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            max-width: 600px;
+            width: 100%;
         }
         h1 {
             font-size: 36px;
@@ -42,7 +42,7 @@
             color: white;
             text-decoration: none;
             border-radius: 5px;
-            margin-top: 20px; /* Añadir un margen superior al botón */
+            margin-top: 20px;
         }
         .btn:hover {
             background-color: #333;
@@ -51,20 +51,19 @@
             margin-top: 50px;
             font-size: 14px;
         }
+        .footer-icons span {
+            margin: 0 5px;
+        }
     </style>
 </head>
 <body>
     <div class="dashboard-container">
-        <h1>Apoderado</h1>
-        <!-- Botón consulta asistencia -->
-        <a href="{% url 'apoderadoConsuAsis' %}" class="btn">Consulta de Asistencia</a>
-        <!-- Botón Consulta de notas -->
-        <a href="{% url 'apoderadoConsuNotas' %}" class="btn">Consulta de Notas</a>
-        <!-- Botón matricula -->
-        <a href="{% url 'apoderadoObservaciones' %}" class="btn">Observaciones</a>
+        <h1>Subdirector</h1>
+        <a href="{% url 'consulta_informes_academicos' %}" class="btn">Consulta de Informes Académicos</a>
+        <a href="{% url 'gestion_recursos_academicos' %}" class="btn">Gestión de Recursos Académicos</a>
         <footer>
-            <p>Colegio Nuevos Horizontes</p>
-            <div>
+            <p>INSTITUCIÓN NUEVOS HORIZONTES</p>
+            <div class="footer-icons">
                 <span>📊</span> | <span>🌐</span> | <span>📩</span>
             </div>
         </footer>

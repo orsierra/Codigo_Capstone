@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recursos Académicos</title>
+    <style>
+        /* General styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Sidebar styles */
+        .sidebar {
+            width: 200px;
+            background-color: #111;
+            color: white;
+            padding: 20px;
+            height: 100vh;
+            position: fixed;
+        }
+
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 0;
+            display: block;
+        }
+
+        .main-content {
+            margin-left: 220px;
+            padding: 20px;
+            background-color: white;
+            flex: 1;
+        }
+
+        /* Table styles */
+        .table-container {
+            width: 100%;
+            overflow-x: auto; /* Makes table scrollable on small screens */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            min-width: 600px; /* Sets a minimum width for the table */
+        }
+
+        table, th, td {
+            border: 1px solid black;
+            padding: 12px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #333;
+            color: white;
+        }
+
+        /* Button styles */
+        .btn {
+            text-decoration: none;
+            color: black;
+            font-size: 1.2em;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: static;
+                width: 100%;
+                height: auto;
+                display: flex;
+                flex-direction: row;
+                overflow-x: auto;
+            }
+
+            .sidebar a {
+                padding: 10px;
+                flex: 1;
+                text-align: center;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            table, th, td {
+                font-size: 0.8em; /* Smaller text for smaller screens */
+                padding: 8px;
+            }
+
+            th, td {
+                padding: 6px;
+            }
+
+            h1 {
+                font-size: 20px;
+                text-align: center;
+            }
+
+            /* Stack sidebar items vertically */
+            .sidebar {
+                flex-direction: column;
+                padding: 10px;
+            }
+
+            /* Adjust table for mobile */
+            .table-container {
+                overflow-x: auto; /* Allows horizontal scrolling */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Menú</h2>
+        <a href="#">Página de la Institución</a>
+        <a href="#">Perfil</a>
+        <a href="#">Salir</a>
+        <div style="margin-top: auto;">
+            <p>Privacidad</p>
+            <p>Accesibilidad</p>
+        </div>
+    </div>
+    <div class="main-content">
+        <h1>Recursos</h1>
+        <div class="table-container">
+            <table>
+                <tr>
+                    <th>PROFESORES</th>
+                    <th>ASIGNATURA</th>
+                    <th>SALA</th>
+                    <th>HORARIO</th>
+                    <th>ACCIÓN</th>
+                </tr>
+                {% for curso in cursos %}
+                    <tr>
+                        <td>{{ curso.profesor.nombre }} {{ curso.profesor.apellido }}</td>
+                        <td>{{ curso.asignatura }}</td>
+                        <td>{{ curso.sala }}</td>
+                        <td>{{ curso.hora }}</td>
+                        <td><a href="#" class="btn">✏️</a></td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5">No hay recursos académicos disponibles</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+</body>
+</html>
