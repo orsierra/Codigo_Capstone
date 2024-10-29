@@ -27,7 +27,7 @@
             color: #fff;
             padding: 20px;
             position: fixed;
-            height: 100vh; /* Fija la altura completa de la pantalla */
+            height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -52,16 +52,25 @@
             margin: 15px 0;
         }
 
-        .sidebar ul li a {
+        .sidebar ul li a,
+        .sidebar ul li form button {
             color: #ced4da;
             text-decoration: none;
             padding: 10px 15px;
             border-radius: 5px;
             transition: background-color 0.3s, color 0.3s;
             display: block;
+            width: 100%;
+            text-align: left;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: inherit;
         }
 
-        .sidebar ul li a:hover {
+        .sidebar ul li a:hover,
+        .sidebar ul li form button:hover {
             background-color: #ffc107;
             color: #343a40;
         }
@@ -158,12 +167,12 @@
         .footer {
             text-align: center;
             font-size: 14px;
-            color: #ffc107; /* Mismo color que el título del menú */
+            color: #ffc107;
             padding-top: 20px;
         }
 
         .footer a {
-            color: #ffc107; /* Mismo color que el título del menú */
+            color: #ffc107;
             text-decoration: none;
         }
 
@@ -182,6 +191,13 @@
             <li><a href="{% url 'registrar_calificaciones' curso.id %}">Registrar calificaciones</a></li>
             <li><a href="{% url 'registro_academico' curso.id %}">Registro Académico</a></li>
             <li><a href="{% url 'observaciones' curso.id %}">Observaciones</a></li>
+            <li>
+                <!-- Botón de Cerrar sesión estilo enlace -->
+                <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit">Cerrar sesión</button>
+                </form>
+            </li>
         </ul>
         <div class="footer">
             <a href="#">Nuevos horizontes</a>

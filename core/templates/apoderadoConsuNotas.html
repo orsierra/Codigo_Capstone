@@ -49,7 +49,8 @@
             margin: 20px 0;
         }
 
-        .sidebar ul li a {
+        .sidebar ul li a, 
+        .sidebar ul li form button {
             color: #ced4da;
             text-decoration: none;
             font-weight: bold;
@@ -57,9 +58,17 @@
             padding: 8px;
             border-radius: 5px;
             transition: all 0.3s;
+            width: 100%;
+            text-align: left;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1em; /* Asegura el mismo tamaño de fuente */
+            font-family: inherit;
         }
 
-        .sidebar ul li a:hover {
+        .sidebar ul li a:hover, 
+        .sidebar ul li form button:hover {
             background-color: #ffc107;
             color: #343a40;
         }
@@ -201,6 +210,13 @@
             <li><a href="{% url 'apoderadoConsuAsis' %}">Asistencia</a></li>
             <li><a href="{% url 'apoderadoConsuNotas' %}">Notas</a></li>
             <li><a href="{% url 'apoderadoObservaciones' %}">Observaciones</a></li>
+            <li>
+                <!-- Formulario para cerrar sesión -->
+                <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit">Cerrar sesión</button>
+                </form>
+            </li>
         </ul>
         <div class="footer">
             <a href="#">Nuevos horizontes</a>

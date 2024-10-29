@@ -1,4 +1,5 @@
 {% load static %}
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -25,7 +26,7 @@
             justify-content: space-between;
             height: 100vh;
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
-            position: fixed; /* Para mantener la barra fija */
+            position: fixed;
             top: 0;
         }
         
@@ -47,18 +48,28 @@
             margin: 15px 0;
         }
         
-        .sidebar ul li a {
+        .sidebar ul li a,
+        .sidebar ul li form button {
             color: #ced4da;
             text-decoration: none;
             padding: 10px 15px;
             border-radius: 5px;
+            background-color: #495057; /* Fondo gris claro */
             transition: background-color 0.3s, color 0.3s;
             display: block;
+            width: 100%;
+            text-align: left;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: inherit;
         }
 
-        .sidebar ul li a:hover {
-            background-color: #495057;
-            color: white;
+        .sidebar ul li a:hover,
+        .sidebar ul li form button:hover {
+            background-color: #ffc107; /* Cambia a anaranjado al pasar el mouse */
+            color: #343a40;
         }
 
         .footer {
@@ -78,11 +89,11 @@
         }
 
         .main-content {
-            margin-left: 270px; /* Mismo ancho de la barra lateral */
+            margin-left: 270px;
             padding: 20px;
             background-color: #f4f4f4;
             overflow-y: auto;
-            width: calc(100% - 270px); /* Ajustar el ancho restante */
+            width: calc(100% - 270px);
         }
 
         h1 {
@@ -169,6 +180,13 @@
             <li><a href="{% url 'registrar_calificaciones' curso.id %}">Registrar calificaciones</a></li>
             <li><a href="{% url 'registro_academico' curso.id %}">Registro Académico</a></li>
             <li><a href="{% url 'observaciones' curso.id %}">Observaciones</a></li>
+            <li>
+                <!-- Botón de Cerrar sesión estilo enlace -->
+                <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit">Cerrar sesión</button>
+                </form>
+            </li>
         </ul>
         <div class="footer">
             <a href="#">Nuevos Horizontes</a>
