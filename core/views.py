@@ -924,7 +924,6 @@ def generar_pdf_contrato(request, id):
 
     return response
 
-<<<<<<< HEAD
 #SUBDIRECTOR
 def subdirector_home(request):
     return render(request, 'subdirector.html')
@@ -998,7 +997,4 @@ def detalle_curso_pdf(request, curso_id):
 
 
 
-=======
-#=================================================== FIN ASISTENTE DE ADMISION Y FINANZAS ==============================================###
->>>>>>> 1cc4112500e3d37cb249048e698fe0adf990e5f9
 
