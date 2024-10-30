@@ -255,7 +255,6 @@ def registro_academico(request, curso_id):
     }
     return render(request, 'registroAcademico.html', context)
 
-
 # ===============================================================================================================================================================
 
 @login_required
