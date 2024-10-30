@@ -5,110 +5,154 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cursos de {{ profesor.nombre }}</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        /* Reset básico */
+        * {
             margin: 0;
-            display: flex; /* Usar flexbox para la barra lateral */
+            padding: 0;
+            box-sizing: border-box;
         }
 
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            height: 100vh;
+            background-color: #f8f9fa;
+        }
+
+        /* Barra lateral */
         .sidebar {
             width: 250px;
-            background-color: #222;
+            background-color: #343a40;
             color: white;
             padding: 20px;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
-            height: 100vh; /* Asegurar que ocupe toda la altura de la pantalla */
-            position: sticky; /* Mantener el sidebar fijo al hacer scroll */
-            top: 0; /* Posicionarlo en la parte superior */
+            position: fixed;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
         }
 
         .sidebar h2 {
             text-align: center;
+            font-size: 1.5em;
+            color: #ffc107;
             margin-bottom: 20px;
+            font-weight: bold;
         }
 
         .sidebar ul {
             list-style: none;
             padding: 0;
+            flex-grow: 1;
         }
 
         .sidebar ul li {
             margin: 15px 0;
         }
 
-        .sidebar ul li a {
-            color: white;
+        .sidebar ul li a,
+        .sidebar ul li form button {
+            color: #ced4da;
             text-decoration: none;
-            transition: color 0.3s;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+            display: block;
+            width: 100%;
+            text-align: left;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: inherit;
         }
 
-        .sidebar ul li a:hover {
-            color: #4CAF50; /* Color al pasar el mouse */
+        .sidebar ul li a:hover,
+        .sidebar ul li form button:hover {
+            background-color: #ffc107;
+            color: #343a40;
         }
 
+        .footer {
+            text-align: center;
+            font-size: 14px;
+            color: #ffc107;
+            padding-top: 20px;
+        }
+
+        .footer a {
+            color: #ffc107;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Contenido principal */
         .main-content {
-            flex-grow: 1;
-            padding: 20px;
-            background-color: #f4f4f4;
-            overflow-y: auto; /* Permitir el desplazamiento si es necesario */
+            margin-left: 270px;
+            padding: 30px;
+            width: calc(100% - 270px);
+            overflow-y: auto;
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         h1 {
             text-align: center;
-            color: #333;
+            color: #343a40;
+            font-size: 2em;
             margin-bottom: 20px;
+            background-color: #007bff;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
         }
 
         .container {
-            max-width: 800px;
-            margin: 0 auto;
+            width: 90%;
+            max-width: 1200px;
             background-color: white;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-
-        .row {
-            margin-top: 20px; /* Separar los nombres de los alumnos del título */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
         .card {
-            margin-bottom: 15px; /* Espacio entre las tarjetas */
-            border-bottom: 1px solid #ccc; /* Línea divisora inferior */
-            padding-bottom: 10px; /* Espacio interno debajo del contenido */
-        }
-
-        .card-title {
-            font-size: 1.1rem; /* Reducir ligeramente el tamaño del nombre */
-            margin: 0; /* Quitar márgenes para mejor alineación */
-        }
-
-        .card-body {
             display: flex;
-            justify-content: space-between; /* Separar los elementos en la línea */
+            justify-content: space-between;
             align-items: center;
+            margin-bottom: 15px;
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
         }
 
-        .btn {
+        .card h5 {
+            font-size: 1.1rem;
+            margin: 0;
+            color: #333;
+            flex-grow: 1; /* Para ocupar el espacio restante */
+        }
+
+        .card .btn {
             background-color: #28a745;
             color: white;
             border: none;
-            padding: 4px 8px; /* Ajustar el tamaño del botón */
+            padding: 8px 16px;
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s;
-            margin-left: auto; /* Empujar el botón hacia la derecha */
-            font-size: 0.8rem; /* Tamaño de fuente más pequeño para el botón */
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-left: auto; /* Mueve el botón a la derecha */
         }
 
-        .btn:hover {
+        .card .btn:hover {
             background-color: #218838;
-        }
-
-        hr {
-            border: none;
-            border-top: 1px solid #ccc; /* Línea divisora */
-            margin: 10px 0; /* Espacio alrededor de la línea */
         }
     </style>
 </head>
@@ -121,24 +165,29 @@
             <li><a href="{% url 'registrar_asistencia' curso.id %}">Registrar asistencia</a></li>
             <li><a href="{% url 'registrar_calificaciones' curso.id %}">Registrar calificaciones</a></li>
             <li><a href="{% url 'registro_academico' curso.id %}">Registro Académico</a></li>
+            <li><a href="{% url 'generar_informes' curso.id %}">Generar Informes</a></li>
             <li><a href="{% url 'observaciones' curso.id %}">Observaciones</a></li>
+            <li>
+                <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit">Cerrar sesión</button>
+                </form>
+            </li>
         </ul>
+        <div class="footer">
+            <a href="#">Nuevos horizontes</a>
+        </div>
     </div>
-  
+
     <div class="main-content">
         <div class="container">
-            <h1 class="text-center mb-4">Informe de Alumnos - {{ curso.nombre }}</h1>
+            <h1>Informe de Alumnos - {{ curso.nombre }}</h1>
     
             <div class="row">
                 {% for alumno in alumnos_aprobados %}
-                <div class="col-md-12 mb-3">
-                    <div class="card">
-                        <div class="card-body d-flex justify-content-between align-items-center">
-                            <h5 class="card-title">{{ alumno.nombre }} {{ alumno.apellido }}</h5>
-                            <a href="{% url 'alumno_detalle' alumno.id %}" class="btn btn-primary">Ver detalle</a>
-                        </div>
-                    </div>
-                    <!-- Línea divisora  <hr>-->
+                <div class="card">
+                    <h5>{{ alumno.nombre }} {{ alumno.apellido }}</h5>
+                    <a href="{% url 'alumno_detalle' alumno.id %}" class="btn">Ver detalle</a>
                 </div>
                 {% endfor %}
             </div>
