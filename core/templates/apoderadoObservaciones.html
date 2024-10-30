@@ -1,9 +1,11 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consulta de Asistencia</title>
+    <title>Observaciones de Alumnos - Apoderado</title>
     <style>
         /* Reset básico */
         * {
@@ -13,16 +15,16 @@
         }
 
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             display: flex;
-            height: 100vh;
+            min-height: 100vh;
             background-color: #f8f9fa;
         }
 
         .sidebar {
             width: 250px;
             background-color: #343a40;
-            color: white;
+            color: #fff;
             padding: 20px;
             position: fixed;
             height: 100%;
@@ -42,6 +44,7 @@
 
         .sidebar ul {
             list-style: none;
+            padding: 0;
             flex-grow: 1;
         }
 
@@ -102,49 +105,51 @@
             text-align: center;
             color: #343a40;
             margin-bottom: 20px;
-            background-color: #007bff;
-            color: white;
-            padding: 15px;
-            border-radius: 8px;
         }
 
-        .container {
-            width: 90%;
-            max-width: 1000px;
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            margin: 0 auto;
+        .alumno-section {
+            margin-bottom: 30px;
+        }
+
+        .alumno-section h2 {
+            color: #495057;
+            font-size: 1.4em;
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-top: 10px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
         }
 
         th, td {
-            border: 1px solid #ccc;
-            padding: 12px;
+            padding: 15px;
             text-align: center;
+            border-bottom: 1px solid #dee2e6;
         }
 
         th {
             background-color: #007bff;
-            color: white;
+            color: #fff;
             font-weight: bold;
         }
 
         tr:nth-child(even) {
-            background-color: #f9f9f9;
+            background-color: #f8f9fa;
         }
 
-        .no-data {
+        .buttons {
             text-align: center;
-            color: #6c757d;
-            font-style: italic;
-            padding: 15px;
+            margin-top: 20px;
         }
 
         .btn {
@@ -157,39 +162,50 @@
             font-weight: bold;
             cursor: pointer;
             transition: background-color 0.3s;
-            text-align: center;
-            display: inline-block;
-            margin-top: 20px;
         }
 
         .btn:hover {
             background-color: #0056b3;
         }
 
-        /* Responsividad */
+        .no-data {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+            padding: 15px;
+        }
+
+        /* Responsividad para pantallas pequeñas */
         @media (max-width: 768px) {
             .sidebar {
                 width: 100%;
                 height: auto;
                 position: relative;
+                flex-direction: row;
+                justify-content: space-around;
             }
 
             .main-content {
                 margin-left: 0;
+                padding: 10px;
                 width: 100%;
+            }
+
+            .footer {
+                margin-top: 10px;
             }
         }
     </style>
 </head>
-
 <body>
 
     <div class="sidebar">
         <h2>Menú</h2>
         <ul>
-            <li><a href="{% url 'alumno_dashboard' %}">Inicio</a></li>
-            <li><a href="{% url 'alumnoConsuAsis' %}">Consulta de Asistencia</a></li>
-            <li><a href="{% url 'alumnoConsuNotas' %}">Consulta de Notas</a></li>
+            <li><a href="{% url 'apoderado_view' %}">Apoderado</a></li>
+            <li><a href="{% url 'apoderadoConsuAsis' %}">Asistencia</a></li>
+            <li><a href="{% url 'apoderadoConsuNotas' %}">Notas</a></li>
+            <li><a href="{% url 'apoderadoObservaciones' %}">Observaciones</a></li>
             <li>
                 <!-- Botón de Cerrar sesión estilo enlace -->
                 <form action="{% url 'logout' %}" method="post" style="display: inline;">
@@ -204,38 +220,44 @@
     </div>
 
     <div class="main-content">
-        <h1>Consulta de Asistencia</h1>
+        <h1>Observaciones de Alumnos</h1>
 
-        <div class="container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Curso</th>
-                        <th>Asignatura</th>
-                        <th>Total de Clases</th>
-                        <th>Asistencia</th>
-                        <th>Porcentaje</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for asistencia in asistencias_data %}
-                        <tr>
-                            <td>{{ asistencia.curso }}</td>
-                            <td>{{ asistencia.asignatura }}</td>
-                            <td>{{ asistencia.total_clases }}</td>
-                            <td>{{ asistencia.asistencia }}</td>
-                            <td>{{ asistencia.porcentaje_asistencia }}%</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-
-            {% if asistencias_data|length == 0 %}
-                <p class="no-data">No se han registrado asistencias aún.</p>
-            {% endif %}
+        {% if observaciones_data %}
+            {% for data in observaciones_data %}
+                <div class="alumno-section">
+                    <h2>{{ data.alumno.nombre }} {{ data.alumno.apellido }}</h2>
+                    
+                    {% if data.observaciones %}
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Curso</th>
+                                    <th>Fecha</th>
+                                    <th>Observación</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for observacion in data.observaciones %}
+                                    <tr>
+                                        <td>{{ observacion.curso.nombre }}</td>
+                                        <td>{{ observacion.fecha }}</td>
+                                        <td>{{ observacion.contenido }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p class="no-data">No hay observaciones registradas para este alumno.</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="no-data">No tienes alumnos asociados con observaciones registradas.</p>
+        {% endif %}
+        
+        <div class="buttons">
+            <a href="{% url 'apoderado_view' %}" class="btn">Regresar</a>
         </div>
-
-        <a href="javascript:history.back()" class="btn">Regresar</a>
     </div>
 
 </body>

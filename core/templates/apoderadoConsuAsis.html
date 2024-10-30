@@ -1,123 +1,185 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Consulta de Asistencia - Apoderado</title>
     <style>
+        /* Reset básico */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: Arial, sans-serif;
-            margin: 0;
             display: flex;
             height: 100vh;
-            background-color: #f4f4f4;
+            background-color: #f8f9fa;
         }
 
         .sidebar {
             width: 250px;
-            background-color: #222;
-            color: white;
+            background-color: #343a40;
+            color: #fff;
             padding: 20px;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
-            height: 100%;
             position: fixed;
-            top: 0;
+            height: 100%;
+            overflow-y: auto;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
         .sidebar h2 {
             text-align: center;
-            margin-bottom: 20px;
+            font-size: 1.5em;
+            margin-bottom: 30px;
+            color: #ffc107;
         }
 
         .sidebar ul {
             list-style: none;
-            padding: 0;
+            flex-grow: 1;
         }
 
         .sidebar ul li {
-            margin: 15px 0;
+            margin: 20px 0;
         }
 
-        .sidebar ul li a {
-            color: white;
+        .sidebar ul li a, 
+        .sidebar ul li form button {
+            color: #ced4da;
+            text-decoration: none;
+            font-weight: bold;
+            display: block;
+            padding: 8px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            width: 100%;
+            text-align: left;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1em; /* Asegura el mismo tamaño de fuente */
+            font-family: inherit;
+        }
+
+        .sidebar ul li a:hover, 
+        .sidebar ul li form button:hover {
+            background-color: #ffc107;
+            color: #343a40;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 14px;
+            color: #ffc107;
+            margin-top: 20px;
+        }
+
+        .footer a {
+            color: #ffc107;
             text-decoration: none;
             transition: color 0.3s;
         }
 
-        .sidebar ul li a:hover {
-            color: #4CAF50;
+        .footer a:hover {
+            text-decoration: underline;
         }
 
         .main-content {
-            flex-grow: 1;
             margin-left: 270px;
             padding: 20px;
-            background-color: #f4f4f4;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            width: 100%;
             overflow-y: auto;
         }
 
-        .container {
-            width: 90%;
-            max-width: 1200px;
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        h1 {
+            font-size: 2em;
+            text-align: center;
+            color: #343a40;
+            margin-bottom: 20px;
         }
 
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 20px;
+        .accordion {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .panel {
+            border: 1px solid #ccc;
+            margin: 10px 0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .panel-heading {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .panel-heading:hover {
+            background-color: #0056b3;
+        }
+
+        .panel-content {
+            display: none;
+            padding: 20px;
+            background-color: #fff;
+            border-top: 1px solid #ddd;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-top: 10px;
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
         th, td {
-            border: 1px solid #ccc;
             padding: 12px;
             text-align: center;
+            border-bottom: 1px solid #dee2e6;
         }
 
         th {
             background-color: #007bff;
             color: white;
+            font-weight: bold;
         }
 
         tr:nth-child(even) {
-            background-color: #f9f9f9;
+            background-color: #f8f9fa;
         }
 
         .buttons {
+            text-align: center;
             margin-top: 20px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .btn {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .btn:hover {
-            background-color: #218838;
         }
 
         .btn-back {
             background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
         }
 
         .btn-back:hover {
@@ -126,64 +188,88 @@
 
         .no-data {
             text-align: center;
-            font-weight: bold;
-            color: #ff0000;
-            margin-top: 20px;
-            font-size: 1.2em;
+            color: #6c757d;
+            font-style: italic;
+            padding: 15px;
         }
     </style>
+    <script>
+        function togglePanel(panelId) {
+            var panel = document.getElementById(panelId);
+            panel.style.display = (panel.style.display === 'block') ? 'none' : 'block';
+        }
+    </script>
 </head>
 
 <body>
+
     <div class="sidebar">
         <h2>Menú</h2>
         <ul>
             <li><a href="{% url 'apoderado_view' %}">Apoderado</a></li>
             <li><a href="{% url 'apoderadoConsuAsis' %}">Asistencia</a></li>
             <li><a href="{% url 'apoderadoConsuNotas' %}">Notas</a></li>
-            <li><a href="{% url 'apoderadoMatri' %}">Matrícula</a></li>
+            <li><a href="{% url 'apoderadoObservaciones' %}">Observaciones</a></li>
+            <li>
+                <!-- Formulario para cerrar sesión -->
+                <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit">Cerrar sesión</button>
+                </form>
+            </li>
         </ul>
-        
+        <div class="footer">
+            <a href="#">Nuevos horizontes</a>
+        </div>
     </div>
 
     <div class="main-content">
-        <div class="container">
-            <h1>Consulta de Asistencia</h1>
+        <h1>Consulta de Asistencia</h1>
 
-            {% if asistencias_data %}
-            <table>
-                <thead>
-                    <tr>
-                        <th>Nombre del Alumno</th>
-                        <th>Curso</th>
-                        <th>Asignatura</th>
-                        <th>Total de Clases</th>
-                        <th>Asistencia</th>
-                        <th>Porcentaje</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for asistencia in asistencias_data %}
-                    <tr>
-                        <td>{{ asistencia.nombre_alumno }}</td>
-                        <td>{{ asistencia.curso }}</td>
-                        <td>{{ asistencia.asignatura }}</td>
-                        <td>{{ asistencia.total_clases }}</td>
-                        <td>{{ asistencia.asistencia }}</td>
-                        <td>{{ asistencia.porcentaje_asistencia }}%</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            {% else %}
-            <p class="no-data">No hay datos de asistencia disponibles.</p>
-            {% endif %}
-            
-            <div class="buttons">
-                <a href="{% url 'apoderado_view' %}" class="btn btn-back">Regresar</a>
+        <div class="accordion">
+            {% for alumno, asistencias in asistencias_data.items %}
+            <div class="panel">
+                <div class="panel-heading" onclick="togglePanel('panel-{{ alumno.id }}')">
+                    <span>{{ alumno.nombre }} {{ alumno.apellido }}</span>
+                    <span>&#x25BC;</span>
+                </div>
+                <div id="panel-{{ alumno.id }}" class="panel-content">
+                    {% if asistencias %}
+                        {% for asistencia in asistencias %}
+                        <div>
+                            <h3>{{ asistencia.curso.nombre }} - {{ asistencia.curso.asignatura }}</h3>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Total de Clases</th>
+                                        <th>Asistencia</th>
+                                        <th>Porcentaje de Asistencia</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>{{ asistencia.total_clases }}</td>
+                                        <td>{{ asistencia.asistencia }}</td>
+                                        <td>{{ asistencia.porcentaje_asistencia }}%</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="no-data">No hay datos de asistencia para este alumno.</p>
+                    {% endif %}
+                </div>
             </div>
+            {% empty %}
+            <p class="no-data">No hay alumnos asociados.</p>
+            {% endfor %}
+        </div>
+
+        <div class="buttons">
+            <button class="btn-back" onclick="window.history.back()">Regresar</button>
         </div>
     </div>
-</body>
 
+</body>
 </html>

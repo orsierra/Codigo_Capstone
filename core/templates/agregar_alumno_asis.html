@@ -1,71 +1,119 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agregar Alumno</title>
-    {% load static %}
     <style>
+        /* Reset básico */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
-            margin: 0;
             display: flex;
+            height: 100vh;
         }
 
+        /* Barra lateral */
         .sidebar {
             width: 250px;
-            background-color: #222;
+            background-color: #343a40;
             color: white;
             padding: 20px;
+            position: fixed;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
-            height: 100vh;
-            position: fixed; /* Fija la barra lateral */
         }
 
         .sidebar h2 {
             text-align: center;
+            font-size: 1.5em;
+            color: #ffc107;
+            font-weight: bold;
             margin-bottom: 20px;
         }
 
         .sidebar ul {
             list-style: none;
             padding: 0;
+            flex-grow: 1;
         }
 
         .sidebar ul li {
             margin: 15px 0;
         }
 
-        .sidebar ul li a {
-            color: white;
+        .sidebar ul li a,
+        .sidebar ul li form button {
+            color: #ced4da;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+            display: block;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: inherit;
+            width: 100%;
+            text-align: left;
+        }
+
+        .sidebar ul li a:hover,
+        .sidebar ul li form button:hover {
+            background-color: #ffc107;
+            color: #343a40;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 14px;
+            color: #ffc107;
+            margin-top: 20px;
+        }
+
+        .footer a {
+            color: #ffc107;
             text-decoration: none;
             transition: color 0.3s;
         }
 
-        .sidebar ul li a:hover {
-            color: #4CAF50;
+        .footer a:hover {
+            text-decoration: underline;
         }
 
+        /* Contenido principal */
         .main-content {
-            margin-left: 250px; /* Espacio para la barra lateral */
-            padding: 20px;
-            background-color: #f4f4f4;
-            flex-grow: 1;
+            margin-left: 270px;
+            padding: 40px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             overflow-y: auto;
-            transition: margin-left 0.3s; /* Transición suave */
+            max-height: 100vh;
+            width: calc(100% - 270px);
         }
 
         h1 {
-            color: #333;
             text-align: center;
-            margin-bottom: 20px; /* Espacio debajo del título */
+            color: #333;
+            margin-bottom: 20px;
         }
 
         form {
-            background-color: white;
+            background-color: #ffffff;
             padding: 20px;
-            border-radius: 5px;
+            border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             max-width: 600px;
             margin: 0 auto;
@@ -81,20 +129,29 @@
         legend {
             font-weight: bold;
             padding: 0 10px;
+            color: #007bff;
         }
 
         label {
             display: block;
             margin: 10px 0 5px;
+            font-weight: bold;
+            color: #333;
         }
 
         input, select {
             width: 100%;
             padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
             margin-bottom: 15px;
-            box-sizing: border-box;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
         }
 
         button {
@@ -105,9 +162,8 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 16px;
-            width: 48%; /* Ancho reducido para los botones */
-            margin-top: 10px; /* Espacio adicional para el botón */
-            display: inline-block; /* Para alinearlos en la misma fila */
+            width: 48%;
+            transition: background-color 0.3s;
         }
 
         button:hover {
@@ -115,17 +171,16 @@
         }
 
         a.btn-back {
-            display: inline-block;
-            margin-top: 10px; /* Espacio arriba del botón */
             text-decoration: none;
             color: white;
             background-color: #007bff;
             padding: 10px 15px;
             border-radius: 5px;
             text-align: center;
+            font-weight: bold;
+            display: inline-block;
+            width: 48%;
             transition: background-color 0.3s;
-            width: 48%; /* Ancho reducido para los botones */
-            vertical-align: top; /* Alineación vertical */
         }
 
         a.btn-back:hover {
@@ -135,19 +190,16 @@
         /* Responsividad */
         @media (max-width: 768px) {
             .sidebar {
-                position: relative;
-                height: auto;
                 width: 100%;
+                height: auto;
+                position: relative;
             }
+
             .main-content {
                 margin-left: 0;
+                width: 100%;
+                padding: 20px;
             }
-        }
-
-        /* Flexbox para botones en fila */
-        .button-container {
-            display: flex;
-            justify-content: space-between; /* Espaciado entre botones */
         }
     </style>
 </head>
@@ -155,9 +207,15 @@
     <div class="sidebar">
         <h2>Menú</h2>
         <ul>
-            <li><a href="{% url 'panel_admision' %}">Panel de Admision</a></li>
-            <li><a href="{% url 'gestionar_estudiantes' %}">Lista de Estudiantes</a></li>
+            <li><a href="{% url 'panel_asisAdminFinan' %}">Inicio</a></li>
+            <li><a href="{% url 'asisAdmiFinan_gestion_pagos' %}">Gestión de Pagos</a></li>
+            <li>
+
+            </li>
         </ul>
+        <div class="footer">
+            <a href="#">Nuevos Horizontes</a>
+        </div>
     </div>
 
     <div class="main-content">
@@ -165,28 +223,24 @@
         
         <form method="post">
             {% csrf_token %}
-            <div>
-                {{ form.non_field_errors }}  <!-- Muestra errores de validación generales -->
-            </div>
-
             <fieldset>
                 <legend>Información Personal</legend>
                 <div>
                     <label for="{{ form.nombre.id_for_label }}">{{ form.nombre.label }}</label>
-                    {{ form.nombre }}  
-                    {{ form.nombre.errors }}  
+                    {{ form.nombre }}
+                    {{ form.nombre.errors }}
                 </div>
                 
                 <div>
                     <label for="{{ form.apellido.id_for_label }}">{{ form.apellido.label }}</label>
-                    {{ form.apellido }}  
-                    {{ form.apellido.errors }}  
+                    {{ form.apellido }}
+                    {{ form.apellido.errors }}
                 </div>
                 
                 <div>
                     <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
-                    {{ form.email }}  
-                    {{ form.email.errors }}  
+                    {{ form.email }}
+                    {{ form.email.errors }}
                 </div>
             </fieldset>
 
@@ -194,26 +248,26 @@
                 <legend>Información de Admisión</legend>
                 <div>
                     <label for="{{ form.apoderado.id_for_label }}">{{ form.apoderado.label }}</label>
-                    {{ form.apoderado }}  
-                    {{ form.apoderado.errors }}  
+                    {{ form.apoderado }}
+                    {{ form.apoderado.errors }}
                 </div>
 
                 <div>
                     <label for="{{ form.curso.id_for_label }}">{{ form.curso.label }}</label>
-                    {{ form.curso }}  
-                    {{ form.curso.errors }}  
+                    {{ form.curso }}
+                    {{ form.curso.errors }}
                 </div>
                 
                 <div>
                     <label for="{{ form.estado_admision.id_for_label }}">{{ form.estado_admision.label }}</label>
-                    {{ form.estado_admision }}  
-                    {{ form.estado_admision.errors }}  
+                    {{ form.estado_admision }}
+                    {{ form.estado_admision.errors }}
                 </div>
 
                 <div>
                     <label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
-                    {{ form.password }}  
-                    {{ form.password.errors }}  
+                    {{ form.password }}
+                    {{ form.password.errors }}
                 </div>
             </fieldset>
             

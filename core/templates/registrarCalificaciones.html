@@ -8,50 +8,96 @@
     <title>Registrar Calificaciones - {{ curso.nombre }}</title>
     <link rel="stylesheet" href="{% static 'styles.css' %}">
     <style>
+        /* Reset básico */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: Arial, sans-serif;
-            margin: 0;
-            display: flex; /* Usar flexbox para la barra lateral */
+            display: flex;
+            height: 100vh;
+            background-color: #f8f9fa;
         }
 
         .sidebar {
             width: 250px;
-            background-color: #222;
+            background-color: #343a40;
             color: white;
             padding: 20px;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
-            height: 100vh; /* Asegurar que ocupe toda la altura de la pantalla */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: fixed;
+            height: 100%;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
         }
 
         .sidebar h2 {
             text-align: center;
+            font-size: 1.5em;
+            color: #ffc107;
             margin-bottom: 20px;
+            font-weight: bold;
         }
 
         .sidebar ul {
             list-style: none;
             padding: 0;
+            flex-grow: 1;
         }
 
         .sidebar ul li {
             margin: 15px 0;
         }
 
-        .sidebar ul li a {
-            color: white;
+        .sidebar ul li a,
+        .sidebar ul li form button {
+            color: #ced4da;
             text-decoration: none;
-            transition: color 0.3s;
+            padding: 10px 15px;
+            border-radius: 5px;
+            background-color: #495057; /* Fondo gris claro */
+            transition: background-color 0.3s, color 0.3s;
+            display: block;
+            width: 100%;
+            text-align: left;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: inherit;
         }
 
-        .sidebar ul li a:hover {
-            color: #4CAF50; /* Color al pasar el mouse */
+        .sidebar ul li a:hover,
+        .sidebar ul li form button:hover {
+            background-color: #ffc107; /* Cambia a anaranjado al pasar el mouse */
+            color: #343a40;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: auto;
+            font-size: 14px;
+        }
+
+        .footer a {
+            color: #ffc107;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
         }
 
         .main-content {
             flex-grow: 1;
             padding: 20px;
+            margin-left: 250px;
             background-color: #f4f4f4;
-            overflow-y: auto; /* Permitir el desplazamiento si es necesario */
+            overflow-y: auto;
         }
 
         h1 {
@@ -66,7 +112,7 @@
             background-color: white;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
         table {
@@ -111,7 +157,7 @@
         }
 
         .btn-back {
-            background-color: #007bff; /* Color para el botón de regresar */
+            background-color: #007bff;
         }
 
         .btn-back:hover {
@@ -125,7 +171,7 @@
             padding: 10px;
             border-radius: 5px;
             margin-bottom: 20px;
-            display: none; /* Ocultar por defecto */
+            display: none;
         }
     </style>
 </head>
@@ -139,7 +185,16 @@
             <li><a href="{% url 'registrar_calificaciones' curso.id %}">Registrar calificaciones</a></li>
             <li><a href="{% url 'registro_academico' curso.id %}">Registro Académico</a></li>
             <li><a href="{% url 'observaciones' curso.id %}">Observaciones</a></li>
+            <li>
+                <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit">Cerrar sesión</button>
+                </form>
+            </li>
         </ul>
+        <div class="footer">
+            <a href="#">Nuevos horizontes</a>
+        </div>
     </div>
 
     <div class="main-content">

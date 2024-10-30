@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -5,133 +6,157 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cursos de {{ profesor.nombre }}</title>
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
+        /* Reset básico */
+        * {
             margin: 0;
-            display: flex;
-            height: 100vh; /* Asegurarse de que ocupe toda la altura de la pantalla */
-            background-color: #f0f0f0; /* Color de fondo general */
+            padding: 0;
+            box-sizing: border-box;
         }
-        
+
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            height: 100vh;
+            background-color: #f8f9fa;
+        }
+
         .sidebar {
             width: 250px;
-            background-color: #222; /* Color más oscuro para el sidebar */
-            color: white;
+            background-color: #343a40;
+            color: #fff;
             padding: 20px;
+            position: fixed;
+            height: 100vh;
             display: flex;
-            flex-direction: column; /* Alinear los elementos verticalmente */
-            justify-content: space-between; /* Espacio entre los elementos */
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2); /* Sombra para el sidebar */
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
         }
-        
-        .sidebar h2 {
+
+        .sidebar-header {
             text-align: center;
-            margin-bottom: 20px; /* Espacio debajo del título */
-            font-size: 1.5em; /* Aumentar tamaño de fuente */
-            font-weight: bold; /* Peso de fuente más fuerte */
-        } 
-        
+            font-size: 1.5em;
+            color: #ffc107;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
         .sidebar ul {
             list-style: none;
             padding: 0;
+            flex-grow: 1;
         }
-        
+
         .sidebar ul li {
             margin: 15px 0;
         }
-        
-        .sidebar ul li a {
-            color: white;
+
+        .sidebar ul li a,
+        .sidebar ul li form button {
+            color: #ced4da;
             text-decoration: none;
-            padding: 10px 15px; /* Añadir padding */
-            border-radius: 5px; /* Bordes redondeados */
-            transition: background-color 0.3s, color 0.3s; /* Transiciones suaves */
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+            display: block;
+            width: 100%;
+            text-align: left;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: inherit;
         }
 
-        .sidebar ul li a:hover {
-            background-color: #4CAF50; /* Color al pasar el mouse */
-            color: white; /* Mantener el color del texto */
+        .sidebar ul li a:hover,
+        .sidebar ul li form button:hover {
+            background-color: #ffc107;
+            color: #343a40;
         }
-        
+
         .main-content {
-            flex-grow: 1;
-            padding: 30px; /* Aumentar el padding */
-            background-color: #ffffff; /* Fondo blanco para el contenido */
-            overflow-y: auto; /* Permitir el desplazamiento si es necesario */
-            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1); /* Sombra para el contenido */
+            margin-left: 270px;
+            padding: 30px;
+            width: calc(100% - 270px);
+            overflow-y: auto;
+            background-color: #ffffff;
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
         }
-        
+
         h1 {
-            color: #333; /* Color del título */
-            font-size: 2em; /* Tamaño del título */
-            margin-bottom: 20px; /* Espacio debajo del título */
+            color: #343a40;
+            font-size: 2em;
+            margin-bottom: 20px;
         }
-        
+
         .cursos-list {
             margin-top: 20px;
         }
-        
+
         .curso {
-            background-color: #e0e0e0; /* Color de fondo más claro para los cursos */
-            padding: 20px; /* Aumentar el padding */
+            background-color: #e9ecef;
+            padding: 20px;
             margin: 10px 0;
-            border-radius: 8px; /* Bordes redondeados más suaves */
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Sombra para los cursos */
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
-        
+
         .curso strong {
-            display: block; /* Mostrar como bloque */
-            margin-bottom: 5px; /* Espacio debajo del nombre del curso */
-            font-size: 1.2em; /* Tamaño más grande para el nombre del curso */
-            color: #2c3e50; /* Color del texto */
+            display: block;
+            margin-bottom: 5px;
+            font-size: 1.2em;
+            color: #2c3e50;
         }
 
         .curso button {
             margin-top: 10px;
-            background-color: #4CAF50;
+            background-color: #007bff;
             color: white;
             border: none;
-            padding: 12px 20px; /* Aumentar el padding del botón */
+            padding: 12px 20px;
             cursor: pointer;
-            border-radius: 5px; /* Bordes redondeados para el botón */
-            transition: background-color 0.3s; /* Transición suave */
-            font-size: 16px; /* Tamaño de fuente del botón */
-            width: 100%; /* Botón ocupa el ancho completo */
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            font-size: 16px;
+            width: 100%;
         }
 
         .curso button:hover {
-            background-color: #45a049; /* Color del botón al pasar el mouse */
+            background-color: #0056b3;
         }
-        
-        footer {
-            text-align: center;
-            margin-top: 20px; /* Espacio arriba del pie de página */
-        }
-        
+
         .footer {
-            margin-top: auto; /* Empujar el pie de página hacia abajo */
-            text-align: center; /* Centrar el texto del pie de página */
-            font-size: 14px; /* Tamaño de fuente más pequeño */
+            text-align: center;
+            font-size: 14px;
+            color: #ffc107;
+            padding-top: 20px;
         }
-        
+
         .footer a {
-            color: white; /* Color de los enlaces del pie de página */
-            text-decoration: none; /* Sin subrayado */
-            margin: 0 10px; /* Espacio entre los enlaces */
-            transition: color 0.3s; /* Transición suave para el color */
+            color: #ffc107;
+            text-decoration: none;
+            transition: color 0.3s;
         }
 
         .footer a:hover {
-            text-decoration: underline; /* Subrayar al pasar el mouse */
+            text-decoration: underline;
         }
     </style>
 </head>
+
 <body>
     <div class="sidebar">
-        <h2>Página de la Institución</h2>
+        <div class="sidebar-header">Menú</div>
         <ul>
             <li><a href="{% url 'profesor' %}">Profesor</a></li>
             <li><a href="{% url 'profesor_cursos' %}">Mis cursos</a></li>
+            <li>
+                <!-- Botón de Cerrar sesión estilo enlace -->
+                <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit">Cerrar sesión</button>
+                </form>
+            </li>
         </ul>
         <div class="footer">
             <a href="#">Nuevos horizontes</a>
@@ -145,12 +170,10 @@
             <div class="cursos-list">
                 {% for curso in cursos %}
                     <div class="curso">
-                        <strong>{{ curso.nombre }}</strong><br>
-                        <span>{{ curso.asignatura }}</span><br>
-                        <span>{{ curso.dias }} - {{ curso.hora|time:"h:i A" }}</span><br>
-                        <strong>Sala: {{ curso.sala }}</strong><br> <!-- se agrega la sala -->
-
-                        <!-- botón de libro de clases -->
+                        <strong>{{ curso.nombre }}</strong>
+                        <p>{{ curso.asignatura }}</p>
+                        <p>{{ curso.dias }} - {{ curso.hora|time:"h:i A" }}</p>
+                        <strong>Sala: {{ curso.sala }}</strong>
                         <a href="{% url 'profesor_libro' curso.id %}">
                             <button>Ver Libro de Clases</button>
                         </a>
