@@ -1,6 +1,6 @@
 # urls.py
 from django.urls import path
-from .views import login_view, profesor_dashboard, profesor_cursos, crear_usuario_db, registrar_calificaciones, registro_academico, observaciones,libro_clases, apoderadoConsuAsis, apoderadoConsuNotas, apoderado_view, director_dashboard, update_curso, descargar_pdf_alumno, direcPdfInfoAca
+from .views import login_view, profesor_dashboard, profesor_cursos, crear_usuario_db, registrar_calificaciones, registro_academico, observaciones,libro_clases, apoderadoConsuAsis, apoderadoConsuNotas, apoderado_view, director_dashboard, update_curso, descargar_pdf_alumno, direcPdfInfoAca,sostenedor,establecimientos
 from core import views
 from django.contrib.auth.views import LogoutView
 
@@ -63,6 +63,10 @@ urlpatterns = [
     path('subdirector/recursos/', views.gestion_recursos_academicos, name='gestion_recursos_academicos'),
     path('subdirector/curso/<int:curso_id>/', views.detalle_curso, name='detalle_curso'),
     path('curso/<int:curso_id>/pdf/', views.detalle_curso_pdf, name='detalle_curso_pdf'),
+    
+    #SOSTENEDOR
+    path('sostenedor/', views.sostenedor, name='sostenedor'),
+    path('establecimientos/', views.establecimientos, name='establecimientos'),
 
 
 ]

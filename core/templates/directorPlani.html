@@ -68,7 +68,6 @@
             color: #343a40;
         }
 
-        /* Botón de cerrar sesión estilo enlace */
         .logout-button {
             color: #ced4da;
             text-decoration: none;
@@ -275,14 +274,15 @@
     </div>
 
     <script>
-        // Script para guardar cambios usando AJAX
         document.querySelectorAll('.save-btn').forEach(button => {
             button.addEventListener('click', function() {
                 const row = button.closest('tr');
                 const cursoId = row.getAttribute('data-curso-id');
                 const hora = row.querySelector('.hora').value;
                 const sala = row.querySelector('.sala').value;
-
+    
+                console.log("Datos enviados:", { curso_id: cursoId, hora: hora, sala: sala });
+    
                 fetch("{% url 'update_curso' %}", {
                     method: "POST",
                     headers: {
@@ -293,7 +293,7 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    if (data.status === 'success') {
+                    if (data.success) {
                         alert('Cambios guardados correctamente');
                     } else {
                         alert('Error: ' + data.message);
@@ -304,7 +304,7 @@
                 });
             });
         });
-    </script>
+    </script>    
 
 </body>
 
