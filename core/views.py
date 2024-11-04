@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Curso, Profesor,Asistencia, Calificacion, Informe, Observacion, Alumno, Apoderado, Curso, InformeFinanciero,InformeAcademico,Director, Contrato,AsisFinanza, AsisMatricula
+from .models import Curso, Profesor,Asistencia, Calificacion, Informe, Observacion, Alumno, Apoderado, Curso, InformeFinanciero,InformeAcademico,Director, Contrato,AsisFinanza, AsisMatricula, Notificacion
 from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404
 from datetime import date
@@ -21,6 +21,8 @@ from weasyprint import HTML
 from django.views.decorators.csrf import csrf_exempt
 from django.db import IntegrityError
 from django.db.models import Count
+from django.core.mail import send_mail
+from django.conf import settings
 
 # ============================================================ MODULO INICIO ==============================================================================
 
@@ -176,9 +178,17 @@ def registrar_asistencia(request, curso_id):
 
 #=============================================================== REGISTRAR CALIFICACIONES ====================================================================
 
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect, render
+from django.contrib import messages
+from .models import Curso, Alumno, Notificacion
+from .forms import CalificacionForm
+
 @login_required
 def registrar_calificaciones(request, curso_id):
     curso = get_object_or_404(Curso, id=curso_id)
+    profesor = curso.profesor  # Obtenemos el profesor del curso
     errores = {}
     form_list = {}
 
@@ -190,19 +200,28 @@ def registrar_calificaciones(request, curso_id):
             form = CalificacionForm(request.POST, prefix=str(alumno.id))
             if form.is_valid():
                 # Guarda la calificación usando el alumno y curso correcto
-                calificacion = form.save(commit=False)  # No guarda aún en la base de datos
-                calificacion.alumno = alumno  # Asocia el alumno
-                calificacion.curso = curso  # Asocia el curso
-                calificacion.save()  # Guarda en la base de datos
+                calificacion = form.save(commit=False)
+                calificacion.alumno = alumno
+                calificacion.curso = curso
+                calificacion.save()
+
+                # Crear una notificación si la calificación es baja (por ejemplo, < 4.0)
+                if calificacion.nota < 4.0:
+                    apoderado = alumno.apoderado  # Accede al único apoderado
+                    if apoderado:
+                        mensaje = (
+                            f"Estimado Apoderado, su hijo/a {alumno.nombre} {alumno.apellido} "
+                            f"ha recibido una calificación de {calificacion.nota} en el curso {curso.nombre}."
+                        )
+                        Notificacion.objects.create(apoderado=apoderado, mensaje=mensaje)
             else:
-                errores[alumno] = form.errors  # Guarda los errores
+                errores[alumno] = form.errors
 
         if not errores:
             messages.success(request, "Se han guardado los cambios exitosamente.")
-            return redirect('registrar_calificaciones', curso_id=curso_id)  # Cambia aquí
+            return redirect('registrar_calificaciones', curso_id=curso_id)
 
     else:
-        # Crea formularios para cada alumno aprobado
         form_list = {alumno: CalificacionForm(prefix=str(alumno.id)) for alumno in alumnos_aprobados}
 
     return render(request, 'registrarCalificaciones.html', {
@@ -210,6 +229,7 @@ def registrar_calificaciones(request, curso_id):
         'form_list': form_list,
         'errores': errores
     })
+
 
 
 
@@ -467,7 +487,33 @@ def alumno_home(request):
 
 # ===================================================================== APODERADO =====================================================================================
 def apoderado_view(request):
-    return render(request, 'apoderado.html')
+    apoderado = get_object_or_404(Apoderado, user=request.user)
+    notificaciones_no_leidas = Notificacion.objects.filter(apoderado=apoderado, leida=False)
+
+    context = {
+        'notificaciones_no_leidas': notificaciones_no_leidas,
+    }
+    return render(request, 'apoderado.html', context)
+
+def marcar_notificacion_como_leida(request, notificacion_id):
+    notificacion = get_object_or_404(Notificacion, id=notificacion_id, apoderado__user=request.user)
+    notificacion.leida = True
+    notificacion.save()
+    return redirect('apoderado_view')
+
+@login_required
+def historial_notificaciones(request):
+    apoderado = get_object_or_404(Apoderado, user=request.user)
+    
+    # Obtén todas las notificaciones del apoderado
+    todas_notificaciones = Notificacion.objects.filter(apoderado=apoderado).order_by('-fecha_creacion')
+    
+    # Marcar como leídas todas las notificaciones no leídas
+    notificaciones_no_leidas = todas_notificaciones.filter(leida=False)
+    if notificaciones_no_leidas.exists():
+        notificaciones_no_leidas.update(leida=True)
+
+    return render(request, 'historial_notificaciones.html', {'notificaciones': todas_notificaciones})
 
 #============================================================================= APODERADO ASISTENCIA =========================================================================================
 

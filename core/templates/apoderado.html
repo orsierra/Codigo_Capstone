@@ -15,8 +15,30 @@
             align-items: center;
             height: 100vh;
             background-image: url("{% static 'img/fondo.jpg' %}");
-            background-size: cover; /* Cubrir toda la pantalla */
-            background-position: center; /* Centrar la imagen */
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        .notification-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            max-width: 300px;
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .notification-item {
+            padding: 10px;
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+            font-size: 14px;
         }
         .dashboard-container {
             display: flex;
@@ -24,11 +46,11 @@
             align-items: center;
             text-align: center;
             background-color: white;
-            padding: 80px; /* Aumentar el padding para hacer el cuadro más grande */
+            padding: 80px;
             border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Sombra más prominente */
-            max-width: 600px; /* Establecer un ancho máximo */
-            width: 100%; /* Hacer que ocupe el 100% del contenedor */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            max-width: 600px;
+            width: 100%;
         }
         h1 {
             font-size: 36px;
@@ -42,7 +64,7 @@
             color: white;
             text-decoration: none;
             border-radius: 5px;
-            margin-top: 20px; /* Añadir un margen superior al botón */
+            margin-top: 20px;
         }
         .btn:hover {
             background-color: #333;
@@ -54,13 +76,20 @@
     </style>
 </head>
 <body>
+    {% if notificaciones_no_leidas %}
+        <div class="notification-container">
+            {% for notificacion in notificaciones_no_leidas %}
+                <div class="notification-item">
+                    {{ notificacion.mensaje }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
     <div class="dashboard-container">
         <h1>Apoderado</h1>
-        <!-- Botón consulta asistencia -->
         <a href="{% url 'apoderadoConsuAsis' %}" class="btn">Consulta de Asistencia</a>
-        <!-- Botón Consulta de notas -->
         <a href="{% url 'apoderadoConsuNotas' %}" class="btn">Consulta de Notas</a>
-        <!-- Botón matricula -->
         <a href="{% url 'apoderadoObservaciones' %}" class="btn">Observaciones</a>
         <footer>
             <p>Colegio Nuevos Horizontes</p>
