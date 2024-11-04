@@ -658,21 +658,21 @@ def director_plani(request):
     cursos = Curso.objects.all()
 
     if request.method == "POST":
-        # Procesar la edición del curso
-        curso_id = request.POST.get("curso_id")
-        asignatura = request.POST.get("asignatura")
-        dias = request.POST.get("dias")
-        hora = request.POST.get("hora")
-        sala = request.POST.get("sala")
+        # Procesar la edición del curso con JSON
+        try:
+            data = json.loads(request.body)
+            curso_id = data.get("curso_id")
+            hora = data.get("hora")
+            sala = data.get("sala")
 
-        curso = Curso.objects.get(id=curso_id)
-        curso.asignatura = asignatura
-        curso.dias = dias
-        curso.hora = hora
-        curso.sala = sala
-        curso.save()
+            curso = Curso.objects.get(id=curso_id)
+            curso.hora = hora
+            curso.sala = sala
+            curso.save()
 
-        return JsonResponse({'success': True})
+            return JsonResponse({'success': True})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)})
 
     return render(request, 'directorPlani.html', {'cursos': cursos})
 
@@ -712,25 +712,29 @@ def informes_academicos(request):
 
     return render(request, 'direInfoAca.html', context)
 
-
+import json
 @csrf_exempt  # Solo si es necesario; no recomendado para producción sin protección
 def update_curso(request):
-    if request.method == 'POST':
-        curso_id = request.POST.get('curso_id')
-        hora = request.POST.get('hora')
-        sala = request.POST.get('sala')
-
+    if request.method == "POST":
         try:
+            data = json.loads(request.body)
+            curso_id = data.get("curso_id")
+            hora = data.get("hora")
+            sala = data.get("sala")
+
+            # Verifica que el curso existe
             curso = Curso.objects.get(id=curso_id)
             curso.hora = hora
             curso.sala = sala
             curso.save()
 
-            return JsonResponse({'status': 'success'})
+            return JsonResponse({'success': True})
         except Curso.DoesNotExist:
-            return JsonResponse({'status': 'error', 'message': 'Curso no encontrado'}, status=404)
+            return JsonResponse({'success': False, 'message': 'Curso no encontrado'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)})
 
-    return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=405)
+    return JsonResponse({'success': False, 'message': 'Método no permitido'}, status=405)
 
 #pdf director
 @login_required
@@ -1124,6 +1128,38 @@ def detalle_curso_pdf(request, curso_id):
     response = HttpResponse(pdf, content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="{curso.nombre}_reporte.pdf"'
     return response
+
+#SOSTENEDOR
+def sostenedor(request):
+    # Simplemente renderiza el template "sostenedor.html"
+    return render(request, 'sostenedor.html')
+
+def establecimientos(request):
+    # Calcular los totales para "Colegio Nuevos Horizontes"
+    total_salas = Curso.objects.count()  # Asumimos que cada curso representa una sala
+    total_alumnos = Alumno.objects.count()
+    total_cursos = Curso.objects.count()
+    total_profesores = Profesor.objects.count()
+    
+    # Contar empleados en los modelos específicos
+    total_directores = Director.objects.count()
+    total_asistentes_matricula = AsisMatricula.objects.count()
+    total_asistentes_finanza = AsisFinanza.objects.count()
+    
+    # Sumar el total de empleados (Director, Profesor, AsisMatricula, AsisFinanza)
+    total_empleados = total_directores + total_profesores + total_asistentes_matricula + total_asistentes_finanza
+
+    # Pasar los totales al template
+    contexto = {
+        'colegio_nombre': 'Colegio Nuevos Horizontes',
+        'total_salas': total_salas,
+        'total_alumnos': total_alumnos,
+        'total_cursos': total_cursos,
+        'total_profesores': total_profesores,
+        'total_empleados': total_empleados
+    }
+
+    return render(request, 'establecimientos.html', contexto)
 
 
 
