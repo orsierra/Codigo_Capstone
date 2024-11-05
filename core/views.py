@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Curso, Profesor,Asistencia, Calificacion, Informe, Observacion, Alumno, Apoderado, Curso, InformeFinanciero,InformeAcademico,Director, Contrato,AsisFinanza, AsisMatricula
+from .models import Curso, Profesor,Asistencia, Calificacion, Informe, Observacion, Alumno, Apoderado, Curso, InformeFinanciero,InformeAcademico,Director, Contrato,AsisFinanza, AsisMatricula, CursoAlumno
 from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404
 from datetime import date
@@ -140,9 +140,9 @@ def libro_clases(request, curso_id):
 @login_required
 def registrar_asistencia(request, curso_id):
     curso = get_object_or_404(Curso, id=curso_id)
-    
-    # Filtra solo los alumnos aprobados
-    alumnos_aprobados = Alumno.objects.filter(curso=curso, estado_admision='Aprobado')
+
+    # Obtener solo los alumnos aprobados a través del modelo CursoAlumno
+    alumnos_aprobados = CursoAlumno.objects.filter(curso=curso, alumno__estado_admision='Aprobado').select_related('alumno')
 
     if not alumnos_aprobados.exists():
         messages.warning(request, f"No hay alumnos aprobados asociados al curso {curso.nombre}.")
@@ -153,14 +153,17 @@ def registrar_asistencia(request, curso_id):
         asistencia = Asistencia(curso=curso, fecha=date.today())
         asistencia.save()  # Guarda el objeto Asistencia antes de agregar a los alumnos
 
-        for alumno in alumnos_aprobados:
+        for curso_alumno in alumnos_aprobados:
+            alumno = curso_alumno.alumno  # Accede al alumno a través de la relación
             asistencia_estado = request.POST.get(f'asistencia_{alumno.id}')
-            if asistencia_estado == 'presente':
-                asistencia.alumnos_presentes.add(alumno)
-            elif asistencia_estado == 'ausente':
-                asistencia.alumnos_ausentes.add(alumno)
-            elif asistencia_estado == 'justificado':
-                asistencia.alumnos_justificados.add(alumno)
+
+            if asistencia_estado:
+                if asistencia_estado == 'presente':
+                    asistencia.alumnos_presentes.add(alumno)
+                elif asistencia_estado == 'ausente':
+                    asistencia.alumnos_ausentes.add(alumno)
+                elif asistencia_estado == 'justificado':
+                    asistencia.alumnos_justificados.add(alumno)
 
         asistencia.save()  # Guarda los cambios después de agregar los alumnos
 
@@ -169,12 +172,11 @@ def registrar_asistencia(request, curso_id):
 
     return render(request, 'registrarAsistencia.html', {
         'curso': curso,
-        'alumnos_aprobados': alumnos_aprobados,
+        'alumnos_aprobados': list({curso_alumno.alumno.id: curso_alumno.alumno for curso_alumno in alumnos_aprobados}.values()),  # Asegura solo alumnos únicos
     })
 
-
-
 #=============================================================== REGISTRAR CALIFICACIONES ====================================================================
+
 
 @login_required
 def registrar_calificaciones(request, curso_id):
@@ -182,28 +184,34 @@ def registrar_calificaciones(request, curso_id):
     errores = {}
     form_list = {}
 
-    # Filtramos solo los alumnos aprobados
-    alumnos_aprobados = Alumno.objects.filter(curso=curso, estado_admision='Aprobado')
+    # Filtramos solo los alumnos aprobados que están inscritos en el curso actual
+    alumnos_aprobados = CursoAlumno.objects.filter(curso=curso, alumno__estado_admision='Aprobado').select_related('alumno')
 
     if request.method == 'POST':
-        for alumno in alumnos_aprobados:
+        for curso_alumno in alumnos_aprobados:
+            alumno = curso_alumno.alumno  # Accede al alumno a través de la relación
             form = CalificacionForm(request.POST, prefix=str(alumno.id))
             if form.is_valid():
                 # Guarda la calificación usando el alumno y curso correcto
-                calificacion = form.save(commit=False)  # No guarda aún en la base de datos
-                calificacion.alumno = alumno  # Asocia el alumno
-                calificacion.curso = curso  # Asocia el curso
-                calificacion.save()  # Guarda en la base de datos
+                calificacion, created = Calificacion.objects.get_or_create(
+                    alumno=alumno,
+                    curso=curso,
+                    defaults={'nota': form.cleaned_data['nota']}
+                )
+                if not created:
+                    # Si ya existe una calificación, se actualiza
+                    calificacion.nota = form.cleaned_data['nota']
+                    calificacion.save()
             else:
                 errores[alumno] = form.errors  # Guarda los errores
 
         if not errores:
             messages.success(request, "Se han guardado los cambios exitosamente.")
-            return redirect('registrar_calificaciones', curso_id=curso_id)  # Cambia aquí
+            return redirect('registrar_calificaciones', curso_id=curso_id)
 
     else:
         # Crea formularios para cada alumno aprobado
-        form_list = {alumno: CalificacionForm(prefix=str(alumno.id)) for alumno in alumnos_aprobados}
+        form_list = {curso_alumno.alumno: CalificacionForm(prefix=str(curso_alumno.alumno.id)) for curso_alumno in alumnos_aprobados}
 
     return render(request, 'registrarCalificaciones.html', {
         'curso': curso,
@@ -218,10 +226,12 @@ def registrar_calificaciones(request, curso_id):
 @login_required
 def registro_academico(request, curso_id):
     curso = get_object_or_404(Curso, id=curso_id)
-    
-    # Filtrar solo alumnos aprobados
-    alumnos_aprobados = Alumno.objects.filter(curso=curso, estado_admision='Aprobado')
-    
+
+    # Filtrar solo alumnos aprobados a través de CursoAlumno
+    curso_alumnos = CursoAlumno.objects.filter(curso=curso)
+    alumnos_aprobados = [curso_alumno.alumno for curso_alumno in curso_alumnos]
+
+    # Obtener calificaciones y asistencias para el curso
     calificaciones = Calificacion.objects.filter(curso=curso)
     asistencias = Asistencia.objects.filter(curso=curso)
 
@@ -255,14 +265,19 @@ def registro_academico(request, curso_id):
     }
     return render(request, 'registroAcademico.html', context)
 
+
 # ===============================================================================================================================================================
 
 @login_required
 def generar_informes(request, curso_id):
     curso = get_object_or_404(Curso, id=curso_id)
-    alumnos_aprobados = Alumno.objects.filter(curso=curso, estado_admision='Aprobado')
+    
+    # Obtén los CursoAlumno que correspondan al curso y filtren por estado de admisión 'Aprobado'
+    curso_alumnos = CursoAlumno.objects.filter(curso=curso)
+    alumnos_aprobados = Alumno.objects.filter(curso_alumno_relacion__in=curso_alumnos, estado_admision='Aprobado')
 
     return render(request, 'Profe_generar_informes.html', {'curso': curso, 'alumnos_aprobados': alumnos_aprobados})
+
 
 # ============================================ generar informe en pdf para el profesor por alumno ================================================================
 @login_required
@@ -343,8 +358,8 @@ def observaciones(request, curso_id):
     curso = get_object_or_404(Curso, id=curso_id)
     observaciones = Observacion.objects.filter(curso=curso)
 
-    # Filtra solo los alumnos aprobados
-    alumnos_aprobados = Alumno.objects.filter(curso=curso, estado_admision='Aprobado')
+    # Filtra solo los alumnos aprobados a través de CursoAlumno
+    alumnos_aprobados = Alumno.objects.filter(curso_alumno_relacion__curso=curso, estado_admision='Aprobado')
 
     if request.method == 'POST':
         if 'eliminar' in request.POST:
@@ -370,6 +385,7 @@ def observaciones(request, curso_id):
         'observaciones': observaciones,
         'form': form,
     })
+
 
 
 # ============================================================= DASHBOARD ALUMNOS =======================================================================

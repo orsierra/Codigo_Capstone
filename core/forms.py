@@ -1,6 +1,8 @@
 from django import forms
-from .models import Asistencia, Alumno, Calificacion, Observacion, Apoderado, Curso, InformeFinanciero, Contrato
+from .models import Asistencia, Alumno, Calificacion, Observacion, Apoderado, Curso, InformeFinanciero, Contrato, CursoAlumno
 from django.core.exceptions import ValidationError
+
+
 class AsistenciaForm(forms.ModelForm):
     class Meta:
         model = Asistencia
