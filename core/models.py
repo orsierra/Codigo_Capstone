@@ -6,6 +6,7 @@ from django.utils import timezone
 
 # modelo profesor, apoderado y alumno
 
+
 class Profesor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)  
     nombre = models.CharField(max_length=100)
@@ -14,6 +15,7 @@ class Profesor(models.Model):
     asignatura = models.CharField(max_length=100, blank=True, null=True)
     def __str__(self):
         return f"{self.nombre} {self.apellido}"
+
 
 class Apoderado(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -70,6 +72,7 @@ class Curso(models.Model):
 
     def __str__(self):
         return self.nombre
+
 
 
 #===============================================================================================
@@ -190,3 +193,13 @@ class CursoAlumno(models.Model):
         curso_nombre = self.curso.nombre if self.curso else "Curso no asignado"
         alumno_nombre = f"{self.alumno.nombre} {self.alumno.apellido}" if self.alumno else "Alumno no asignado"
         return f"{alumno_nombre} inscrito en {curso_nombre}"
+
+class BitacoraClase(models.Model):
+    curso = models.ForeignKey(Curso, on_delete=models.CASCADE)
+    fecha = models.DateField()
+    profesor = models.ForeignKey(Profesor, on_delete=models.CASCADE)
+    actividades_realizadas = models.TextField()
+    observaciones = models.TextField(blank=True, null=True)  # Añade este campo para las observaciones opcionales
+
+    def __str__(self):
+        return f"Bitácora de {self.curso} el {self.fecha}"
