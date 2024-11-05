@@ -59,7 +59,7 @@
             text-decoration: none;
             padding: 10px 15px;
             border-radius: 5px;
-            background-color: #495057; /* Fondo gris claro */
+            background-color: #495057;
             transition: background-color 0.3s, color 0.3s;
             display: block;
             width: 100%;
@@ -73,7 +73,7 @@
 
         .sidebar ul li a:hover,
         .sidebar ul li form button:hover {
-            background-color: #ffc107; /* Cambia a anaranjado al pasar el mouse */
+            background-color: #ffc107;
             color: #343a40;
         }
 
@@ -207,7 +207,7 @@
                     <p>Se encontraron errores en los formularios:</p>
                     <ul>
                         {% for alumno, error in errores.items %}
-                            <li>{{ alumno.nombre }}: {{ error }}</li>
+                            <li>{{ alumno.nombre }} {{ alumno.apellido }}: {{ error }}</li>
                         {% endfor %}
                     </ul>
                 </div>

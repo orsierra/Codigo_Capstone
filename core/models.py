@@ -11,7 +11,7 @@ class Profesor(models.Model):
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
-
+    asignatura = models.CharField(max_length=100, blank=True, null=True)
     def __str__(self):
         return f"{self.nombre} {self.apellido}"
 
@@ -174,3 +174,19 @@ class AsisMatricula(models.Model):
     
     def __str__(self):
         return f'{self.nombre} {self.apellido}'
+
+
+
+class CursoAlumno(models.Model):
+    curso = models.ForeignKey(Curso, on_delete=models.SET_NULL, related_name='curso_alumno_relacion', null=True, blank=True)
+    alumno = models.ForeignKey(Alumno, on_delete=models.SET_NULL, related_name='curso_alumno_relacion', null=True, blank=True)
+
+    class Meta:
+        unique_together = ('curso', 'alumno')  # Evita duplicados para el mismo alumno en el mismo curso
+        verbose_name = 'Relación Curso-Alumno'
+        verbose_name_plural = 'Relaciones Curso-Alumno'
+
+    def __str__(self):
+        curso_nombre = self.curso.nombre if self.curso else "Curso no asignado"
+        alumno_nombre = f"{self.alumno.nombre} {self.alumno.apellido}" if self.alumno else "Alumno no asignado"
+        return f"{alumno_nombre} inscrito en {curso_nombre}"
