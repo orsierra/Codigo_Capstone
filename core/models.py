@@ -25,6 +25,15 @@ class Apoderado(models.Model):
     def __str__(self):
         return f"{self.nombre} {self.apellido}"
 
+class Notificacion(models.Model):
+    apoderado = models.ForeignKey(Apoderado, on_delete=models.CASCADE)
+    mensaje = models.TextField()
+    leida = models.BooleanField(default=False)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    tipo = models.CharField(max_length=100, choices=[('calificacion_baja', 'Calificación Baja'), ('asistencia', 'Asistencia')], default='calificacion_baja')
+    prioridad = models.IntegerField(default=1)  # Valores bajos = mayor prioridad
+
+
 class Alumno(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     nombre = models.CharField(max_length=100)
