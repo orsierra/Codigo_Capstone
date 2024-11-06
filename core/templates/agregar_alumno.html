@@ -9,76 +9,143 @@
     <link href="{% static 'django_select2/css/select2.min.css' %}" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        /* Reset básico */
+        * {
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
+            box-sizing: border-box;
         }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Barra lateral */
         .sidebar {
             width: 250px;
-            background: #343a40;
-            color: #fff;
+            background-color: #343a40;
+            color: white;
+            padding: 20px;
             position: fixed;
             height: 100%;
-            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
         }
+
         .sidebar h2 {
+            color: #ffc107;
             text-align: center;
-            color: #fff;
+            margin-bottom: 20px;
+            font-weight: bold;
+            font-size: 1.5em;
         }
+
         .sidebar ul {
             list-style: none;
             padding: 0;
+            flex-grow: 1;
         }
+
         .sidebar ul li {
             margin: 15px 0;
         }
-        .sidebar ul li a {
-            color: #fff;
+
+        .sidebar ul li a,
+        .sidebar ul li form button {
+            color: #ced4da;
             text-decoration: none;
-            padding: 10px;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
             display: block;
-            transition: background 0.3s;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: inherit;
+            width: 100%;
+            text-align: left;
         }
-        .sidebar ul li a:hover {
-            background: #495057;
+
+        .sidebar ul li a:hover,
+        .sidebar ul li form button:hover {
+            background-color: #ffc107;
+            color: #343a40;
         }
+
+        .footer {
+            text-align: center;
+            font-size: 14px;
+            color: #ffc107;
+            margin-top: 20px;
+        }
+
+        .footer a {
+            color: #ffc107;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Contenido principal */
         .main-content {
             margin-left: 270px;
-            padding: 20px;
+            padding: 40px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            max-height: 100vh;
+            width: calc(100% - 270px);
         }
+
         h1 {
+            text-align: center;
             color: #333;
         }
+
         fieldset {
             border: 1px solid #ccc;
             padding: 20px;
             margin-bottom: 20px;
             background: #fff;
         }
+
         legend {
             font-weight: bold;
             padding: 0 10px;
         }
+
         div {
             margin-bottom: 15px;
         }
+
         label {
             display: block;
             margin-bottom: 5px;
             color: #555;
         }
+
         input, select {
             width: 100%;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
         }
+
         .button-container {
             display: flex;
             justify-content: space-between;
         }
+
         button {
             background-color: #007bff;
             color: white;
@@ -87,9 +154,11 @@
             border-radius: 5px;
             cursor: pointer;
         }
+
         button:hover {
             background-color: #0056b3;
         }
+
         .btn-back {
             background-color: #6c757d;
             color: white;
@@ -98,6 +167,7 @@
             border-radius: 5px;
             display: inline-block;
         }
+
         .btn-back:hover {
             background-color: #5a6268;
         }
@@ -112,7 +182,7 @@
             <li><a href="{% url 'gestionar_estudiantes' %}">Lista de Estudiantes</a></li>
         </ul>
         <div class="footer">
-            <a href="#" style="color: #fff;">Nuevos Horizontes</a>
+            <a href="#">Nuevos Horizontes</a>
         </div>
     </div>
 
@@ -172,7 +242,6 @@
                 <a class="btn-back" href="{% url 'gestionar_estudiantes' %}">Volver</a>
             </div>
         </form>
-        
     </div>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>

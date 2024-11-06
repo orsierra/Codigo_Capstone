@@ -1041,29 +1041,35 @@ def ver_gestion_pagos_admision(request):
 def agregar_alumno_asis(request):
     if request.method == 'POST':
         form = AlumnoForm(request.POST)
+
+        # Verifica si el formulario es válido
         if form.is_valid():
-            # Primero crea el usuario
-            user = User.objects.create_user(
-                username=form.cleaned_data['email'],  
-                password=form.cleaned_data['password'],  
-                email=form.cleaned_data['email'],
-            )
-            # Luego crea el Alumno
-            alumno = Alumno(
-                user=user,
-                nombre=form.cleaned_data['nombre'],
-                apellido=form.cleaned_data['apellido'],
-                email=form.cleaned_data['email'],
-                apoderado=form.cleaned_data['apoderado'],  
-                estado_admision=form.cleaned_data['estado_admision'],  
-                curso=form.cleaned_data['curso'],  
-            )
-            alumno.save()  # Guarda el alumno en la base de datos
-            return redirect('asisAdmiFinan_gestion_pagos')  # Redirige a la lista de estudiantes
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
+
+            # Verifica si el usuario ya existe
+            if User.objects.filter(username=email).exists():
+                form.add_error('email', 'Este correo electrónico ya está en uso.')
+            else:
+                try:
+                    # Guarda el Alumno y las relaciones de CursoAlumno usando el método save del formulario
+                    form.save()
+                    return redirect('asisAdmiFinan_gestion_pagos')  # Redirige a la página de gestión de estudiantes
+                except IntegrityError:
+                    form.add_error(None, 'Ocurrió un error al crear el usuario. Intenta nuevamente.')
+                except Exception as e:
+                    form.add_error(None, f'Ocurrió un error inesperado: {str(e)}')
+        else:
+            # Mostrar errores del formulario en caso de que no sea válido
+            print(form.errors)
+
     else:
-        form = AlumnoForm()  # Si no es POST, crea un nuevo formulario
-    
-    return render(request, 'agregar_alumno_asis.html', {'form': form})  # Renderiza la plantilla con el formulario
+        form = AlumnoForm()  # Instancia un formulario vacío si no es un POST
+
+    return render(request, 'agregar_alumno_asis.html', {'form': form})  # Renderiza el formulario en la plantilla
+
+
+
 
 # =====================================================VISTA de ASISTENTE DE ADMISIÓN Y FINANZAS PARA ELIMINAR ALUMNO =====================
 @login_required
@@ -1075,35 +1081,46 @@ def eliminar_alumno_asis(request, alumno_id):
 # =====================================================VISTA de ASISTENTE DE ADMISIÓN Y FINANZAS PARA ACTUALIZAR INFORME=====================
 @login_required
 def editar_informe_asis(request, id):
-    # Obtener el alumno por ID
+    # Obtener el alumno por su ID
+    alumno = get_object_or_404(Alumno, id=id)
     alumno_instance = get_object_or_404(Alumno, id=id)
-    
+
     # Obtener el contrato relacionado con el alumno (si existe)
+    contrato = Contrato.objects.filter(alumno=alumno).first()
     contrato_instance = Contrato.objects.filter(alumno=alumno_instance).first()
 
     # Obtener el apoderado del alumno
     apoderado_instance = alumno_instance.apoderado  # Asegúrate de que el modelo Alumno tenga relación con Apoderado
 
     if request.method == 'POST':
-        form = ContratoForm(request.POST, instance=contrato_instance, alumno_instance=alumno_instance, apoderado_instance=apoderado_instance)
+        # Si el formulario ha sido enviado
+        # Si existe un contrato, lo editamos
+        if contrato:
+            form = ContratoForm(request.POST, instance=contrato, alumno_instance=alumno_instance, apoderado_instance=apoderado_instance)
+        else:  # Si no existe un contrato, creamos uno nuevo
+            form = ContratoForm(request.POST, alumno_instance=alumno_instance, apoderado_instance=apoderado_instance)
+            form.instance.alumno = alumno  # Asociar el contrato nuevo con el alumno
         
         if form.is_valid():
+            contrato = form.save(commit=False)  # No guardar aún el contrato
             # Recuperar el apoderado por su ID del campo oculto
             apoderado_id = form.cleaned_data['apoderado_id']
             apoderado = Apoderado.objects.get(id=apoderado_id)
-
-            # Asignar la instancia del apoderado al contrato
-            contrato = form.save(commit=False)
             contrato.apoderado = apoderado
             contrato.alumno = alumno_instance
-            contrato.save()
+            contrato.save()  # Guardar los cambios en el contrato
 
-            # Redirigir a la URL de éxito
-            return redirect('editar_informe_asis', id=alumno_instance.id)
+            messages.success(request, 'Los cambios han sido guardados con éxito.')
+            return redirect('editar_informe_asis', id=alumno.id)  # Redirigir a la nueva vista 'asis_pago'
+
     else:
+        # Si es un GET, cargar el formulario con los datos existentes del contrato
         form = ContratoForm(instance=contrato_instance, alumno_instance=alumno_instance, apoderado_instance=apoderado_instance)
 
-    return render(request, 'asis_edicion_info_pago.html', {'form': form, 'alumno': alumno_instance})
+    # Renderizar la plantilla con el formulario y los datos del alumno
+    return render(request, 'asis_edicion_info_pago.html', {'alumno': alumno, 'form': form})
+
+
 #==================================================  Generar contrato PDF =================================================================
 @login_required
 def generar_pdf_contrato(request, id):
@@ -1128,7 +1145,7 @@ def generar_pdf_contrato(request, id):
 
     return response
 
-#SUBDIRECTOR
+#==================================================SUBDIRECTOR=====================================================================
 def subdirector_home(request):
     return render(request, 'subdirector.html')
 

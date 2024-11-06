@@ -1,10 +1,9 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar Informe</title>
+    <title>Registro de Pagos</title>
     <style>
         /* Reset básico */
         * {
@@ -194,12 +193,18 @@
             background-color: #218838;
         }
 
-        .btn-pdf {
-            background-color: #007bff;
+        /* Botón de "Imprimir PDF" */
+        .btn-primary {
+            background-color: #007bff; /* Azul */
         }
 
-        .btn-pdf:hover {
-            background-color: #0056b3;
+        .btn-primary:hover {
+            background-color: #0056b3; /* Azul oscuro */
+        }
+
+            /* Botón de "Volver" */
+        .btn-back {
+            background-color: #6c757d; /* Gris */
         }
 
         .btn-back {
@@ -209,6 +214,44 @@
         .btn-back:hover {
             background-color: #5a6268;
         }
+        form p {
+            margin: 15px 0;
+            font-size: 14px;
+        }
+        
+        form p label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        form p input,
+        form p select,
+        form p textarea {
+            width: 100%;
+            padding: 8px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        
+        form p input[type="submit"],
+        form p button {
+            background-color: #343a40;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        form p input[type="submit"]:hover,
+        form p button:hover {
+            background-color: purple;
+        }
+        
     </style>
 </head>
 <body>
@@ -232,47 +275,24 @@
 
     <div class="content">
         <div class="header">
-            Editar Informe
+            <h1>Registro de Contrato</h1>
+            <h1>Editar Informe</h1>
         </div>
-        
+
         <div class="container">
-            <h3>Detalles del Informe</h3>
+                        <!-- Formulario para editar el informe -->
             <form method="post" action="{% url 'editar_informe_asis' alumno.id %}">
                 {% csrf_token %}
-                <div class="form-group">
-                    <label for="alumno">Alumno:</label>
-                    <input type="text" id="alumno" name="alumno" value="{{ alumno.nombre }}" readonly>
-                </div>
-                <div class="form-group">
-                    <label for="apoderado">Apoderado:</label>
-                    <input type="text" id="apoderado" name="apoderado" value="{{ alumno.apoderado }}" readonly>
-                </div>
-                <div class="form-group">
-                    <label for="fecha">Fecha:</label>
-                    <input type="date" id="fecha" name="fecha" value="{{ informe.fecha }}">
-                </div>
-                <div class="form-group">
-                    <label for="valor_total">Valor Total:</label>
-                    <input type="number" id="valor_total" name="valor_total" value="{{ informe.valor_total }}">
-                </div>
-                <div class="form-group">
-                    <label for="forma_pago">Forma de Pago:</label>
-                    <select id="forma_pago" name="forma_pago">
-                        <option value="Efectivo" {% if informe.forma_pago == "Efectivo" %}selected{% endif %}>Efectivo</option>
-                        <option value="Transferencia" {% if informe.forma_pago == "Transferencia" %}selected{% endif %}>Transferencia</option>
-                        <option value="Tarjeta" {% if informe.forma_pago == "Tarjeta" %}selected{% endif %}>Tarjeta</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="observaciones">Observaciones:</label>
-                    <textarea id="observaciones" name="observaciones">{{ informe.observaciones }}</textarea>
-                </div>
-                
+
+
+                {{ form.as_p }}  <!-- Renderiza todos los campos del formulario como párrafos -->
+
                 <div class="buttons">
                     <button type="submit" class="btn-update">Actualizar Contrato</button>
-                    <a href="{% url 'generar_pdf_contrato' alumno.id %}" class="btn-pdf" target="_blank">Imprimir PDF</a>
-                    <a href="{% url 'asisAdmiFinan_gestion_pagos' %}" class="btn-back">Volver</a>
+                    <a href="{% url 'generar_pdf_contrato' alumno.id %}" class="btn-primary" target="_blank">Imprimir PDF</a>
+                    <a href="{% url 'asisAdmiFinan_gestion_pagos' %}" class="btn-back" target="_blank">Volver</a>
                 </div>
+                
             </form>
         </div>
     </div>
