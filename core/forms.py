@@ -1,6 +1,8 @@
 from django import forms
 from .models import Asistencia, Alumno, Calificacion, Observacion, Apoderado, Curso, InformeFinanciero, Contrato, CursoAlumno
 from django.core.exceptions import ValidationError
+from django_select2.forms import Select2MultipleWidget
+from django.contrib.auth.models import User
 
 
 class AsistenciaForm(forms.ModelForm):
@@ -57,36 +59,67 @@ class ObservacionForm(forms.ModelForm):
         self.fields['fecha'].widget.attrs.update({'class': 'form-control'})
         self.fields['contenido'].widget.attrs.update({'class': 'form-control'})
     
-    
-
 
 class ApoderadoForm(forms.ModelForm):
     class Meta:
         model = Apoderado
         fields = ['nombre', 'apellido', 'email', 'telefono']
 
-
 class AlumnoForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput)  # Campo de contraseña
+    password = forms.CharField(widget=forms.PasswordInput)
+    cursos = forms.ModelMultipleChoiceField(
+        queryset=Curso.objects.all(),
+        widget=Select2MultipleWidget(attrs={'class': 'CursoAlumno'}),  # Using the Select2 widget
+        required=True,
+        label="Cursos"
+    )
 
     class Meta:
         model = Alumno
-        fields = ['nombre', 'apellido', 'email', 'apoderado', 'password', 'curso', 'estado_admision']
-        
-        # Opciones para el estado de admisión
+        fields = ['nombre', 'apellido', 'email', 'apoderado', 'password', 'estado_admision']
+
         ESTADO_ADMISION_CHOICES = [
             ('Aprobado', 'Aprobado'),
             ('Pendiente', 'Pendiente'),
         ]
 
         widgets = {
-            'curso': forms.Select(),  # Menú desplegable para seleccionar el curso
-            'apoderado': forms.Select(),  # Menú desplegable para seleccionar el apoderado
-            'estado_admision': forms.Select(choices=ESTADO_ADMISION_CHOICES),  # Opciones de "Aprobado" y "Pendiente"
+            'apoderado': forms.Select(),
+            'estado_admision': forms.Select(choices=ESTADO_ADMISION_CHOICES),
         }
 
+    def __init__(self, *args, **kwargs):
+        alumno_instance = kwargs.get('instance')
+        super().__init__(*args, **kwargs)
 
+        if alumno_instance:
+            # Si existe una instancia de alumno, asignar los cursos en los que está inscrito
+            self.fields['cursos'].initial = [curso_alumno.curso for curso_alumno in alumno_instance.curso_alumno_relacion.all()]
 
+    def save(self, commit=True):
+        alumno = super().save(commit=False)
+        email = self.cleaned_data['email']
+        password = self.cleaned_data['password']
+
+        # Obtener o crear el usuario basado en el email
+        user, created = User.objects.get_or_create(username=email)
+        user.set_password(password)
+        user.save()
+
+        alumno.user = user  # Asociar el usuario con el alumno
+
+        if commit:
+            alumno.save()
+
+        # Guardar la relación ManyToMany entre el alumno y los cursos
+        selected_cursos = self.cleaned_data['cursos']
+        alumno.curso_alumno_relacion.clear()  # Limpiar cursos actuales para evitar duplicados
+        for curso in selected_cursos:
+            CursoAlumno.objects.get_or_create(alumno=alumno, curso=curso)
+
+        return alumno
+
+    
 class InformeFinancieroForm(forms.ModelForm):
     class Meta:
         model = InformeFinanciero
@@ -154,7 +187,6 @@ class ContratoForm(forms.ModelForm):
             self.fields['apoderado_id'].initial = apoderado_instance.id
             # Mostramos el nombre y apellido del apoderado en el campo de solo lectura
             self.fields['apoderado_nombre'].initial = f"{apoderado_instance.nombre} {apoderado_instance.apellido}"
-
 
 
 

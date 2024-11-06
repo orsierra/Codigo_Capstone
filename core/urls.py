@@ -71,5 +71,6 @@ urlpatterns = [
     path('sostenedor/', views.sostenedor, name='sostenedor'),
     path('establecimientos/', views.establecimientos, name='establecimientos'),
 
+    
 
 ]

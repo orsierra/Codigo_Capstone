@@ -41,7 +41,6 @@ class Alumno(models.Model):
     email = models.EmailField(unique=True)
     apoderado = models.ForeignKey(Apoderado, related_name='alumnos', on_delete=models.SET_NULL, null=True)
     estado_admision = models.CharField(max_length=50, default='Pendiente')
-    curso = models.ForeignKey('Curso', related_name='alumnos_inscritos', on_delete=models.SET_NULL, null=True)
 
 
     def __str__(self):
@@ -190,3 +189,4 @@ class CursoAlumno(models.Model):
         curso_nombre = self.curso.nombre if self.curso else "Curso no asignado"
         alumno_nombre = f"{self.alumno.nombre} {self.alumno.apellido}" if self.alumno else "Alumno no asignado"
         return f"{alumno_nombre} inscrito en {curso_nombre}"
+
