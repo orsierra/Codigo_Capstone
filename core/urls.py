@@ -22,6 +22,8 @@ urlpatterns = [
     path('alumno_detalle/<int:alumno_id>/', views.alumno_detalle, name='alumno_detalle'),
     path('alumno_detalle/<int:alumno_id>/descargar_pdf/', descargar_pdf_alumno, name='descargar_pdf_alumno'),  # descarga detalles del alumno en pdf
     path('observaciones/<int:curso_id>/', observaciones, name='observaciones'),
+    path('historial-bitacoras/<int:curso_id>/', views.historial_bitacoras, name='historial_bitacoras'),
+    path('eliminar-bitacora/<int:bitacora_id>/', views.eliminar_bitacora, name='eliminar_bitacora'),
     #alumno
     path('alumno/', views.alumno_dashboard, name='alumno_dashboard'),
     path('alumno/asistencia/', views.alumno_consulta_asistencia, name='alumnoConsuAsis'),

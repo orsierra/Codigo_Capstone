@@ -3,12 +3,12 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Curso, Profesor,Asistencia, Calificacion, Informe, Observacion, Alumno, Apoderado, Curso, InformeFinanciero,InformeAcademico,Director, Contrato,AsisFinanza, AsisMatricula, CursoAlumno, Notificacion
+from .models import Curso, BitacoraClase, Profesor,Asistencia, Calificacion, Informe, Observacion, Alumno, Apoderado, Curso, InformeFinanciero,InformeAcademico,Director, Contrato,AsisFinanza, AsisMatricula, CursoAlumno, Notificacion
 from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404
 from datetime import date
 from django.utils import timezone
-from .forms import CalificacionForm, ObservacionForm, AlumnoForm, InformeFinancieroForm, ApoderadoForm, ContratoForm
+from .forms import CalificacionForm, ObservacionForm, AlumnoForm, InformeFinancieroForm, ApoderadoForm, ContratoForm, AsistenciaForm
 from django.contrib import messages
 from django.db.models import Avg
 from django.http import HttpResponse
@@ -23,6 +23,7 @@ from django.db import IntegrityError
 from django.db.models import Count
 from django.core.mail import send_mail
 from django.conf import settings
+from django.urls import reverse
 
 # ============================================================ MODULO INICIO ==============================================================================
 
@@ -139,43 +140,88 @@ def libro_clases(request, curso_id):
 
 # ================================================================= REGISTRAR ASISTENCIA ===================================================================
 
+from django.utils.dateparse import parse_date
+
 @login_required
 def registrar_asistencia(request, curso_id):
     curso = get_object_or_404(Curso, id=curso_id)
+    profesor = curso.profesor
 
-    # Obtener solo los alumnos aprobados a través del modelo CursoAlumno
+    # Obtener los alumnos aprobados
     alumnos_aprobados = CursoAlumno.objects.filter(curso=curso, alumno__estado_admision='Aprobado').select_related('alumno')
 
-    if not alumnos_aprobados.exists():
-        messages.warning(request, f"No hay alumnos aprobados asociados al curso {curso.nombre}.")
-        return redirect('profesor_cursos')  # Redirigir a otra vista si no hay alumnos aprobados
+    success_message = None  # Inicializar el mensaje de éxito como None
 
     if request.method == 'POST':
-        # Crear un nuevo objeto Asistencia
-        asistencia = Asistencia(curso=curso, fecha=date.today())
-        asistencia.save()  # Guarda el objeto Asistencia antes de agregar a los alumnos
+        actividades_realizadas = request.POST.get('actividades_realizadas')
+        observaciones = request.POST.get('observaciones')
 
-        for curso_alumno in alumnos_aprobados:
-            alumno = curso_alumno.alumno  # Accede al alumno a través de la relación
-            asistencia_estado = request.POST.get(f'asistencia_{alumno.id}')
+        if not actividades_realizadas:
+            success_message = "Debe registrar las actividades realizadas en la bitácora antes de guardar la asistencia."
+        else:
+            # Guardar bitácora
+            BitacoraClase.objects.create(
+                curso=curso,
+                fecha=date.today(),
+                profesor=profesor,
+                actividades_realizadas=actividades_realizadas,
+                observaciones=observaciones,
+            )
 
-            if asistencia_estado:
-                if asistencia_estado == 'presente':
-                    asistencia.alumnos_presentes.add(alumno)
-                elif asistencia_estado == 'ausente':
-                    asistencia.alumnos_ausentes.add(alumno)
-                elif asistencia_estado == 'justificado':
-                    asistencia.alumnos_justificados.add(alumno)
+            # Crear y guardar objeto Asistencia
+            asistencia = Asistencia(curso=curso, fecha=date.today())
+            asistencia.save()
 
-        asistencia.save()  # Guarda los cambios después de agregar los alumnos
+            for curso_alumno in alumnos_aprobados:
+                alumno = curso_alumno.alumno
+                asistencia_estado = request.POST.get(f'asistencia_{alumno.id}')
 
-        messages.success(request, "Asistencia registrada exitosamente.")
-        return redirect('registrar_asistencia', curso_id=curso.id)  # Redirigir a la misma vista con curso_id
+                if asistencia_estado:
+                    if asistencia_estado == 'presente':
+                        asistencia.alumnos_presentes.add(alumno)
+                    elif asistencia_estado == 'ausente':
+                        asistencia.alumnos_ausentes.add(alumno)
+                    elif asistencia_estado == 'justificado':
+                        asistencia.alumnos_justificados.add(alumno)
+
+            asistencia.save()
+            success_message = "Bitácora y asistencia registradas exitosamente."  # Asignar el mensaje de éxito
 
     return render(request, 'registrarAsistencia.html', {
         'curso': curso,
-        'alumnos_aprobados': list({curso_alumno.alumno.id: curso_alumno.alumno for curso_alumno in alumnos_aprobados}.values()),  # Asegura solo alumnos únicos
+        'alumnos_aprobados': alumnos_aprobados,
+        'success_message': success_message,  # Pasar el mensaje de éxito al contexto
     })
+
+
+
+
+
+@login_required
+def historial_bitacoras(request, curso_id):
+    # Obtener el curso y las bitácoras asociadas a este curso
+    curso = get_object_or_404(Curso, id=curso_id)
+    bitacoras = BitacoraClase.objects.filter(curso=curso).order_by('-fecha')  # Ordenadas por fecha descendente
+    
+    context = {
+        'curso': curso,
+        'bitacoras': bitacoras,
+    }
+    return render(request, 'historial_bitacoras.html', context)
+
+@login_required
+def eliminar_bitacora(request, bitacora_id):
+    # Obtener la bitácora a través de su id, si no existe se muestra un error 404
+    bitacora = get_object_or_404(BitacoraClase, id=bitacora_id)
+    
+    # Eliminar la bitácora
+    bitacora.delete()
+    
+    # Mensaje de éxito
+    messages.success(request, "Registro de bitácora eliminado exitosamente.")
+    
+    # Redireccionar de vuelta al historial de bitácoras
+    return redirect(reverse('historial_bitacoras', kwargs={'curso_id': bitacora.curso.id}))
 
 #=============================================================== REGISTRAR CALIFICACIONES ====================================================================
 
@@ -183,45 +229,41 @@ def registrar_asistencia(request, curso_id):
 @login_required
 def registrar_calificaciones(request, curso_id):
     curso = get_object_or_404(Curso, id=curso_id)
-    profesor = curso.profesor  # Obtenemos el profesor del curso
+    profesor = curso.profesor
     errores = {}
     form_list = {}
+    success_message = None
 
-    # Filtramos solo los alumnos aprobados que están inscritos en el curso actual
     alumnos_aprobados = CursoAlumno.objects.filter(curso=curso, alumno__estado_admision='Aprobado').select_related('alumno')
 
     if request.method == 'POST':
         for curso_alumno in alumnos_aprobados:
-            alumno = curso_alumno.alumno  # Accede al alumno a través de la relación
+            alumno = curso_alumno.alumno
             form = CalificacionForm(request.POST, prefix=str(alumno.id))
             if form.is_valid():
-                # Guarda la calificación usando el alumno y curso correcto
                 calificacion, created = Calificacion.objects.get_or_create(
                     alumno=alumno,
                     curso=curso,
                     defaults={'nota': form.cleaned_data['nota']}
                 )
                 if not created:
-                    # Si ya existe una calificación, se actualiza
                     calificacion.nota = form.cleaned_data['nota']
                     calificacion.save()
             else:
                 errores[alumno] = form.errors
 
         if not errores:
-            messages.success(request, "Se han guardado los cambios exitosamente.")
-            return redirect('registrar_calificaciones', curso_id=curso_id)
+            success_message = "Se han guardado los cambios exitosamente."
 
     else:
-        # Crea formularios para cada alumno aprobado
         form_list = {curso_alumno.alumno: CalificacionForm(prefix=str(curso_alumno.alumno.id)) for curso_alumno in alumnos_aprobados}
 
     return render(request, 'registrarCalificaciones.html', {
         'curso': curso,
         'form_list': form_list,
-        'errores': errores
+        'errores': errores,
+        'success_message': success_message
     })
-
 
 
 

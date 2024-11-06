@@ -167,6 +167,7 @@
             <li><a href="{% url 'registro_academico' curso.id %}">Registro Académico</a></li>
             <li><a href="{% url 'generar_informes' curso.id %}">Generar Informes</a></li>
             <li><a href="{% url 'observaciones' curso.id %}">Observaciones</a></li>
+            <li><a href="{% url 'historial_bitacoras' curso.id %}">Historial de Bitácoras</a></li>
             <li>
                 <form action="{% url 'logout' %}" method="post" style="display: inline;">
                     {% csrf_token %}
