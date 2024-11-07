@@ -223,7 +223,7 @@ def eliminar_bitacora(request, bitacora_id):
     # Redireccionar de vuelta al historial de bitácoras
     return redirect(reverse('historial_bitacoras', kwargs={'curso_id': bitacora.curso.id}))
 
-#=============================================================== REGISTRAR CALIFICACIONES ====================================================================
+#=============================================================== REGISTRAR CALIFICACIONES =======================================================================
 
 
 @login_required
