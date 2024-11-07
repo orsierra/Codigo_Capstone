@@ -88,6 +88,15 @@
             {% endfor %}
         </ul>
 
+        <h3>Observaciones</h3>
+        <ul>
+            {% for observacion in observaciones %}
+                <li>Fecha: {{ observacion.fecha }} - {{ observacion.contenido }}</li>
+            {% empty %}
+                <li>No hay observaciones para este alumno.</li>
+            {% endfor %}
+        </ul>
+
         <!-- Botones de navegación -->
         <div class="mt-4">
             {% if curso %}

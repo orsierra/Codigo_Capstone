@@ -344,6 +344,7 @@ def alumno_detalle(request, alumno_id):
             'asistencias': [],
             'ausencias': [],
             'justificaciones': [],
+            'observaciones': [],  # Agregar observaciones vacías en el contexto
             'promedio': 0,
         })
 
@@ -358,10 +359,8 @@ def alumno_detalle(request, alumno_id):
     ausencias = Asistencia.objects.filter(curso=curso_actual, alumnos_ausentes=alumno)
     justificaciones = Asistencia.objects.filter(curso=curso_actual, alumnos_justificados=alumno)
 
-    # Verificar si los datos de asistencia se obtienen correctamente (depuración)
-    print("Asistencias:", asistencias)
-    print("Ausencias:", ausencias)
-    print("Justificaciones:", justificaciones)
+    # Filtrar observaciones del alumno por el curso actual
+    observaciones = Observacion.objects.filter(alumno=alumno, curso=curso_actual)
 
     context = {
         'alumno': alumno,
@@ -370,6 +369,7 @@ def alumno_detalle(request, alumno_id):
         'asistencias': asistencias,
         'ausencias': ausencias,
         'justificaciones': justificaciones,
+        'observaciones': observaciones,  # Incluir observaciones en el contexto
         'promedio': promedio,
     }
     return render(request, 'alumno_detalle.html', context)
@@ -381,11 +381,12 @@ def descargar_pdf_alumno(request, alumno_id):
     # Obtener el alumno específico o devolver 404 si no se encuentra
     alumno = get_object_or_404(Alumno, id=alumno_id)
     
-    # Obtener las calificaciones y asistencias del alumno
+    # Obtener las calificaciones, asistencias, y observaciones del alumno
     calificaciones = Calificacion.objects.filter(alumno=alumno)
     asistencias = Asistencia.objects.filter(alumnos_presentes=alumno)
     ausencias = Asistencia.objects.filter(alumnos_ausentes=alumno)
     justificaciones = Asistencia.objects.filter(alumnos_justificados=alumno)
+    observaciones = Observacion.objects.filter(alumno=alumno)  # Obtener las observaciones del alumno
 
     # Calcular el promedio de calificaciones
     if calificaciones:
@@ -400,6 +401,7 @@ def descargar_pdf_alumno(request, alumno_id):
         'asistencias': asistencias,
         'ausencias': ausencias,
         'justificaciones': justificaciones,
+        'observaciones': observaciones,  # Añadir las observaciones al contexto
         'promedio': promedio,
     }
 
@@ -417,6 +419,7 @@ def descargar_pdf_alumno(request, alumno_id):
     html.write_pdf(response)
 
     return response
+
 
 # =============================================================== OBSERVACIONES =========================================================================
 @login_required

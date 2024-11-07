@@ -15,9 +15,10 @@
             padding: 0;
             background-color: #f4f4f4;
         }
+        /* Barra lateral */
         .sidebar {
             width: 250px;
-            background: #343a40;
+            background-color: #343a40;
             color: #fff;
             position: fixed;
             height: 100%;
@@ -25,7 +26,7 @@
         }
         .sidebar h2 {
             text-align: center;
-            color: #fff;
+            color: #ffc107;
         }
         .sidebar ul {
             list-style: none;
@@ -34,35 +35,89 @@
         .sidebar ul li {
             margin: 15px 0;
         }
+        .sidebar ul li a,
+        .sidebar ul li form button {
+            color: #ced4da;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+            display: block;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: inherit;
+            width: 100%;
+            text-align: left;
+        }
         .sidebar ul li a {
-            color: #fff;
+            color: #ced4da;
             text-decoration: none;
             padding: 10px;
             display: block;
             transition: background 0.3s;
         }
         .sidebar ul li a:hover {
-            background: #495057;
+            background-color: #ffc107;
+            color: #343a40;
         }
+        .footer {
+            text-align: center;
+            font-size: 14px;
+            color: #ffc107;
+            margin-top: 20px;
+        }
+
+        .footer a {
+            color: #ffc107;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        /* Estilo para los botones en el sidebar */
+        .sidebar form button {
+            background-color: #343a40;
+            color: #ced4da;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;  /* Asegura que el botón ocupe todo el ancho */
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .sidebar form button:hover {
+            background-color: #ffc107;
+            color: #343a40;
+        }
+        
+        /* Contenedor principal y formulario */
         .main-content {
             margin-left: 270px;
             padding: 20px;
+            width: calc(100% - 320px);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
         }
         .form-container {
-            width: 80%;
-            max-width: 800px;
+            width: 100%;
+            max-width: 900px;
             background-color: #fff;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center; /* Centra el título */
         }
         h1 {
             color: #333;
-            text-align: center;
+            margin-bottom: 20px;
         }
         fieldset {
             border: 1px solid #ccc;
@@ -117,8 +172,7 @@
             background-color: #5a6268;
         }
     </style>
-    
-    {{ form.media }}  <!-- This includes the necessary JS and CSS for django-select2 -->
+    {{ form.media }}  <!-- Incluye los archivos CSS y JS necesarios para django-select2 -->
 </head>
 <body>
     <div class="sidebar">
@@ -126,76 +180,82 @@
         <ul>
             <li><a href="{% url 'panel_asisAdminFinan' %}">Inicio</a></li>
             <li><a href="{% url 'asisAdmiFinan_gestion_pagos' %}">Lista de Estudiantes</a></li>
+            <li>
+                <form action="{% url 'logout' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit">Cerrar sesión</button>
+                </form>
+            </li>
         </ul>
         <div class="footer">
-            <a href="#" style="color: #fff;">Nuevos Horizontes</a>
+            <a href="#">Nuevos Horizontes</a>
         </div>
     </div>
 
     <div class="main-content">
-        <h1>Agregar Alumno</h1>
-        <form method="post">
-            {% csrf_token %}
-            {% if form.non_field_errors %}
-                <div class="error">{{ form.non_field_errors }}</div>
-            {% endif %}
-            <fieldset>
-                <legend>Información Personal</legend>
-                <div>
-                    <label for="{{ form.nombre.id_for_label }}">{{ form.nombre.label }}</label>
-                    {{ form.nombre }}
-                    {{ form.nombre.errors }}
-                </div>
-                <div>
-                    <label for="{{ form.apellido.id_for_label }}">{{ form.apellido.label }}</label>
-                    {{ form.apellido }}
-                    {{ form.apellido.errors }}
-                </div>
-                <div>
-                    <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
-                    {{ form.email }}
-                    {{ form.email.errors }}
-                </div>
-            </fieldset>
-        
-            <fieldset>
-                <legend>Información de Admisión</legend>
-                <div>
-                    <label for="{{ form.apoderado.id_for_label }}">{{ form.apoderado.label }}</label>
-                    {{ form.apoderado }}
-                    {{ form.apoderado.errors }}
-                </div>
-                <div>
-                    <label for="{{ form.cursos.id_for_label }}">{{ form.cursos.label }}</label>
-                    {{ form.cursos }}  <!-- El widget de Select2 se aplicará aquí -->
-                    {{ form.cursos.errors }}
-                </div>
+        <div class="form-container">
+            <h1>Agregar Alumno</h1>
+            <form method="post">
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                    <div class="error">{{ form.non_field_errors }}</div>
+                {% endif %}
+                <fieldset>
+                    <legend>Información Personal</legend>
+                    <div>
+                        <label for="{{ form.nombre.id_for_label }}">{{ form.nombre.label }}</label>
+                        {{ form.nombre }}
+                        {{ form.nombre.errors }}
+                    </div>
+                    <div>
+                        <label for="{{ form.apellido.id_for_label }}">{{ form.apellido.label }}</label>
+                        {{ form.apellido }}
+                        {{ form.apellido.errors }}
+                    </div>
+                    <div>
+                        <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+                        {{ form.email }}
+                        {{ form.email.errors }}
+                    </div>
+                </fieldset>
                 
-                <div>
-                    <label for="{{ form.estado_admision.id_for_label }}">{{ form.estado_admision.label }}</label>
-                    {{ form.estado_admision }}
-                    {{ form.estado_admision.errors }}
+                <fieldset>
+                    <legend>Información de Admisión</legend>
+                    <div>
+                        <label for="{{ form.apoderado.id_for_label }}">{{ form.apoderado.label }}</label>
+                        {{ form.apoderado }}
+                        {{ form.apoderado.errors }}
+                    </div>
+                    <div>
+                        <label for="{{ form.cursos.id_for_label }}">{{ form.cursos.label }}</label>
+                        {{ form.cursos }}
+                        {{ form.cursos.errors }}
+                    </div>
+                    <div>
+                        <label for="{{ form.estado_admision.id_for_label }}">{{ form.estado_admision.label }}</label>
+                        {{ form.estado_admision }}
+                        {{ form.estado_admision.errors }}
+                    </div>
+                    <div>
+                        <label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
+                        {{ form.password }}
+                        {{ form.password.errors }}
+                    </div>
+                </fieldset>
+
+                <div class="button-container">
+                    <button type="submit">Agregar Alumno</button>
+                    <a class="btn-back" href="{% url 'asisAdmiFinan_gestion_pagos' %}">Volver</a>
                 </div>
-                <div>
-                    <label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
-                    {{ form.password }}
-                    {{ form.password.errors }}
-                </div>
-            </fieldset>
-        
-            <div class="button-container">
-                <button type="submit">Agregar Alumno</button>
-                <a class="btn-back" href="{% url 'asisAdmiFinan_gestion_pagos' %}">Volver</a>
-            </div>
-        </form>
-        
+            </form>
+        </div>
     </div>
-    
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <script>
         $(document).ready(function() {
-            $('.CursoAlumno').select2(); // Inicializa Select2 en los elementos que tienen la clase CursoAlumno
+            $('.CursoAlumno').select2();
         });
     </script>
 </body>
