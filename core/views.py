@@ -328,32 +328,52 @@ def generar_informes(request, curso_id):
 # ============================================ generar informe en pdf para el profesor por alumno ================================================================
 @login_required
 def alumno_detalle(request, alumno_id):
+    # Obtener el alumno
     alumno = get_object_or_404(Alumno, id=alumno_id)
-    curso = alumno.curso  # Obtiene el curso al que pertenece el alumno
 
-    # Filtrar calificaciones por el alumno y su curso
-    calificaciones = Calificacion.objects.filter(alumno=alumno, curso=curso)
+    # Obtener el curso actual del alumno mediante el modelo CursoAlumno
+    curso_alumno = CursoAlumno.objects.filter(alumno=alumno).first()
+    curso_actual = curso_alumno.curso if curso_alumno else None
+
+    # Si no se encuentra el curso, manejar el caso
+    if not curso_actual:
+        return render(request, 'alumno_detalle.html', {
+            'alumno': alumno,
+            'curso': None,
+            'calificaciones': [],
+            'asistencias': [],
+            'ausencias': [],
+            'justificaciones': [],
+            'promedio': 0,
+        })
+
+    # Filtrar calificaciones del alumno por el curso actual
+    calificaciones = Calificacion.objects.filter(alumno=alumno, curso=curso_actual)
 
     # Calcular el promedio de calificaciones
-    if calificaciones.exists():
-        promedio = sum(calificacion.nota for calificacion in calificaciones) / calificaciones.count()
-    else:
-        promedio = 0  # Si no hay calificaciones, el promedio es 0
+    promedio = calificaciones.aggregate(promedio=Avg('nota'))['promedio'] or 0
 
-    # Filtrar asistencias usando los campos ManyToMany
-    asistencias = Asistencia.objects.filter(curso=curso).filter(alumnos_presentes=alumno)  # Asistencias de presentes
-    ausencias = Asistencia.objects.filter(curso=curso).filter(alumnos_ausentes=alumno)  # Asistencias de ausentes
-    justificaciones = Asistencia.objects.filter(curso=curso).filter(alumnos_justificados=alumno)  # Asistencias justificadas
+    # Filtrar asistencias, ausencias y justificaciones usando el curso actual
+    asistencias = Asistencia.objects.filter(curso=curso_actual, alumnos_presentes=alumno)
+    ausencias = Asistencia.objects.filter(curso=curso_actual, alumnos_ausentes=alumno)
+    justificaciones = Asistencia.objects.filter(curso=curso_actual, alumnos_justificados=alumno)
+
+    # Verificar si los datos de asistencia se obtienen correctamente (depuración)
+    print("Asistencias:", asistencias)
+    print("Ausencias:", ausencias)
+    print("Justificaciones:", justificaciones)
 
     context = {
         'alumno': alumno,
+        'curso': curso_actual,
         'calificaciones': calificaciones,
         'asistencias': asistencias,
         'ausencias': ausencias,
         'justificaciones': justificaciones,
-        'promedio': promedio,  # Añadir el promedio al contexto
+        'promedio': promedio,
     }
     return render(request, 'alumno_detalle.html', context)
+
 ##============================================ generar pdf por alumno: asistencia y calificaciones================================
 
 @login_required
@@ -448,7 +468,7 @@ def alumno_dashboard(request):
 def alumno_consulta_asistencia(request):
     # Obtener el objeto Alumno asociado al usuario actual
     alumno = get_object_or_404(Alumno, user=request.user)
-    
+
     # Verificar el estado de admisión del alumno
     if alumno.estado_admision != 'Aprobado':
         messages.error(request, 'Su estado de admisión no le permite acceder a la consulta de asistencia.')
@@ -456,10 +476,12 @@ def alumno_consulta_asistencia(request):
 
     asistencias_data = []
 
-    # Obtener los cursos en los que está inscrito el alumno
-    cursos = alumno.cursos_asignados.all()
+    # Obtener los cursos en los que está inscrito el alumno a través de CursoAlumno
+    cursos_alumno = CursoAlumno.objects.filter(alumno=alumno)
 
-    for curso in cursos:
+    for curso_alumno in cursos_alumno:
+        curso = curso_alumno.curso  # Acceder al curso
+
         # Recuperar todas las fechas en las que el alumno estuvo presente, ausente o justificado para el curso
         fechas_presentes = set(Asistencia.objects.filter(curso=curso, alumnos_presentes=alumno).values_list('fecha', flat=True))
         fechas_ausentes = set(Asistencia.objects.filter(curso=curso, alumnos_ausentes=alumno).values_list('fecha', flat=True))
@@ -488,25 +510,27 @@ def alumno_consulta_asistencia(request):
 
 
 
-
 # =========================================================== Vista para la consulta de notas ==========================================================================
 
 @login_required
 def alumno_consulta_notas(request):
     # Obtener el alumno actual (suponiendo que el usuario esté autenticado)
-    alumno = Alumno.objects.get(user=request.user)
+    alumno = get_object_or_404(Alumno, user=request.user)
 
-    # Obtener los cursos del alumno
-    cursos = Curso.objects.filter(alumnos=alumno).prefetch_related('calificacion_set')
+    # Obtener los cursos del alumno a través de CursoAlumno
+    cursos_alumno = CursoAlumno.objects.filter(alumno=alumno)
 
     # Agregar el promedio de notas para cada curso
     cursos_con_promedios = []
-    for curso in cursos:
+    for curso_alumno in cursos_alumno:
+        curso = curso_alumno.curso  # Acceder al curso
         calificaciones = Calificacion.objects.filter(curso=curso, alumno=alumno)
+        
         if calificaciones.exists():
             promedio = calificaciones.aggregate(average_nota=models.Avg('nota'))['average_nota']
         else:
             promedio = None  # No hay notas disponibles
+
         cursos_con_promedios.append({
             'curso': curso,
             'calificaciones': calificaciones,
@@ -514,6 +538,7 @@ def alumno_consulta_notas(request):
         })
 
     return render(request, 'alumnoConsuNotas.html', {'cursos_con_promedios': cursos_con_promedios})
+
 
 
 # ===================================================================== alumno home ====================================================================================
@@ -571,10 +596,12 @@ def apoderadoConsuAsis(request):
     asistencias_data = {}
 
     for alumno in alumnos:
-        cursos = alumno.cursos_asignados.all()
+        # Obtiene los cursos asociados al alumno a través del modelo CursoAlumno
+        cursos_asignados = CursoAlumno.objects.filter(alumno=alumno).select_related('curso')
         asistencias_data[alumno] = []
 
-        for curso in cursos:
+        for curso_alumno in cursos_asignados:
+            curso = curso_alumno.curso  # Obtener el curso desde CursoAlumno
             # Recupera todas las fechas en las que el alumno estuvo en algún estado de asistencia para el curso
             fechas_presentes = set(Asistencia.objects.filter(curso=curso, alumnos_presentes=alumno).values_list('fecha', flat=True))
             fechas_ausentes = set(Asistencia.objects.filter(curso=curso, alumnos_ausentes=alumno).values_list('fecha', flat=True))
@@ -589,7 +616,7 @@ def apoderadoConsuAsis(request):
             porcentaje_asistencia = (total_asistencia / total_clases * 100) if total_clases > 0 else 0
 
             asistencias_data[alumno].append({
-                'curso': curso,
+                'curso': curso.nombre,  # Acceder al nombre del curso
                 'total_clases': total_clases,
                 'asistencia': total_asistencia,
                 'porcentaje_asistencia': round(porcentaje_asistencia, 2),
@@ -625,10 +652,13 @@ def apoderadoConsuNotas(request):
             'cursos': []
         }
 
-        # Obtener los cursos únicos en base a las calificaciones del alumno
-        cursos = Curso.objects.filter(calificacion__alumno=alumno).distinct()
+        # Obtener los cursos asignados al alumno a través de CursoAlumno
+        cursos_asignados = CursoAlumno.objects.filter(alumno=alumno).select_related('curso')
         
-        for curso in cursos:
+        for curso_alumno in cursos_asignados:
+            curso = curso_alumno.curso  # Obtener el curso desde CursoAlumno
+            
+            # Obtener las calificaciones del alumno para el curso específico
             calificaciones_curso = Calificacion.objects.filter(alumno=alumno, curso=curso)
             # Calcular el promedio de notas
             total_notas = sum(c.nota for c in calificaciones_curso if c.nota is not None)
@@ -668,11 +698,21 @@ def apoderado_observaciones(request):
     observaciones_data = []
     
     for alumno in alumnos_aprobados:
-        observaciones_alumno = Observacion.objects.filter(alumno=alumno).select_related('curso')
-        observaciones_data.append({
-            'alumno': alumno,
-            'observaciones': observaciones_alumno
-        })
+        # Obtener los cursos del alumno a través de CursoAlumno
+        cursos_asignados = CursoAlumno.objects.filter(alumno=alumno).select_related('curso')
+        
+        for curso_alumno in cursos_asignados:
+            curso = curso_alumno.curso  # Obtener el curso desde CursoAlumno
+            
+            # Obtener las observaciones del alumno para el curso específico
+            observaciones_alumno = Observacion.objects.filter(alumno=alumno, curso=curso)
+            
+            # Almacenar los datos de observaciones en la lista
+            observaciones_data.append({
+                'alumno': alumno,
+                'curso': curso,
+                'observaciones': observaciones_alumno
+            })
 
     context = {
         'observaciones_data': observaciones_data
@@ -689,11 +729,6 @@ def director_dashboard(request):
 def directorMenu(request):
     # Aquí podrías agregar lógica para consultar informes si es necesario
     return render(request, 'directorMenu.html')
-
-from django.shortcuts import render, redirect
-from .models import Curso
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 
 @csrf_exempt
 def director_plani(request):
@@ -923,44 +958,32 @@ def gestionar_estudiantes(request):
 def agregar_alumno(request):
     if request.method == 'POST':
         form = AlumnoForm(request.POST)
+
+        # Verifica si el formulario es válido
         if form.is_valid():
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
+
+            # Verifica si el usuario ya existe
             if User.objects.filter(username=email).exists():
                 form.add_error('email', 'Este correo electrónico ya está en uso.')
             else:
                 try:
-                    user = User.objects.create_user(
-                        username=email,
-                        password=password,
-                        email=email,
-                    )
-                    
-                    # Crear el Alumno asociado al usuario
-                    alumno = Alumno(
-                        user=user,
-                        nombre=form.cleaned_data['nombre'],
-                        apellido=form.cleaned_data['apellido'],
-                        email=email,
-                        apoderado=form.cleaned_data['apoderado'],
-                        estado_admision=form.cleaned_data['estado_admision'],
-                        curso=form.cleaned_data['curso'],
-                    )
-                    alumno.save()  # Guarda el alumno en la base de datos
-
-                    # Asignar el alumno al curso
-                    curso = form.cleaned_data['curso']
-                    curso.alumnos.add(alumno)  # Añade el alumno al curso
-                    
-                    return redirect('gestionar_estudiantes')  # Redirige a la lista de estudiantes
-
+                    # Guarda el Alumno y las relaciones de CursoAlumno usando el método save del formulario
+                    form.save()
+                    return redirect('gestionar_estudiantes')  # Redirige a la página de gestión de estudiantes
                 except IntegrityError:
                     form.add_error(None, 'Ocurrió un error al crear el usuario. Intenta nuevamente.')
+                except Exception as e:
+                    form.add_error(None, f'Ocurrió un error inesperado: {str(e)}')
+        else:
+            # Mostrar errores del formulario en caso de que no sea válido
+            print(form.errors)
 
     else:
-        form = AlumnoForm()  # Si no es POST, crea un nuevo formulario
-    
-    return render(request, 'agregar_alumno.html', {'form': form})  # Renderiza la plantilla con el formulario
+        form = AlumnoForm()  # Instancia un formulario vacío si no es un POST
+
+    return render(request, 'agregar_alumno.html', {'form': form})  # Renderiza el formulario en la plantilla
 
 
 
@@ -969,6 +992,9 @@ def eliminar_alumno(request, alumno_id):
     alumno = get_object_or_404(Alumno, id=alumno_id)
     alumno.delete()  # Eliminar el alumno
     return redirect('gestionar_estudiantes')  # Redirige a la lista de estudiantes
+
+
+
 
 @login_required
 def actualizar_matricula(request, id):
@@ -984,7 +1010,6 @@ def actualizar_matricula(request, id):
         form = AlumnoForm(instance=alumno)
 
     return render(request, 'actualizar_matricula.html', {'form': form, 'alumno': alumno})
-
 
 
 @login_required
@@ -1016,29 +1041,35 @@ def ver_gestion_pagos_admision(request):
 def agregar_alumno_asis(request):
     if request.method == 'POST':
         form = AlumnoForm(request.POST)
+
+        # Verifica si el formulario es válido
         if form.is_valid():
-            # Primero crea el usuario
-            user = User.objects.create_user(
-                username=form.cleaned_data['email'],  
-                password=form.cleaned_data['password'],  
-                email=form.cleaned_data['email'],
-            )
-            # Luego crea el Alumno
-            alumno = Alumno(
-                user=user,
-                nombre=form.cleaned_data['nombre'],
-                apellido=form.cleaned_data['apellido'],
-                email=form.cleaned_data['email'],
-                apoderado=form.cleaned_data['apoderado'],  
-                estado_admision=form.cleaned_data['estado_admision'],  
-                curso=form.cleaned_data['curso'],  
-            )
-            alumno.save()  # Guarda el alumno en la base de datos
-            return redirect('asisAdmiFinan_gestion_pagos')  # Redirige a la lista de estudiantes
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
+
+            # Verifica si el usuario ya existe
+            if User.objects.filter(username=email).exists():
+                form.add_error('email', 'Este correo electrónico ya está en uso.')
+            else:
+                try:
+                    # Guarda el Alumno y las relaciones de CursoAlumno usando el método save del formulario
+                    form.save()
+                    return redirect('asisAdmiFinan_gestion_pagos')  # Redirige a la página de gestión de estudiantes
+                except IntegrityError:
+                    form.add_error(None, 'Ocurrió un error al crear el usuario. Intenta nuevamente.')
+                except Exception as e:
+                    form.add_error(None, f'Ocurrió un error inesperado: {str(e)}')
+        else:
+            # Mostrar errores del formulario en caso de que no sea válido
+            print(form.errors)
+
     else:
-        form = AlumnoForm()  # Si no es POST, crea un nuevo formulario
-    
-    return render(request, 'agregar_alumno_asis.html', {'form': form})  # Renderiza la plantilla con el formulario
+        form = AlumnoForm()  # Instancia un formulario vacío si no es un POST
+
+    return render(request, 'agregar_alumno_asis.html', {'form': form})  # Renderiza el formulario en la plantilla
+
+
+
 
 # =====================================================VISTA de ASISTENTE DE ADMISIÓN Y FINANZAS PARA ELIMINAR ALUMNO =====================
 @login_required
@@ -1050,35 +1081,46 @@ def eliminar_alumno_asis(request, alumno_id):
 # =====================================================VISTA de ASISTENTE DE ADMISIÓN Y FINANZAS PARA ACTUALIZAR INFORME=====================
 @login_required
 def editar_informe_asis(request, id):
-    # Obtener el alumno por ID
+    # Obtener el alumno por su ID
+    alumno = get_object_or_404(Alumno, id=id)
     alumno_instance = get_object_or_404(Alumno, id=id)
-    
+
     # Obtener el contrato relacionado con el alumno (si existe)
+    contrato = Contrato.objects.filter(alumno=alumno).first()
     contrato_instance = Contrato.objects.filter(alumno=alumno_instance).first()
 
     # Obtener el apoderado del alumno
     apoderado_instance = alumno_instance.apoderado  # Asegúrate de que el modelo Alumno tenga relación con Apoderado
 
     if request.method == 'POST':
-        form = ContratoForm(request.POST, instance=contrato_instance, alumno_instance=alumno_instance, apoderado_instance=apoderado_instance)
+        # Si el formulario ha sido enviado
+        # Si existe un contrato, lo editamos
+        if contrato:
+            form = ContratoForm(request.POST, instance=contrato, alumno_instance=alumno_instance, apoderado_instance=apoderado_instance)
+        else:  # Si no existe un contrato, creamos uno nuevo
+            form = ContratoForm(request.POST, alumno_instance=alumno_instance, apoderado_instance=apoderado_instance)
+            form.instance.alumno = alumno  # Asociar el contrato nuevo con el alumno
         
         if form.is_valid():
+            contrato = form.save(commit=False)  # No guardar aún el contrato
             # Recuperar el apoderado por su ID del campo oculto
             apoderado_id = form.cleaned_data['apoderado_id']
             apoderado = Apoderado.objects.get(id=apoderado_id)
-
-            # Asignar la instancia del apoderado al contrato
-            contrato = form.save(commit=False)
             contrato.apoderado = apoderado
             contrato.alumno = alumno_instance
-            contrato.save()
+            contrato.save()  # Guardar los cambios en el contrato
 
-            # Redirigir a la URL de éxito
-            return redirect('editar_informe_asis', id=alumno_instance.id)
+            messages.success(request, 'Los cambios han sido guardados con éxito.')
+            return redirect('editar_informe_asis', id=alumno.id)  # Redirigir a la nueva vista 'asis_pago'
+
     else:
+        # Si es un GET, cargar el formulario con los datos existentes del contrato
         form = ContratoForm(instance=contrato_instance, alumno_instance=alumno_instance, apoderado_instance=apoderado_instance)
 
-    return render(request, 'asis_edicion_info_pago.html', {'form': form, 'alumno': alumno_instance})
+    # Renderizar la plantilla con el formulario y los datos del alumno
+    return render(request, 'asis_edicion_info_pago.html', {'alumno': alumno, 'form': form})
+
+
 #==================================================  Generar contrato PDF =================================================================
 @login_required
 def generar_pdf_contrato(request, id):
@@ -1103,7 +1145,7 @@ def generar_pdf_contrato(request, id):
 
     return response
 
-#SUBDIRECTOR
+#==================================================SUBDIRECTOR=====================================================================
 def subdirector_home(request):
     return render(request, 'subdirector.html')
 

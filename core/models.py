@@ -43,7 +43,6 @@ class Alumno(models.Model):
     email = models.EmailField(unique=True)
     apoderado = models.ForeignKey(Apoderado, related_name='alumnos', on_delete=models.SET_NULL, null=True)
     estado_admision = models.CharField(max_length=50, default='Pendiente')
-    curso = models.ForeignKey('Curso', related_name='alumnos_inscritos', on_delete=models.SET_NULL, null=True)
 
 
     def __str__(self):

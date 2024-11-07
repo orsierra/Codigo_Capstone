@@ -15,22 +15,22 @@
         }
 
         h1, h3 {
-            color: #0056b3; /* Un color que se vea bien */
+            color: #0056b3;
         }
 
         ul {
-            list-style-type: none; /* Elimina los puntos de la lista */
-            padding: 0; /* Elimina el padding de la lista */
+            list-style-type: none;
+            padding: 0;
         }
 
         li {
-            margin: 5px 0; /* Espaciado entre elementos de la lista */
+            margin: 5px 0;
         }
 
         /* Estilo para ocultar botones al imprimir */
         @media print {
             .btn {
-                display: none; /* Oculta los botones en la impresión */
+                display: none;
             }
         }
     </style>
@@ -40,7 +40,16 @@
         <h1>Detalle de {{ alumno.nombre }} {{ alumno.apellido }}</h1>
         <h3>Información del Alumno</h3>
         <p><strong>Email:</strong> {{ alumno.email }}</p>
-        <p><strong>Curso:</strong> {{ alumno.curso }}</p>
+        
+        <!-- Verificar si el curso existe y mostrar el nombre -->
+        <p><strong>Curso:</strong> 
+            {% if curso %}
+                {{ curso.nombre }}
+            {% else %}
+                No asignado
+            {% endif %}
+        </p>
+        
         <p><strong>Promedio de Calificaciones:</strong> {{ promedio|floatformat:2 }}</p>
 
         <h3>Calificaciones</h3>
@@ -79,9 +88,13 @@
             {% endfor %}
         </ul>
 
-        <!-- Botones -->
+        <!-- Botones de navegación -->
         <div class="mt-4">
-            <a href="{% url 'profesor_cursos' %}" class="btn btn-primary">Volver a Mis Cursos</a>
+            {% if curso %}
+                <a href="{% url 'profesor_libro' curso.id %}" class="btn btn-primary">Volver a Libro de clases</a>
+            {% else %}
+                <a href="#" class="btn btn-secondary disabled">Libro de clases no disponible</a>
+            {% endif %}
             <a href="{% url 'descargar_pdf_alumno' alumno.id %}" class="btn btn-success">Descargar PDF</a>
         </div>
     </div>

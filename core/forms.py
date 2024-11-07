@@ -1,6 +1,8 @@
 from django import forms
 from .models import Asistencia, Alumno, Calificacion, Observacion, Apoderado, Curso, InformeFinanciero, Contrato, CursoAlumno
 from django.core.exceptions import ValidationError
+from django_select2.forms import Select2MultipleWidget
+from django.contrib.auth.models import User
 
 
 class AsistenciaForm(forms.ModelForm):
@@ -57,49 +59,82 @@ class ObservacionForm(forms.ModelForm):
         self.fields['fecha'].widget.attrs.update({'class': 'form-control'})
         self.fields['contenido'].widget.attrs.update({'class': 'form-control'})
     
-    
-
 
 class ApoderadoForm(forms.ModelForm):
     class Meta:
         model = Apoderado
         fields = ['nombre', 'apellido', 'email', 'telefono']
 
-
 class AlumnoForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput)  # Campo de contraseña
+    password = forms.CharField(widget=forms.PasswordInput)
+    cursos = forms.ModelMultipleChoiceField(
+        queryset=Curso.objects.all(),
+        widget=Select2MultipleWidget(attrs={'class': 'CursoAlumno'}),  # Using the Select2 widget
+        required=True,
+        label="Cursos"
+    )
 
     class Meta:
         model = Alumno
-        fields = ['nombre', 'apellido', 'email', 'apoderado', 'password', 'curso', 'estado_admision']
-        
-        # Opciones para el estado de admisión
+        fields = ['nombre', 'apellido', 'email', 'apoderado', 'password', 'estado_admision']
+
         ESTADO_ADMISION_CHOICES = [
             ('Aprobado', 'Aprobado'),
             ('Pendiente', 'Pendiente'),
         ]
 
         widgets = {
-            'curso': forms.Select(),  # Menú desplegable para seleccionar el curso
-            'apoderado': forms.Select(),  # Menú desplegable para seleccionar el apoderado
-            'estado_admision': forms.Select(choices=ESTADO_ADMISION_CHOICES),  # Opciones de "Aprobado" y "Pendiente"
+            'apoderado': forms.Select(),
+            'estado_admision': forms.Select(choices=ESTADO_ADMISION_CHOICES),
         }
 
+    def __init__(self, *args, **kwargs):
+        alumno_instance = kwargs.get('instance')
+        super().__init__(*args, **kwargs)
 
+        if alumno_instance:
+            # Si existe una instancia de alumno, asignar los cursos en los que está inscrito
+            self.fields['cursos'].initial = [curso_alumno.curso for curso_alumno in alumno_instance.curso_alumno_relacion.all()]
 
+    def save(self, commit=True):
+        alumno = super().save(commit=False)
+        email = self.cleaned_data['email']
+        password = self.cleaned_data['password']
+
+        # Obtener o crear el usuario basado en el email
+        user, created = User.objects.get_or_create(username=email)
+        user.set_password(password)
+        user.save()
+
+        alumno.user = user  # Asociar el usuario con el alumno
+
+        if commit:
+            alumno.save()
+
+        # Guardar la relación ManyToMany entre el alumno y los cursos
+        selected_cursos = self.cleaned_data['cursos']
+        alumno.curso_alumno_relacion.clear()  # Limpiar cursos actuales para evitar duplicados
+        for curso in selected_cursos:
+            CursoAlumno.objects.get_or_create(alumno=alumno, curso=curso)
+
+        return alumno
+
+    
 class InformeFinancieroForm(forms.ModelForm):
     class Meta:
         model = InformeFinanciero
         fields = ['concepto', 'monto', 'observaciones']
 
 
+
 class ContratoForm(forms.ModelForm):
+    # Mantener el campo valor_total como solo lectura
     valor_total = forms.DecimalField(
         max_digits=10,
         decimal_places=2,
         label='Valor Total',
-        initial=1500000,  # Establece el valor predeterminado en 1500000
-        widget=forms.NumberInput(attrs={'readonly': 'readonly'})  # Mantener como solo lectura
+        initial=1500000,  # Valor predeterminado
+        widget=forms.NumberInput(attrs={'readonly': 'readonly'})  # Solo lectura
     )
 
     # Limitar las opciones de forma_pago
@@ -109,19 +144,23 @@ class ContratoForm(forms.ModelForm):
         ('cheque', 'Cheque'),
     ]
     
-    forma_pago = forms.ChoiceField(choices=FORMA_PAGO_CHOICES, initial='efectivo')
+    forma_pago = forms.ChoiceField(
+        choices=FORMA_PAGO_CHOICES,
+        initial='efectivo',
+        label='Forma de Pago'
+    )
 
-    # Cambiar el campo fecha a DateField
+    # Campo de fecha
     fecha = forms.DateField(
-        widget=forms.TextInput(attrs={'placeholder': 'YYYY-MM-DD'}),
-        input_formats=['%Y-%m-%d'],  # Formato que acepta el input
+        widget=forms.DateInput(attrs={'placeholder': 'YYYY-MM-DD', 'type': 'date'}),
+        input_formats=['%Y-%m-%d'],
         label='Fecha'
     )
 
     # Campo oculto para el ID del alumno
     alumno_id = forms.IntegerField(widget=forms.HiddenInput())
-    
-    # Mostrar el nombre y apellido del alumno pero que sea solo lectura
+
+    # Mostrar el nombre y apellido del alumno en solo lectura
     alumno_nombre = forms.CharField(
         label='Alumno',
         widget=forms.TextInput(attrs={'readonly': 'readonly'})
@@ -130,7 +169,7 @@ class ContratoForm(forms.ModelForm):
     # Campo oculto para el ID del apoderado
     apoderado_id = forms.IntegerField(widget=forms.HiddenInput())
 
-    # Mostrar el nombre y apellido del apoderado pero que sea solo lectura
+    # Mostrar el nombre y apellido del apoderado en solo lectura
     apoderado_nombre = forms.CharField(
         label='Apoderado',
         widget=forms.TextInput(attrs={'readonly': 'readonly'})
@@ -138,8 +177,11 @@ class ContratoForm(forms.ModelForm):
 
     class Meta:
         model = Contrato
-        fields = ['alumno_id', 'alumno_nombre', 'apoderado_id', 'apoderado_nombre', 'fecha', 'valor_total', 'forma_pago', 'observaciones']
-
+        fields = [
+            'alumno_id', 'alumno_nombre', 'apoderado_id', 'apoderado_nombre', 
+            'fecha', 'valor_total', 'forma_pago', 'observaciones'
+        ]
+    
     def __init__(self, *args, **kwargs):
         alumno_instance = kwargs.pop('alumno_instance', None)
         apoderado_instance = kwargs.pop('apoderado_instance', None)
@@ -150,11 +192,5 @@ class ContratoForm(forms.ModelForm):
             self.fields['alumno_nombre'].initial = f"{alumno_instance.nombre} {alumno_instance.apellido}"  # Mostrar nombre completo
         
         if apoderado_instance:
-            # Asignamos el id del apoderado al campo oculto
-            self.fields['apoderado_id'].initial = apoderado_instance.id
-            # Mostramos el nombre y apellido del apoderado en el campo de solo lectura
-            self.fields['apoderado_nombre'].initial = f"{apoderado_instance.nombre} {apoderado_instance.apellido}"
-
-
-
-
+            self.fields['apoderado_id'].initial = apoderado_instance.id  # Asignar el ID del apoderado
+            self.fields['apoderado_nombre'].initial = f"{apoderado_instance.nombre} {apoderado_instance.apellido}"  # Mostrar nombre completo del apoderado

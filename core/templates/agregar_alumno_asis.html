@@ -1,228 +1,144 @@
 {% load static %}
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agregar Alumno</title>
+    <link href="{% static 'django_select2/css/select2.min.css' %}" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <style>
-        /* Reset básico */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
             font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
             background-color: #f4f4f4;
-            display: flex;
-            height: 100vh;
         }
-
-        /* Barra lateral */
         .sidebar {
             width: 250px;
-            background-color: #343a40;
-            color: white;
-            padding: 20px;
+            background: #343a40;
+            color: #fff;
             position: fixed;
             height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+            padding: 20px;
         }
-
         .sidebar h2 {
             text-align: center;
-            font-size: 1.5em;
-            color: #ffc107;
-            font-weight: bold;
-            margin-bottom: 20px;
+            color: #fff;
         }
-
         .sidebar ul {
             list-style: none;
             padding: 0;
-            flex-grow: 1;
         }
-
         .sidebar ul li {
             margin: 15px 0;
         }
-
-        .sidebar ul li a,
-        .sidebar ul li form button {
-            color: #ced4da;
+        .sidebar ul li a {
+            color: #fff;
             text-decoration: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            transition: background-color 0.3s, color 0.3s;
+            padding: 10px;
             display: block;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-family: inherit;
-            font-size: inherit;
-            width: 100%;
-            text-align: left;
+            transition: background 0.3s;
         }
-
-        .sidebar ul li a:hover,
-        .sidebar ul li form button:hover {
-            background-color: #ffc107;
-            color: #343a40;
+        .sidebar ul li a:hover {
+            background: #495057;
         }
-
-        .footer {
-            text-align: center;
-            font-size: 14px;
-            color: #ffc107;
-            margin-top: 20px;
-        }
-
-        .footer a {
-            color: #ffc107;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .footer a:hover {
-            text-decoration: underline;
-        }
-
-        /* Contenido principal */
         .main-content {
             margin-left: 270px;
-            padding: 40px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            overflow-y: auto;
-            max-height: 100vh;
-            width: calc(100% - 270px);
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
-
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 20px;
-        }
-
-        form {
-            background-color: #ffffff;
+        .form-container {
+            width: 80%;
+            max-width: 800px;
+            background-color: #fff;
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
-            margin: 0 auto;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-
+        h1 {
+            color: #333;
+            text-align: center;
+        }
         fieldset {
             border: 1px solid #ccc;
-            border-radius: 5px;
+            padding: 20px;
             margin-bottom: 20px;
-            padding: 10px;
+            background: #fff;
+            border-radius: 4px;
         }
-
         legend {
             font-weight: bold;
             padding: 0 10px;
-            color: #007bff;
         }
-
+        div {
+            margin-bottom: 15px;
+        }
         label {
             display: block;
-            margin: 10px 0 5px;
-            font-weight: bold;
-            color: #333;
+            margin-bottom: 5px;
+            color: #555;
         }
-
         input, select {
             width: 100%;
             padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            margin-bottom: 15px;
-            font-size: 16px;
-            color: #333;
+            border: 1px solid #ccc;
+            border-radius: 4px;
         }
-
         .button-container {
             display: flex;
             justify-content: space-between;
+            align-items: center;
         }
-
         button {
-            background-color: #28a745;
+            background-color: #007bff;
             color: white;
             border: none;
             padding: 10px 15px;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 16px;
-            width: 48%;
-            transition: background-color 0.3s;
         }
-
         button:hover {
-            background-color: #218838;
-        }
-
-        a.btn-back {
-            text-decoration: none;
-            color: white;
-            background-color: #007bff;
-            padding: 10px 15px;
-            border-radius: 5px;
-            text-align: center;
-            font-weight: bold;
-            display: inline-block;
-            width: 48%;
-            transition: background-color 0.3s;
-        }
-
-        a.btn-back:hover {
             background-color: #0056b3;
         }
-
-        /* Responsividad */
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-            }
-
-            .main-content {
-                margin-left: 0;
-                width: 100%;
-                padding: 20px;
-            }
+        .btn-back {
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            display: inline-block;
+        }
+        .btn-back:hover {
+            background-color: #5a6268;
         }
     </style>
+    
+    {{ form.media }}  <!-- This includes the necessary JS and CSS for django-select2 -->
 </head>
 <body>
     <div class="sidebar">
         <h2>Menú</h2>
         <ul>
             <li><a href="{% url 'panel_asisAdminFinan' %}">Inicio</a></li>
-            <li><a href="{% url 'asisAdmiFinan_gestion_pagos' %}">Gestión de Pagos</a></li>
-            <li>
-
-            </li>
+            <li><a href="{% url 'asisAdmiFinan_gestion_pagos' %}">Lista de Estudiantes</a></li>
         </ul>
         <div class="footer">
-            <a href="#">Nuevos Horizontes</a>
+            <a href="#" style="color: #fff;">Nuevos Horizontes</a>
         </div>
     </div>
 
     <div class="main-content">
         <h1>Agregar Alumno</h1>
-        
         <form method="post">
             {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="error">{{ form.non_field_errors }}</div>
+            {% endif %}
             <fieldset>
                 <legend>Información Personal</legend>
                 <div>
@@ -230,20 +146,18 @@
                     {{ form.nombre }}
                     {{ form.nombre.errors }}
                 </div>
-                
                 <div>
                     <label for="{{ form.apellido.id_for_label }}">{{ form.apellido.label }}</label>
                     {{ form.apellido }}
                     {{ form.apellido.errors }}
                 </div>
-                
                 <div>
                     <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
                     {{ form.email }}
                     {{ form.email.errors }}
                 </div>
             </fieldset>
-
+        
             <fieldset>
                 <legend>Información de Admisión</legend>
                 <div>
@@ -251,11 +165,10 @@
                     {{ form.apoderado }}
                     {{ form.apoderado.errors }}
                 </div>
-
                 <div>
-                    <label for="{{ form.curso.id_for_label }}">{{ form.curso.label }}</label>
-                    {{ form.curso }}
-                    {{ form.curso.errors }}
+                    <label for="{{ form.cursos.id_for_label }}">{{ form.cursos.label }}</label>
+                    {{ form.cursos }}  <!-- El widget de Select2 se aplicará aquí -->
+                    {{ form.cursos.errors }}
                 </div>
                 
                 <div>
@@ -263,19 +176,27 @@
                     {{ form.estado_admision }}
                     {{ form.estado_admision.errors }}
                 </div>
-
                 <div>
                     <label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
                     {{ form.password }}
                     {{ form.password.errors }}
                 </div>
             </fieldset>
-            
+        
             <div class="button-container">
                 <button type="submit">Agregar Alumno</button>
                 <a class="btn-back" href="{% url 'asisAdmiFinan_gestion_pagos' %}">Volver</a>
             </div>
         </form>
+        
     </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.CursoAlumno').select2(); // Inicializa Select2 en los elementos que tienen la clase CursoAlumno
+        });
+    </script>
 </body>
 </html>
