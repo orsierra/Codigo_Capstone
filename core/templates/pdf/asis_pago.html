@@ -77,7 +77,8 @@
         <div class="info-box">
             <h3>Información del Estudiante:</h3>
             <p><strong>Estudiante:</strong> {{ alumno.nombre }} {{ alumno.apellido }}</p>
-            <p><strong>Apoderado:</strong> {{ alumno.apoderado }}</p>
+            <p><strong>Apoderado:</strong> {{ alumno.apoderado.nombre }} {{ alumno.apoderado.apellido }}</p>
+            <p><strong>Establecimiento:</strong> {{ establecimiento_nombre }}</p>
         </div>
         
         <!-- Segundo cuadro: Detalles del Contrato -->

@@ -1,6 +1,6 @@
 # urls.py
 from django.urls import path
-from .views import login_view, profesor_dashboard, profesor_cursos, crear_usuario_db, registrar_calificaciones, registro_academico, observaciones,libro_clases, apoderadoConsuAsis, apoderadoConsuNotas, apoderado_view, director_dashboard, update_curso, descargar_pdf_alumno, direcPdfInfoAca,sostenedor,establecimientos
+from .views import login_view, profesor_dashboard, profesor_cursos, registrar_calificaciones, registro_academico, observaciones,libro_clases, apoderadoConsuAsis, apoderadoConsuNotas, apoderado_view, director_dashboard, update_curso, descargar_pdf_alumno, direcPdfInfoAca,sostenedor,establecimientos
 from core import views
 from django.contrib.auth.views import LogoutView
 
@@ -9,6 +9,7 @@ urlpatterns = [
     path('login/', login_view, name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('quienes-somos/', views.quienes_somos, name='quienes_somos'),
+<<<<<<< HEAD
   #  path('dashboard/', dashboard_view, name='dashboard'),  # Aquí iría la vista del dashboard
     path('profesor/<int:establecimiento_id>/', profesor_dashboard, name='profesor'),
     # en urls.py
@@ -17,24 +18,42 @@ urlpatterns = [
     path('crear_db_usuarios', crear_usuario_db, name='crear_usuarios'),
     #Profesor mis cursos
     # En urls.py
+=======
+    #path('dashboard/', dashboard_view, name='dashboard'),  # Aquí iría la vista del dashboard
+    path('profesor/<int:establecimiento_id>/', profesor_dashboard, name='profesor'),
+    path('profesor/<int:establecimiento_id>/cursos/', profesor_cursos, name='profesor_cursos'),
+    #Profesor mis cursos
+>>>>>>> 0a8adaebda7543fd12cebfee7af3c4a308e30ef2
     path('libro-clases/<int:establecimiento_id>/<int:curso_id>/', libro_clases, name='libro_clases'),
     path('registrar-asistencia/<int:establecimiento_id>/<int:curso_id>/', views.registrar_asistencia, name='registrar_asistencia'),
     path('registrar-calificaciones/<int:establecimiento_id>/<int:curso_id>/', registrar_calificaciones, name='registrar_calificaciones'),  
     path('registro-academico/<int:establecimiento_id>/<int:curso_id>/', registro_academico, name='registro_academico'),
     path('generar-informes/<int:establecimiento_id>/<int:curso_id>/', views.generar_informes, name='generar_informes'),
     path('alumno_detalle/<int:establecimiento_id>/<int:alumno_id>/', views.alumno_detalle, name='alumno_detalle'),
+<<<<<<< HEAD
     path('alumno_detalle/<int:establecimiento_id>/<int:alumno_id>/descargar_pdf/', descargar_pdf_alumno, name='descargar_pdf_alumno'),  # descarga detalles del alumno en pdf
     path('observaciones/<int:establecimiento_id>/<int:alumno_id>/', views.observaciones, name='observaciones'),
 
 
 
+=======
+    path('alumno_detalle/<int:establecimiento_id>/<int:alumno_id>/descargar_pdf/', descargar_pdf_alumno, name='descargar_pdf_alumno'),
+    path('observaciones/<int:establecimiento_id>/<int:curso_id>/', views.observaciones, name='observaciones'),
+    path('historial_bitacoras/<int:establecimiento_id>/<int:curso_id>/', views.historial_bitacoras, name='historial_bitacoras'),
+    path('eliminar_bitacora/<int:establecimiento_id>/<int:bitacora_id>/', views.eliminar_bitacora, name='eliminar_bitacora'),
+>>>>>>> 0a8adaebda7543fd12cebfee7af3c4a308e30ef2
     #alumno
-    path('alumno/', views.alumno_dashboard, name='alumno_dashboard'),
-    path('alumno/asistencia/', views.alumno_consulta_asistencia, name='alumnoConsuAsis'),
+    path('alumno/<int:establecimiento_id>/', views.alumno_dashboard, name='alumno_dashboard'),
+    path('alumno/asistencia/<int:establecimiento_id>/', views.alumno_consulta_asistencia, name='alumnoConsuAsis'),
+
+
     path('alumno/notas/', views.alumno_consulta_notas, name='alumnoConsuNotas'),
     path('alumno/', views.alumno_home, name='alumno_home'),
     #Apoderado
     path('apoderado/', apoderado_view, name='apoderado_view'),  # Dashboard del apoderado
+    path('notificacion/<int:notificacion_id>/leer/', views.marcar_notificacion_como_leida, name='marcar_notificacion_como_leida'),
+    path('marcar-notificacion/<int:notificacion_id>/', views.marcar_notificacion_como_leida, name='marcar_notificacion_como_leida'),
+    path('historial-notificaciones/', views.historial_notificaciones, name='historial_notificaciones'),
     path('consulta-asistencia/', apoderadoConsuAsis, name='apoderadoConsuAsis'),  # Consulta de asistencia
     path('apoderado/consulta-notas/', apoderadoConsuNotas, name='apoderadoConsuNotas'),  # Consulta de notas
     path('observaciones/', views.apoderado_observaciones, name='apoderadoObservaciones'),
@@ -56,13 +75,22 @@ urlpatterns = [
     path('panel_admision/', views.panel_admision, name='panel_admision'),
     path('eliminar_alumno/<int:alumno_id>/', views.eliminar_alumno, name='eliminar_alumno'),
     # Asistente de admision y finanza
+<<<<<<< HEAD
     path('panel_asisAdminFinan/', views.asisAdminFinan_dashboard, name='panel_asisAdminFinan'),
     path('gestion-pagos-admision/', views.ver_gestion_pagos_admision, name='asisAdmiFinan_gestion_pagos'),
 
     path('eliminar-alumno-asis/<int:id>/', views.eliminar_alumno_asis, name='eliminar_alumno_asis'),
     path('agregar-alumno-asis/', views.agregar_alumno_asis, name='agregar_alumno_asis'),
     path('editar-informe-asis/<int:id>/', views.editar_informe_asis, name='editar_informe_asis'),
+=======
+    path('panel_asisAdminFinan/<int:establecimiento_id>/', views.asisAdminFinan_dashboard, name='panel_asisAdminFinan'),
+    path('gestion-pagos-admision/<int:establecimiento_id>/', views.ver_gestion_pagos_admision, name='asisAdmiFinan_gestion_pagos'),
+    path('editar-informe-asis/<int:establecimiento_id>/<int:id>/', views.editar_informe_asis, name='editar_informe_asis'),
+>>>>>>> 0a8adaebda7543fd12cebfee7af3c4a308e30ef2
     path('generar_pdf_contrato/<int:id>/', views.generar_pdf_contrato, name='generar_pdf_contrato'),
+    path('agregar-alumno/<int:establecimiento_id>/', views.agregar_alumno_asis, name='agregar_alumno_asis'),
+    path('eliminar-alumno/<int:establecimiento_id>/<int:alumno_id>/', views.eliminar_alumno_asis, name='eliminar_alumno_asis'),
+   
     
     #SUBDIRECTOR
     path('subdirector/', views.subdirector_home, name='subdirector_home'),
@@ -77,5 +105,6 @@ urlpatterns = [
 
 
 
+    
 
 ]

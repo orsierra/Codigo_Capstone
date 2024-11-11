@@ -5,6 +5,17 @@ from django.utils import timezone
 
 
 # modelo profesor, apoderado y alumno
+# Nuevo modelo de Establecimiento
+class Establecimiento(models.Model):
+    nombre = models.CharField(max_length=200, unique=True)
+    direccion = models.CharField(max_length=255, blank=True, null=True)
+    telefono = models.CharField(max_length=15, blank=True, null=True)
+    email = models.EmailField(blank=True, null=True)
+
+    def __str__(self):
+        return self.nombre
+
+
 
 # Nuevo modelo de Establecimiento
 class Establecimiento(models.Model):
@@ -23,9 +34,14 @@ class Profesor(models.Model):
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
-
+    asignatura = models.CharField(max_length=100, blank=True, null=True)
     def __str__(self):
+<<<<<<< HEAD
         return f"{self.nombre} {self.apellido} - {self.establecimiento.nombre if self.establecimiento else 'Sin Establecimiento'}"
+=======
+        return f"{self.nombre} {self.apellido}- {self.establecimiento.nombre if self.establecimiento else 'Sin Establecimiento'}"
+
+>>>>>>> 0a8adaebda7543fd12cebfee7af3c4a308e30ef2
 
 
 # Modelo Apoderado
@@ -39,6 +55,19 @@ class Apoderado(models.Model):
 
     def __str__(self):
         return f"{self.nombre} {self.apellido} - {self.establecimiento.nombre if self.establecimiento else 'Sin Establecimiento'}"
+<<<<<<< HEAD
+=======
+
+class Notificacion(models.Model):
+    establecimiento = models.ForeignKey(Establecimiento, on_delete=models.CASCADE, related_name='notificaciones', null=True, blank=True)
+    apoderado = models.ForeignKey(Apoderado, on_delete=models.CASCADE)
+    mensaje = models.TextField()
+    leida = models.BooleanField(default=False)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    tipo = models.CharField(max_length=100, choices=[('calificacion_baja', 'Calificación Baja'), ('asistencia', 'Asistencia')], default='calificacion_baja')
+    prioridad = models.IntegerField(default=1)  # Valores bajos = mayor prioridad
+
+>>>>>>> 0a8adaebda7543fd12cebfee7af3c4a308e30ef2
 
 
 # Modelo Alumno
@@ -50,9 +79,9 @@ class Alumno(models.Model):
     email = models.EmailField(unique=True)
     apoderado = models.ForeignKey(Apoderado, related_name='alumnos', on_delete=models.SET_NULL, null=True)
     estado_admision = models.CharField(max_length=50, default='Pendiente')
-    curso = models.ForeignKey('Curso', related_name='alumnos_inscritos', on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
+<<<<<<< HEAD
         return f"{self.nombre} {self.apellido} - {self.establecimiento.nombre if self.establecimiento else 'Sin Establecimiento'}"
 
 
@@ -60,12 +89,20 @@ class Alumno(models.Model):
 class Director(models.Model):
     establecimiento = models.ForeignKey(Establecimiento, on_delete=models.CASCADE, related_name='directores', null=True, blank=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)  
+=======
+        return f"{self.nombre} {self.apellido}- {self.establecimiento.nombre if self.establecimiento else 'Sin Establecimiento'}"
+    
+class Director(models.Model):
+    establecimiento = models.ForeignKey(Establecimiento, on_delete=models.CASCADE, related_name='directores', null=True, blank=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)  # Asociación con el modelo User de Django
+>>>>>>> 0a8adaebda7543fd12cebfee7af3c4a308e30ef2
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=200, default='Sin apellido')
     email = models.EmailField(unique=True)
 
     def __str__(self):
         return f"{self.nombre} {self.apellido} - {self.establecimiento.nombre if self.establecimiento else 'Sin Establecimiento'}"
+<<<<<<< HEAD
     
 # Modelo SUBDirector
 class Subdirector(models.Model):
@@ -84,6 +121,13 @@ class Subdirector(models.Model):
 
 # Modelo Curso
 class Curso(models.Model): 
+=======
+
+
+
+#Modulo curso relacionado con alumno
+class Curso(models.Model):
+>>>>>>> 0a8adaebda7543fd12cebfee7af3c4a308e30ef2
     establecimiento = models.ForeignKey(Establecimiento, on_delete=models.CASCADE, related_name='cursos', null=True, blank=True)
     nombre = models.CharField(max_length=100)
     asignatura = models.CharField(max_length=100)
@@ -95,6 +139,10 @@ class Curso(models.Model):
 
     def __str__(self):
         return f"{self.nombre} - {self.establecimiento.nombre if self.establecimiento else 'Sin Establecimiento'}"
+<<<<<<< HEAD
+=======
+
+>>>>>>> 0a8adaebda7543fd12cebfee7af3c4a308e30ef2
 
 # Modelo Asistencia
 class Asistencia(models.Model):
@@ -163,6 +211,10 @@ class Observacion(models.Model):
 # Modelo Informe Financiero
 class InformeFinanciero(models.Model):
     establecimiento = models.ForeignKey(Establecimiento, on_delete=models.CASCADE, related_name='informes_financieros', null=True, blank=True)
+<<<<<<< HEAD
+=======
+    concepto = models.CharField(max_length=200)
+>>>>>>> 0a8adaebda7543fd12cebfee7af3c4a308e30ef2
     concepto = models.CharField(max_length=200)
     monto = models.DecimalField(max_digits=10, decimal_places=2)
     observaciones = models.TextField(blank=True, null=True)
@@ -197,10 +249,21 @@ class Contrato(models.Model):
 # Modelo Asistente de Finanzas
 class AsisFinanza(models.Model):
     establecimiento = models.ForeignKey(Establecimiento, on_delete=models.CASCADE, related_name='asistentes_finanzas', null=True, blank=True)
+<<<<<<< HEAD
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=200, default='Sin apellido')
     email = models.EmailField(unique=True)
+=======
+    user = models.OneToOneField(User, on_delete= models.CASCADE)
+    nombre = models.CharField(max_length=100)
+    apellido = models.CharField(max_length=200, default='Sin apellido')
+    email = models.EmailField(unique=True)
+    
+    def __str__(self):
+        return f'{self.nombre} {self.apellido} - {self.establecimiento.nombre if self.establecimiento else "Sin Establecimiento"}'
+
+>>>>>>> 0a8adaebda7543fd12cebfee7af3c4a308e30ef2
 
     def __str__(self):
         return f'{self.nombre} {self.apellido} - {self.establecimiento.nombre if self.establecimiento else "Sin Establecimiento"}'
@@ -209,7 +272,11 @@ class AsisFinanza(models.Model):
 # Modelo Asistente de Matrícula
 class AsisMatricula(models.Model):
     establecimiento = models.ForeignKey(Establecimiento, on_delete=models.CASCADE, related_name='asistentes_matricula', null=True, blank=True)
+<<<<<<< HEAD
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+=======
+    user = models.OneToOneField(User, on_delete= models.CASCADE)
+>>>>>>> 0a8adaebda7543fd12cebfee7af3c4a308e30ef2
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=200, default='Sin apellido')
     email = models.EmailField(unique=True)
@@ -217,3 +284,36 @@ class AsisMatricula(models.Model):
     def __str__(self):
         return f'{self.nombre} {self.apellido} - {self.establecimiento.nombre if self.establecimiento else "Sin Establecimiento"}'
 
+<<<<<<< HEAD
+=======
+
+
+class CursoAlumno(models.Model):
+    establecimiento = models.ForeignKey(Establecimiento, on_delete=models.CASCADE, related_name='curso_alumno_relaciones', null=True, blank=True)
+    curso = models.ForeignKey(Curso, on_delete=models.SET_NULL, related_name='curso_alumno_relacion', null=True, blank=True)
+    alumno = models.ForeignKey(Alumno, on_delete=models.SET_NULL, related_name='curso_alumno_relacion', null=True, blank=True)
+
+    class Meta:
+        unique_together = ('curso', 'alumno')  # Evita duplicados para el mismo alumno en el mismo curso
+        verbose_name = 'Relación Curso-Alumno'
+        verbose_name_plural = 'Relaciones Curso-Alumno'
+
+    def __str__(self):
+        curso_nombre = self.curso.nombre if self.curso else "Curso no asignado"
+        alumno_nombre = f"{self.alumno.nombre} {self.alumno.apellido}" if self.alumno else "Alumno no asignado"
+        return f"{alumno_nombre} inscrito en {curso_nombre} - {self.establecimiento.nombre if self.establecimiento else 'Sin Establecimiento'}"
+
+
+
+class BitacoraClase(models.Model):
+    establecimiento = models.ForeignKey(Establecimiento, on_delete=models.CASCADE, related_name='bitacoras_clase', null=True, blank=True)
+    curso = models.ForeignKey(Curso, on_delete=models.CASCADE)
+    fecha = models.DateField()
+    profesor = models.ForeignKey(Profesor, on_delete=models.CASCADE)
+    actividades_realizadas = models.TextField()
+    observaciones = models.TextField(blank=True, null=True)  # Añade este campo para las observaciones opcionales
+
+    def __str__(self):
+        return f"Bitácora de {self.curso} el {self.fecha} - {self.establecimiento.nombre if self.establecimiento else 'Sin Establecimiento'}"
+
+>>>>>>> 0a8adaebda7543fd12cebfee7af3c4a308e30ef2

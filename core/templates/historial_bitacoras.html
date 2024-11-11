@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Bitácoras de Clase</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 90%;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+
+        p.description {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 1.2em;
+        }
+
+        .bitacora-item {
+            background-color: #f9f9f9;
+            border-left: 4px solid #007bff;
+            padding: 20px 25px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            position: relative;
+        }
+
+        .bitacora-item h2 {
+            color: #007bff;
+            margin: 0 0 10px;
+            font-size: 1.5em;
+        }
+
+        .bitacora-item p {
+            margin: 5px 0;
+            color: #555;
+            font-size: 1.1em;
+        }
+
+        .bitacora-item .fecha {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            color: #888;
+            font-size: 1em;
+        }
+
+        .bitacora-item .actions {
+            margin-top: 15px;
+            text-align: right;
+        }
+
+        .bitacora-item .actions form {
+            display: inline;
+        }
+
+        .bitacora-item .actions button {
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 1em;
+        }
+
+        .bitacora-item .actions button:hover {
+            background-color: #c82333;
+        }
+
+        .btn-back {
+            display: block;
+            width: 100%;
+            max-width: 250px;
+            margin: 30px auto;
+            padding: 12px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 1.1em;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .btn-back:hover {
+            background-color: #0056b3;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .bitacora-item h2 {
+                font-size: 1.3em;
+            }
+
+            .bitacora-item p {
+                font-size: 1em;
+            }
+
+            .bitacora-item .fecha {
+                position: static;
+                text-align: right;
+                margin-top: 10px;
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Historial de Bitácoras de Clase</h1>
+        <p class="description">
+            En esta sección, puedes revisar el historial de bitácoras de clase. Cada registro incluye detalles sobre las actividades realizadas, el curso, y la fecha en que se llevó a cabo la clase.
+        </p>
+
+        {% for bitacora in bitacoras %}
+            <div class="bitacora-item">
+                <h2>{{ bitacora.curso.nombre }} - {{ bitacora.curso.asignatura }}</h2>
+                <p><strong>Actividades realizadas:</strong> {{ bitacora.actividades_realizadas }}</p>
+                <p><strong>Observaciones:</strong> {{ bitacora.observaciones|default:"Ninguna" }}</p>
+                <span class="fecha">Fecha: {{ bitacora.fecha|date:"F j, Y" }}</span>
+                <div class="actions">
+                    <form action="{% url 'eliminar_bitacora' establecimiento.id bitacora.id %}" method="post" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este registro de bitácora?');">
+                        {% csrf_token %}
+                        <button type="submit">Eliminar</button>
+                    </form>
+                </div>
+            </div>
+        {% empty %}
+            <p>No tienes registros en la bitácora de clase.</p>
+        {% endfor %}
+
+        <a href="{% url 'libro_clases' establecimiento.id curso.id %}" class="btn-back">Volver al Menú Principal</a>
+    </div>
+</body>
+</html>

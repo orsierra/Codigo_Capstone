@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asistencia - {{ curso.nombre }}</title>
+    <title>Asistencia y Bitácora - {{ curso.nombre }}</title>
     <link rel="stylesheet" href="{% static 'styles.css' %}">
     <style>
         /* Reset básico */
@@ -83,7 +83,6 @@
             background-color: #ffffff;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
         }
 
@@ -152,14 +151,14 @@
             background-color: #0056b3;
         }
 
-        .message {
+        /* Success Message Style */
+        .success-message {
             background-color: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
             padding: 10px;
             border-radius: 5px;
             margin-bottom: 20px;
-            display: none;
             width: 100%;
             text-align: center;
         }
@@ -179,12 +178,34 @@
         .footer a:hover {
             text-decoration: underline;
         }
+
+        /* Bitácora de clase */
+        .bitacora-container {
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .bitacora-label {
+            font-weight: bold;
+            color: #343a40;
+            margin-bottom: 5px;
+        }
+
+        .bitacora-textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+            resize: vertical;
+        }
     </style>
 </head>
 <body>
     <div class="sidebar">
         <h2>Menú</h2>
         <ul>
+<<<<<<< HEAD
             <a href="{% url 'profesor' establecimiento_id=establecimiento_id %}">Profesor</a>
             <a href="{% url 'profesor_cursos' establecimiento_id=establecimiento_id %}">Mis cursos</a>
             <a href="{% url 'registrar_asistencia' establecimiento_id=establecimiento_id curso_id=curso.id %}">Registrar asistencia</a>
@@ -197,6 +218,18 @@
             </a>
         {% endfor %}
                 <!-- Botón de Cerrar sesión estilo enlace -->
+=======
+            <li><a href="{% url 'profesor' establecimiento_id=establecimiento.id %}">Profesor</a></li>
+            <li><a href="{% url 'profesor_cursos' establecimiento_id=establecimiento.id %}">Mis cursos</a></li>
+            <li><a href="{% url 'registrar_asistencia' establecimiento_id=establecimiento.id curso_id=curso.id %}">Registrar asistencia</a></li>
+            <li><a href="{% url 'registrar_calificaciones' establecimiento_id=establecimiento.id curso_id=curso.id %}">Registrar calificaciones</a></li>
+            <li><a href="{% url 'registro_academico' establecimiento_id=establecimiento.id curso_id=curso.id %}">Registro Académico</a></li>
+            <li><a href="{% url 'generar_informes' establecimiento_id=establecimiento.id curso_id=curso.id %}">Generar Informes</a></li>
+            <li><a href="{% url 'observaciones' establecimiento_id=establecimiento.id curso_id=curso.id %}">Observaciones</a></li>
+            <li><a href="{% url 'historial_bitacoras' establecimiento_id=curso.establecimiento.id curso_id=curso.id %}">Historial de Bitácoras</a></li>
+            
+            <li>
+>>>>>>> 0a8adaebda7543fd12cebfee7af3c4a308e30ef2
                 <form action="{% url 'logout' %}" method="post" style="display: inline;">
                     {% csrf_token %}
                     <button type="submit">Cerrar sesión</button>
@@ -204,24 +237,33 @@
             </li>
         </ul>
         <div class="footer">
-            <a href="#">Nuevos horizontes</a>
+            <a href="#">Nuevos Horizontes</a>
         </div>
     </div>
 
     <div class="main-content">
         <div class="container">
-            <h1>Asistencia para {{ curso.nombre }}</h1>
+            <h1>Registro de Asistencia y Bitácora - {{ curso.nombre }}</h1>
         
-            {% if messages %}
-                <div class="message" id="successMessage" style="display: block;">
-                    {% for message in messages %}
-                        <p>{{ message }}</p>
-                    {% endfor %}
-                </div>
+            {% if success_message %}
+                <div class="success-message">{{ success_message }}</div>
             {% endif %}
-        
+
             <form method="post">
                 {% csrf_token %}
+                
+                <!-- Bitácora de Clase -->
+                <div class="bitacora-container">
+                    <label class="bitacora-label" for="actividades_realizadas">Actividades realizadas en la clase:</label>
+                    <textarea name="actividades_realizadas" id="actividades_realizadas" rows="4" class="bitacora-textarea" required></textarea>
+                </div>
+
+                <div class="bitacora-container">
+                    <label class="bitacora-label" for="observaciones">Observaciones:</label>
+                    <textarea name="observaciones" id="observaciones" rows="4" class="bitacora-textarea"></textarea>
+                </div>
+
+                <!-- Tabla de Asistencia -->
                 <table>
                     <thead>
                         <tr>
@@ -232,15 +274,16 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for alumno in alumnos_aprobados %}
+                        {% for curso_alumno in alumnos_aprobados %}
                             <tr>
-                                <td>{{ alumno.nombre }} {{ alumno.apellido }}</td>
-                                <td><input type="radio" name="asistencia_{{ alumno.id }}" value="ausente"></td>
-                                <td><input type="radio" name="asistencia_{{ alumno.id }}" value="presente" checked></td>
-                                <td><input type="radio" name="asistencia_{{ alumno.id }}" value="justificado"></td>
+                                <td>{{ curso_alumno.alumno.nombre }} {{ curso_alumno.alumno.apellido }}</td>
+                                <td><input type="radio" name="asistencia_{{ curso_alumno.alumno.id }}" value="ausente"></td>
+                                <td><input type="radio" name="asistencia_{{ curso_alumno.alumno.id }}" value="presente" checked></td>
+                                <td><input type="radio" name="asistencia_{{ curso_alumno.alumno.id }}" value="justificado"></td>
                             </tr>
                         {% endfor %}
                     </tbody>
+                    
                 </table>
         
                 <div class="buttons">
@@ -250,12 +293,5 @@
             </form>
         </div>
     </div>
-
-    <script>
-        // Muestra el mensaje si hay mensajes en la vista
-        {% if messages %}
-            document.getElementById('successMessage').style.display = 'block';
-        {% endif %}
-    </script>
 </body>
 </html>
