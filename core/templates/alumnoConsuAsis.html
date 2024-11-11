@@ -187,8 +187,8 @@
     <div class="sidebar">
         <h2>Menú</h2>
         <ul>
-            <li><a href="{% url 'alumno_dashboard' %}">Inicio</a></li>
-            <li><a href="{% url 'alumnoConsuAsis' %}">Consulta de Asistencia</a></li>
+            <li><a href="{% url 'alumno_dashboard' establecimiento.id %}">Inicio</a></li>
+            <li><a href="{% url 'alumnoConsuAsis' establecimiento.id %}">Consulta de Asistencia</a></li>
             <li><a href="{% url 'alumnoConsuNotas' %}">Consulta de Notas</a></li>
             <li>
                 <!-- Botón de Cerrar sesión estilo enlace -->

@@ -205,14 +205,14 @@
     <div class="sidebar">
         <h2>Menú</h2>
         <ul>
-            <li><a href="{% url 'profesor' %}">Profesor</a></li>
-            <li><a href="{% url 'profesor_cursos' %}">Mis cursos</a></li>
-            <li><a href="{% url 'registrar_asistencia' curso.id %}">Registrar asistencia</a></li>
-            <li><a href="{% url 'registrar_calificaciones' curso.id %}">Registrar calificaciones</a></li>
-            <li><a href="{% url 'registro_academico' curso.id %}">Registro Académico</a></li>
-            <li><a href="{% url 'generar_informes' curso.id %}">Generar Informes</a></li>
-            <li><a href="{% url 'observaciones' curso.id %}">Observaciones</a></li>
-            <li><a href="{% url 'historial_bitacoras' curso.id %}">Historial de Bitácoras</a></li>
+            <li><a href="{% url 'profesor' establecimiento_id=establecimiento.id %}">Profesor</a></li>
+            <li><a href="{% url 'profesor_cursos' establecimiento_id=establecimiento.id %}">Mis cursos</a></li>
+            <li><a href="{% url 'registrar_asistencia' establecimiento_id=establecimiento.id curso_id=curso.id %}">Registrar asistencia</a></li>
+            <li><a href="{% url 'registrar_calificaciones' establecimiento_id=establecimiento.id curso_id=curso.id %}">Registrar calificaciones</a></li>
+            <li><a href="{% url 'registro_academico' establecimiento_id=establecimiento.id curso_id=curso.id %}">Registro Académico</a></li>
+            <li><a href="{% url 'generar_informes' establecimiento_id=establecimiento.id curso_id=curso.id %}">Generar Informes</a></li>
+            <li><a href="{% url 'observaciones' establecimiento_id=establecimiento.id curso_id=curso.id %}">Observaciones</a></li>
+            <li><a href="{% url 'historial_bitacoras' establecimiento_id=curso.establecimiento.id curso_id=curso.id %}">Historial de Bitácoras</a></li>
             
             <li>
                 <form action="{% url 'logout' %}" method="post" style="display: inline;">
@@ -259,20 +259,21 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for alumno in alumnos_aprobados %}
+                        {% for curso_alumno in alumnos_aprobados %}
                             <tr>
-                                <td>{{ alumno.nombre }} {{ alumno.apellido }}</td>
-                                <td><input type="radio" name="asistencia_{{ alumno.id }}" value="ausente"></td>
-                                <td><input type="radio" name="asistencia_{{ alumno.id }}" value="presente" checked></td>
-                                <td><input type="radio" name="asistencia_{{ alumno.id }}" value="justificado"></td>
+                                <td>{{ curso_alumno.alumno.nombre }} {{ curso_alumno.alumno.apellido }}</td>
+                                <td><input type="radio" name="asistencia_{{ curso_alumno.alumno.id }}" value="ausente"></td>
+                                <td><input type="radio" name="asistencia_{{ curso_alumno.alumno.id }}" value="presente" checked></td>
+                                <td><input type="radio" name="asistencia_{{ curso_alumno.alumno.id }}" value="justificado"></td>
                             </tr>
                         {% endfor %}
                     </tbody>
+                    
                 </table>
         
                 <div class="buttons">
                     <button type="submit" class="btn">Guardar</button>
-                    <button type="button" class="btn btn-back" onclick="window.location.href='{% url 'profesor_libro' curso.id %}'">Regresar</button>
+                    <button type="button" class="btn btn-back" onclick="window.location.href='{% url 'libro_clases' establecimiento.id curso.id %}'">Regresar</button>
                 </div>
             </form>
         </div>

@@ -259,8 +259,8 @@
     <div class="sidebar">
         <h2>Menú</h2>
         <ul>
-            <li><a href="{% url 'panel_asisAdminFinan' %}">Inicio</a></li>
-            <li><a href="{% url 'asisAdmiFinan_gestion_pagos' %}">Gestión de Pagos</a></li>
+            <li><a href="{% url 'panel_asisAdminFinan' establecimiento.id   %}">Inicio</a></li>
+            <li><a href="{% url 'asisAdmiFinan_gestion_pagos' establecimiento.id %}">Gestión de Pagos</a></li>
             <li>
                 <form action="{% url 'logout' %}" method="post" style="display: inline;">
                     {% csrf_token %}
@@ -281,7 +281,7 @@
 
         <div class="container">
                         <!-- Formulario para editar el informe -->
-            <form method="post" action="{% url 'editar_informe_asis' alumno.id %}">
+            <form method="post" action="{% url 'editar_informe_asis' establecimiento.id alumno.id %}">
                 {% csrf_token %}
 
 
@@ -290,7 +290,7 @@
                 <div class="buttons">
                     <button type="submit" class="btn-update">Actualizar Contrato</button>
                     <a href="{% url 'generar_pdf_contrato' alumno.id %}" class="btn-primary" target="_blank">Imprimir PDF</a>
-                    <a href="{% url 'asisAdmiFinan_gestion_pagos' %}" class="btn-back" target="_blank">Volver</a>
+                    <a href="{% url 'asisAdmiFinan_gestion_pagos' establecimiento.id %}" class="btn-back" >Volver</a>
                 </div>
                 
             </form>

@@ -148,8 +148,9 @@
     <div class="sidebar">
         <div class="sidebar-header">Menú</div>
         <ul>
-            <li><a href="{% url 'profesor' %}">Profesor</a></li>
-            <li><a href="{% url 'profesor_cursos' %}">Mis cursos</a></li>
+            <li><a href="{% url 'profesor' establecimiento_id=establecimiento.id %}">Profesor</a></li>
+            <a href="{% url 'profesor_cursos' establecimiento_id=establecimiento.id %}">Mis cursos</a>
+
             <li>
                 <!-- Botón de Cerrar sesión estilo enlace -->
                 <form action="{% url 'logout' %}" method="post" style="display: inline;">
@@ -174,7 +175,7 @@
                         <p>{{ curso.asignatura }}</p>
                         <p>{{ curso.dias }} - {{ curso.hora|time:"h:i A" }}</p>
                         <strong>Sala: {{ curso.sala }}</strong>
-                        <a href="{% url 'profesor_libro' curso.id %}">
+                        <a href="{% url 'libro_clases' curso.establecimiento_id curso.id %}">
                             <button>Ver Libro de Clases</button>
                         </a>
                     </div>
@@ -185,4 +186,5 @@
         {% endif %}
     </div>
 </body>
+
 </html>

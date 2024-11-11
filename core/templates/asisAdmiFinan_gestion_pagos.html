@@ -198,7 +198,8 @@
     <div class="sidebar">
         <h2>Menú</h2>
         <ul>
-            <li><a href="{% url 'panel_asisAdminFinan' %}">Inicio</a></li>
+            <li><a href="{% url 'panel_asisAdminFinan' establecimiento_id=establecimiento_id %}">Inicio</a></li>
+
             <li>
                 <form action="{% url 'logout' %}" method="post" style="display: inline;">
                     {% csrf_token %}
@@ -213,7 +214,7 @@
 
     <div class="content">
         <!-- Botón de Agregar Alumno -->
-        <a href="{% url 'agregar_alumno_asis' %}" class="add-student">Agregar Alumno</a>
+        <a href="{% url 'agregar_alumno_asis' establecimiento_id=establecimiento_id %}" class="add-student">Agregar Alumno</a>
 
         <h1>Gestión de Pagos y Admisión</h1>
 
@@ -232,16 +233,20 @@
                     <td>{{ alumno.estado_admision }}</td>
                     <td>
                         <div class="action-buttons">
-                            <button class="update" onclick="window.location.href='{% url 'editar_informe_asis' alumno.id %}'">Editar Informe</button>
-                            <form action="{% url 'eliminar_alumno_asis' alumno.id %}" method="POST" style="display: inline;">
+                            <!-- Botón para editar el informe -->
+                            <button class="update" onclick="window.location.href='{% url 'editar_informe_asis' establecimiento_id=establecimiento_id id=alumno.id %}'">Editar Informe</button>
+            
+                            <!-- Formulario para eliminar al alumno -->
+                            <form action="{% url 'eliminar_alumno_asis' establecimiento_id=establecimiento_id alumno_id=alumno.id %}" method="post">
                                 {% csrf_token %}
-                                <button type="submit" class="delete">Eliminar</button>
+                                <button type="submit" class="delete">Eliminar Alumno</button>
                             </form>
                         </div>
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
+            
         </table>
 
         <!-- Botón de volver -->

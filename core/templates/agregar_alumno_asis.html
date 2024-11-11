@@ -178,8 +178,8 @@
     <div class="sidebar">
         <h2>Menú</h2>
         <ul>
-            <li><a href="{% url 'panel_asisAdminFinan' %}">Inicio</a></li>
-            <li><a href="{% url 'asisAdmiFinan_gestion_pagos' %}">Lista de Estudiantes</a></li>
+            <li><a href="{% url 'panel_asisAdminFinan' establecimiento.id %}">Inicio</a></li>
+            <li><a href="{% url 'asisAdmiFinan_gestion_pagos' establecimiento.id %}">Lista de Estudiantes</a></li>
             <li>
                 <form action="{% url 'logout' %}" method="post">
                     {% csrf_token %}
@@ -245,7 +245,7 @@
 
                 <div class="button-container">
                     <button type="submit">Agregar Alumno</button>
-                    <a class="btn-back" href="{% url 'asisAdmiFinan_gestion_pagos' %}">Volver</a>
+                    <a class="btn-back" href="{% url 'asisAdmiFinan_gestion_pagos' establecimiento.id %}">Volver</a>
                 </div>
             </form>
         </div>

@@ -73,6 +73,11 @@ class AlumnoForm(forms.ModelForm):
         required=True,
         label="Cursos"
     )
+    establecimiento_nombre = forms.CharField(
+        label='Establecimiento',
+        widget=forms.TextInput(attrs={'readonly': 'readonly'}),
+        required=False
+    )
 
     class Meta:
         model = Alumno
@@ -89,11 +94,18 @@ class AlumnoForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        # Obtener el establecimiento desde kwargs
+        establecimiento_instance = kwargs.pop('establecimiento_instance', None)
         alumno_instance = kwargs.get('instance')
+        
         super().__init__(*args, **kwargs)
 
+        # Si se proporciona un establecimiento, mostrar su nombre como solo lectura
+        if establecimiento_instance:
+            self.fields['establecimiento_nombre'].initial = establecimiento_instance.nombre
+
         if alumno_instance:
-            # Si existe una instancia de alumno, asignar los cursos en los que está inscrito
+            # Asignar cursos en los que el alumno está inscrito si ya existe una instancia de alumno
             self.fields['cursos'].initial = [curso_alumno.curso for curso_alumno in alumno_instance.curso_alumno_relacion.all()]
 
     def save(self, commit=True):
@@ -108,6 +120,10 @@ class AlumnoForm(forms.ModelForm):
 
         alumno.user = user  # Asociar el usuario con el alumno
 
+        # Asignar el establecimiento al alumno si se pasó como argumento
+        if hasattr(self, 'establecimiento_instance'):
+            alumno.establecimiento = self.establecimiento_instance
+
         if commit:
             alumno.save()
 
@@ -118,6 +134,7 @@ class AlumnoForm(forms.ModelForm):
             CursoAlumno.objects.get_or_create(alumno=alumno, curso=curso)
 
         return alumno
+
 
     
 class InformeFinancieroForm(forms.ModelForm):
@@ -175,16 +192,26 @@ class ContratoForm(forms.ModelForm):
         widget=forms.TextInput(attrs={'readonly': 'readonly'})
     )
 
+    # Campo oculto para el ID del establecimiento
+    establecimiento_id = forms.IntegerField(widget=forms.HiddenInput())
+
+    # Mostrar el nombre del establecimiento en solo lectura
+    establecimiento_nombre = forms.CharField(
+        label='Establecimiento',
+        widget=forms.TextInput(attrs={'readonly': 'readonly'})
+    )
+
     class Meta:
         model = Contrato
         fields = [
-            'alumno_id', 'alumno_nombre', 'apoderado_id', 'apoderado_nombre', 
-            'fecha', 'valor_total', 'forma_pago', 'observaciones'
+            'alumno_id', 'alumno_nombre', 'apoderado_id', 'apoderado_nombre',
+            'establecimiento_id', 'establecimiento_nombre', 'fecha', 'valor_total', 'forma_pago', 'observaciones'
         ]
     
     def __init__(self, *args, **kwargs):
         alumno_instance = kwargs.pop('alumno_instance', None)
         apoderado_instance = kwargs.pop('apoderado_instance', None)
+        establecimiento_instance = kwargs.pop('establecimiento_instance', None)
         super(ContratoForm, self).__init__(*args, **kwargs)
 
         if alumno_instance:
@@ -194,3 +221,8 @@ class ContratoForm(forms.ModelForm):
         if apoderado_instance:
             self.fields['apoderado_id'].initial = apoderado_instance.id  # Asignar el ID del apoderado
             self.fields['apoderado_nombre'].initial = f"{apoderado_instance.nombre} {apoderado_instance.apellido}"  # Mostrar nombre completo del apoderado
+        
+        if establecimiento_instance:
+            self.fields['establecimiento_id'].initial = establecimiento_instance.id  # Guardar el ID del establecimiento
+            self.fields['establecimiento_nombre'].initial = establecimiento_instance.nombre  # Mostrar nombre del establecimiento
+

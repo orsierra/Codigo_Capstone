@@ -100,11 +100,11 @@
         <!-- Botones de navegación -->
         <div class="mt-4">
             {% if curso %}
-                <a href="{% url 'profesor_libro' curso.id %}" class="btn btn-primary">Volver a Libro de clases</a>
+                <a href="{% url 'libro_clases' establecimiento.id curso.id %}" class="btn btn-primary">Volver a Libro de clases</a>
             {% else %}
                 <a href="#" class="btn btn-secondary disabled">Libro de clases no disponible</a>
             {% endif %}
-            <a href="{% url 'descargar_pdf_alumno' alumno.id %}" class="btn btn-success">Descargar PDF</a>
+            <a href="{% url 'descargar_pdf_alumno' establecimiento.id alumno.id %}" class="btn btn-success">Descargar PDF</a>
         </div>
     </div>
 

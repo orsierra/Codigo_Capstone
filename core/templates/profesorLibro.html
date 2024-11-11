@@ -127,8 +127,8 @@
     <div class="sidebar">
         <h2>Libro de Clase</h2>
         <ul>
-            <li><a href="{% url 'profesor' %}">Profesor</a></li>
-            <li><a href="{% url 'profesor_cursos' %}">Mis Cursos</a></li>
+            <li><a href="{% url 'profesor' establecimiento_id=establecimiento.id %}">Profesor</a></li>
+            <a href="{% url 'profesor_cursos' establecimiento_id=establecimiento.id %}">Mis cursos</a>
         </ul>
         <div class="footer">
             <a href="#">Nuevos Horizontes</a>
@@ -139,12 +139,13 @@
         <h1>{{ curso.asignatura }} - {{ curso.nombre }}</h1>
 
         <div class="button-container">
-            <a href="{% url 'registrar_asistencia' curso.id %}"><button>Registrar Asistencia</button></a>
-            <a href="{% url 'registrar_calificaciones' curso.id %}"><button>Registrar Calificaciones</button></a>
-            <a href="{% url 'registro_academico' curso.id %}"><button>Registro Académico</button></a>
-            <a href="{% url 'generar_informes' curso.id %}"><button>Generar Informe</button></a>
-            <a href="{% url 'observaciones' curso_id=curso.id %}"><button>Observaciones</button></a>
-            <a href="{% url 'historial_bitacoras' curso.id %}"><button>Ver Historial de Bitácoras</button></a>
+            <a href="{% url 'registrar_asistencia' curso.establecimiento_id curso.id %}"><button>Registrar Asistencia</button></a>
+            <a href="{% url 'registrar_calificaciones' curso.establecimiento_id curso.id %}"><button>Registrar Calificaciones</button></a>
+            <a href="{% url 'registro_academico' curso.establecimiento_id curso.id %}"><button>Registro Académico</button></a>
+            <a href="{% url 'generar_informes' curso.establecimiento_id curso.id %}"><button>Generar Informe</button></a>
+            <a href="{% url 'observaciones' establecimiento_id=curso.establecimiento_id curso_id=curso.id %}"><button>Observaciones</button></a>
+            <a href="{% url 'historial_bitacoras' establecimiento_id=curso.establecimiento_id curso_id=curso.id %}"><button>Ver Historial de Bitácoras</button></a>
+
         </div>
     </div>
 </body>

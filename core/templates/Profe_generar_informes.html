@@ -160,14 +160,14 @@
     <div class="sidebar">
         <h2>Menú</h2>
         <ul>
-            <li><a href="{% url 'profesor' %}">Profesor</a></li>
-            <li><a href="{% url 'profesor_cursos' %}">Mis cursos</a></li>
-            <li><a href="{% url 'registrar_asistencia' curso.id %}">Registrar asistencia</a></li>
-            <li><a href="{% url 'registrar_calificaciones' curso.id %}">Registrar calificaciones</a></li>
-            <li><a href="{% url 'registro_academico' curso.id %}">Registro Académico</a></li>
-            <li><a href="{% url 'generar_informes' curso.id %}">Generar Informes</a></li>
-            <li><a href="{% url 'observaciones' curso.id %}">Observaciones</a></li>
-            <li><a href="{% url 'historial_bitacoras' curso.id %}">Historial de Bitácoras</a></li>
+            <li><a href="{% url 'profesor' establecimiento_id=establecimiento.id %}">Profesor</a></li>
+            <li><a href="{% url 'profesor_cursos' establecimiento_id=establecimiento.id %}">Mis cursos</a></li>
+            <li><a href="{% url 'registrar_asistencia' establecimiento_id=establecimiento.id curso_id=curso.id %}">Registrar asistencia</a></li>
+            <li><a href="{% url 'registrar_calificaciones' establecimiento_id=establecimiento.id curso_id=curso.id %}">Registrar calificaciones</a></li>
+            <li><a href="{% url 'registro_academico' establecimiento_id=establecimiento.id curso_id=curso.id %}">Registro Académico</a></li>
+            <li><a href="{% url 'generar_informes' establecimiento_id=establecimiento.id curso_id=curso.id %}">Generar Informes</a></li>
+            <li><a href="{% url 'observaciones' establecimiento_id=establecimiento.id curso_id=curso.id %}">Observaciones</a></li>
+            <li><a href="{% url 'historial_bitacoras' establecimiento_id=curso.establecimiento.id curso_id=curso.id %}">Historial de Bitácoras</a></li>
             <li>
                 <form action="{% url 'logout' %}" method="post" style="display: inline;">
                     {% csrf_token %}
@@ -180,19 +180,22 @@
         </div>
     </div>
 
-    <div class="main-content">
-        <div class="container">
-            <h1>Informe de Alumnos - {{ curso.nombre }}</h1>
+    <div class="container">
+        <h1>Informe de Alumnos - {{ curso.nombre }}</h1>
     
+        {% if alumnos_aprobados %}
             <div class="row">
                 {% for alumno in alumnos_aprobados %}
-                <div class="card">
-                    <h5>{{ alumno.nombre }} {{ alumno.apellido }}</h5>
-                    <a href="{% url 'alumno_detalle' alumno.id %}" class="btn">Ver detalle</a>
-                </div>
+                    <div class="card">
+                        <h5>{{ alumno.nombre }} {{ alumno.apellido }}</h5>
+                        <a href="{% url 'alumno_detalle' establecimiento.id alumno.id %}" class="btn">Ver detalle</a>
+                    </div>
                 {% endfor %}
             </div>
-        </div>
+        {% else %}
+            <p>No hay alumnos aprobados para este curso.</p>
+        {% endif %}
+    </div>
     </div>
 </body>
 </html>
