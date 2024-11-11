@@ -143,22 +143,9 @@
             <a href="{% url 'registrar_calificaciones' curso.establecimiento_id curso.id %}"><button>Registrar Calificaciones</button></a>
             <a href="{% url 'registro_academico' curso.establecimiento_id curso.id %}"><button>Registro Académico</button></a>
             <a href="{% url 'generar_informes' curso.establecimiento_id curso.id %}"><button>Generar Informe</button></a>
-<<<<<<< HEAD
-            {% for alumno in alumnos %}
-    <a href="{% url 'observaciones' establecimiento_id=curso.establecimiento_id alumno_id=alumno.id %}">
-        <button>Observaciones de {{ alumno.nombre }}</button>
-    </a>
-{% endfor %}
-
-            
-            
-            
-            
-=======
             <a href="{% url 'observaciones' establecimiento_id=curso.establecimiento_id curso_id=curso.id %}"><button>Observaciones</button></a>
             <a href="{% url 'historial_bitacoras' establecimiento_id=curso.establecimiento_id curso_id=curso.id %}"><button>Ver Historial de Bitácoras</button></a>
 
->>>>>>> 0a8adaebda7543fd12cebfee7af3c4a308e30ef2
         </div>
     </div>
 </body>
