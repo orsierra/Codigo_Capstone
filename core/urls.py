@@ -10,18 +10,24 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='logout'),
     path('quienes-somos/', views.quienes_somos, name='quienes_somos'),
   #  path('dashboard/', dashboard_view, name='dashboard'),  # Aquí iría la vista del dashboard
-    path('profesor/', profesor_dashboard, name='profesor'),
-    path('profesor/cursos/', profesor_cursos, name='profesor_cursos'),  # Ruta para "Mis cursos"
+    path('profesor/<int:establecimiento_id>/', profesor_dashboard, name='profesor'),
+    # en urls.py
+    path('profesor/<int:establecimiento_id>/cursos/', profesor_cursos, name='profesor_cursos'),
+  # Ruta para "Mis cursos"
     path('crear_db_usuarios', crear_usuario_db, name='crear_usuarios'),
     #Profesor mis cursos
-    path('libro-clases/<int:curso_id>/', libro_clases, name='profesor_libro'),
-    path('registrar-asistencia/<int:curso_id>/', views.registrar_asistencia, name='registrar_asistencia'),
-    path('registrar-calificaciones/<int:curso_id>/', registrar_calificaciones, name='registrar_calificaciones'),  
-    path('registro-academico/<int:curso_id>/', registro_academico, name='registro_academico'),
-    path('generar-informes/<int:curso_id>/', views.generar_informes, name='generar_informes'),
-    path('alumno_detalle/<int:alumno_id>/', views.alumno_detalle, name='alumno_detalle'),
-    path('alumno_detalle/<int:alumno_id>/descargar_pdf/', descargar_pdf_alumno, name='descargar_pdf_alumno'),  # descarga detalles del alumno en pdf
-    path('observaciones/<int:curso_id>/', observaciones, name='observaciones'),
+    # En urls.py
+    path('libro-clases/<int:establecimiento_id>/<int:curso_id>/', libro_clases, name='libro_clases'),
+    path('registrar-asistencia/<int:establecimiento_id>/<int:curso_id>/', views.registrar_asistencia, name='registrar_asistencia'),
+    path('registrar-calificaciones/<int:establecimiento_id>/<int:curso_id>/', registrar_calificaciones, name='registrar_calificaciones'),  
+    path('registro-academico/<int:establecimiento_id>/<int:curso_id>/', registro_academico, name='registro_academico'),
+    path('generar-informes/<int:establecimiento_id>/<int:curso_id>/', views.generar_informes, name='generar_informes'),
+    path('alumno_detalle/<int:establecimiento_id>/<int:alumno_id>/', views.alumno_detalle, name='alumno_detalle'),
+    path('alumno_detalle/<int:establecimiento_id>/<int:alumno_id>/descargar_pdf/', descargar_pdf_alumno, name='descargar_pdf_alumno'),  # descarga detalles del alumno en pdf
+    path('observaciones/<int:establecimiento_id>/<int:alumno_id>/', views.observaciones, name='observaciones'),
+
+
+
     #alumno
     path('alumno/', views.alumno_dashboard, name='alumno_dashboard'),
     path('alumno/asistencia/', views.alumno_consulta_asistencia, name='alumnoConsuAsis'),
@@ -52,6 +58,7 @@ urlpatterns = [
     # Asistente de admision y finanza
     path('panel_asisAdminFinan/', views.asisAdminFinan_dashboard, name='panel_asisAdminFinan'),
     path('gestion-pagos-admision/', views.ver_gestion_pagos_admision, name='asisAdmiFinan_gestion_pagos'),
+
     path('eliminar-alumno-asis/<int:id>/', views.eliminar_alumno_asis, name='eliminar_alumno_asis'),
     path('agregar-alumno-asis/', views.agregar_alumno_asis, name='agregar_alumno_asis'),
     path('editar-informe-asis/<int:id>/', views.editar_informe_asis, name='editar_informe_asis'),
@@ -66,7 +73,9 @@ urlpatterns = [
     
     #SOSTENEDOR
     path('sostenedor/', views.sostenedor, name='sostenedor'),
-    path('establecimientos/', views.establecimientos, name='establecimientos'),
+    path('establecimientos/<int:establecimiento_id>/', views.establecimientos, name='establecimientos'),
+
+
 
 
 ]
