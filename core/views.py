@@ -1,9 +1,10 @@
 # views.py
+import json
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Curso, BitacoraClase, Profesor,Asistencia, Calificacion, Informe, Observacion, Alumno, Apoderado, Curso, InformeFinanciero,InformeAcademico,Director, Contrato,AsisFinanza, AsisMatricula, CursoAlumno, Notificacion, Establecimiento
+from .models import Curso, BitacoraClase, Profesor,Asistencia, Calificacion, Informe, Observacion, Alumno, Apoderado, Curso, InformeFinanciero,InformeAcademico,Director, Contrato,AsisFinanza, AsisMatricula, CursoAlumno, Notificacion, Establecimiento,Subdirector
 from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404
 from datetime import date
@@ -29,15 +30,13 @@ from django.http import Http404
 # ============================================================ MODULO INICIO ==============================================================================
 
 
-def inicio(request):
+def inicio(request): 
     return render(request, 'inicio.html')
 
 def quienes_somos(request):
     return render(request, 'quienes_somos.html')
 
-# ============================================================ MODULO LOGIN ===============================================================================
-
-
+# Modulo Login
 def login_view(request):
     if request.method == "POST":
         username = request.POST['username']
@@ -45,39 +44,33 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         
         if user is not None:
-            # Verificar si es un alumno y su estado de admisión
             if hasattr(user, 'alumno'):
                 alumno = Alumno.objects.get(user=user)
     
                 if alumno.estado_admision == 'Pendiente':
-                # Si el estado es "Pendiente", no permitir el login
                     messages.error(request, 'Su estado de admisión está pendiente. No puede acceder al sistema.')
-                    return render(request, 'login.html')  # Volver a mostrar el formulario de login
-                # Si el estado no es "Pendiente", permitir el login
+                    return render(request, 'login.html')
                 login(request, user)
-                # Obtener el establecimiento_id asociado al alumno
-                establecimiento_id = alumno.establecimiento_id
-                return redirect('alumno_dashboard', establecimiento_id=establecimiento_id)  # Redirigir al alumno con establecimiento_id
+                return redirect('alumno_dashboard')
 
-
-            # Verificar si es profesor
-            elif hasattr(user, 'profesor'):
+            if hasattr(user, 'profesor'):
                 profesor = user.profesor  # Obtener el objeto profesor
-                establecimiento_id = profesor.establecimiento_id 
+                establecimiento_id = profesor.establecimiento_id  # Asegúrate de que el modelo Profesor tenga un campo `establecimiento`
                 login(request, user)
                 return redirect('profesor', establecimiento_id=establecimiento_id)  # Pasa el establecimiento_id aquí
 
-            # Verificar si es apoderado
             elif hasattr(user, 'apoderado'):
                 login(request, user)
-                return redirect('apoderado_view')  # Redirigir al apoderado
+                return redirect('apoderado_view')
 
-            # Verificar si es director
             elif hasattr(user, 'director'):
                 login(request, user)
-                return redirect('director_dashboard')  # Redirigir al director
+                return redirect('director_dashboard')
             
-            #Verificar si es asisfinanza
+            elif hasattr(user, 'subdirector'):
+                login(request, user)
+                return redirect('subdirector_home')
+
             elif hasattr(user, 'asisfinanza'):
                 asisfinanza = user.asisfinanza  # Obtener el objeto profesor
                 establecimiento_id = asisfinanza.establecimiento_id  # Asegúrate de que el modelo Profesor tenga un campo `establecimiento`
@@ -87,26 +80,22 @@ def login_view(request):
                 #Verificar si es asisMatricula
             elif hasattr(user, 'asismatricula'):
                 login(request, user)
-                return redirect('panel_admision')  # Redirigir al asisMatricula
-            
-            # Otras redirecciones según roles adicionales
+                return redirect('panel_admision')
             else:
                 login(request, user)
-                return redirect('login')  # Redirigir a una página predeterminada si no es alumno, profesor, apoderado o director
+                return redirect('login')
 
         else:
-            # Si las credenciales son inválidas
             messages.error(request, 'Usuario o contraseña incorrectos.')
     
     return render(request, 'login.html')
-# =================================================================== LOGOUT =============================================================
+
+# Logout
 def logout_view(request):
     logout(request)
     return redirect('inicio') 
 
-
-# =================================================================== DASHBOARD DE PROFESOR ==============================================================
-
+# Dashboard de profesor
 @login_required
 def profesor_dashboard(request, establecimiento_id):
     # Verificar que el establecimiento_id no sea vacío o inválido
@@ -134,23 +123,23 @@ def profesor_cursos(request, establecimiento_id):
     }
     return render(request, 'profesorCursos.html', context)
 
-# ================================================================== USER DB ===============================================================================
 
-
-# ======================================================= VIEWS PROFESOR LIBRO =============================================================================
-
+# Libro de clases del profesor
 @login_required
 def libro_clases(request, establecimiento_id, curso_id):
     establecimiento = get_object_or_404(Establecimiento, id=establecimiento_id)
     curso = get_object_or_404(Curso, id=curso_id, establecimiento=establecimiento)
+    alumnos = Alumno.objects.filter(curso=curso)  # Filtra los alumnos en el curso
+
     context = {
         'curso': curso,
         'establecimiento': establecimiento,
+        'alumnos': alumnos,
     }
     return render(request, 'profesorLibro.html', context)
 
-# ================================================================= REGISTRAR ASISTENCIA ===================================================================
 
+# Registrar asistencia
 @login_required
 def registrar_asistencia(request, establecimiento_id, curso_id):
     establecimiento = get_object_or_404(Establecimiento, id=establecimiento_id)
@@ -326,11 +315,8 @@ def registro_academico(request, establecimiento_id, curso_id):
     asistencias_por_alumno = {}
 
     for alumno in alumnos_aprobados:
-        # Filtrar calificaciones del alumno
         calificaciones_alumno = calificaciones.filter(alumno=alumno)
         calificaciones_por_alumno[alumno] = calificaciones_alumno
-
-        # Calcular el promedio de calificaciones
         promedio = calificaciones_alumno.aggregate(Avg('nota'))['nota__avg'] or 0
         promedios_por_alumno[alumno] = round(promedio, 2)
 
@@ -380,7 +366,7 @@ def generar_informes(request, establecimiento_id, curso_id):
 
 
 
-# ============================================ generar informe en pdf para el profesor por alumno ================================================================
+# Alumno detalle para generar informe en PDF
 @login_required
 def alumno_detalle(request, establecimiento_id, alumno_id):
     establecimiento = get_object_or_404(Establecimiento, id=establecimiento_id)
@@ -457,20 +443,37 @@ def descargar_pdf_alumno(request, establecimiento_id, alumno_id):
         'justificaciones': justificaciones,
         'observaciones': observaciones,  # Añadir las observaciones al contexto
         'promedio': promedio,
-        'establecimiento': establecimiento  # Añadir el establecimiento al contexto
+        'establecimiento': establecimiento,
+        'curso': curso,  # Asegúrate de pasar el objeto curso al contexto
+    }
+    return render(request, 'alumno_detalle.html', context)
+
+
+# Descargar PDF de alumno
+@login_required
+def descargar_pdf_alumno(request, establecimiento_id, alumno_id):
+    establecimiento = get_object_or_404(Establecimiento, id=establecimiento_id)
+    alumno = get_object_or_404(Alumno, id=alumno_id, establecimiento=establecimiento)
+    calificaciones = Calificacion.objects.filter(alumno=alumno)
+    asistencias = Asistencia.objects.filter(alumnos_presentes=alumno)
+    ausencias = Asistencia.objects.filter(alumnos_ausentes=alumno)
+    justificaciones = Asistencia.objects.filter(alumnos_justificados=alumno)
+    promedio = calificaciones.aggregate(Avg('nota'))['nota__avg'] or 0
+
+    context = {
+        'alumno': alumno,
+        'calificaciones': calificaciones,
+        'asistencias': asistencias,
+        'ausencias': ausencias,
+        'justificaciones': justificaciones,
+        'promedio': promedio,
+        'establecimiento': establecimiento,
     }
 
-    # Renderizar la plantilla HTML
     html_string = render_to_string('alumno_detalle.html', context)
-
-    # Crear el objeto PDF
     html = HTML(string=html_string)
-
-    # Preparar la respuesta HTTP para el PDF
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="{alumno.nombre}_{alumno.apellido}_detalle.pdf"'
-
-    # Generar el PDF y enviarlo en la respuesta
     html.write_pdf(response)
 
     return response
@@ -512,29 +515,16 @@ def observaciones(request, establecimiento_id, curso_id):
     })
 
 
-# ============================================================= DASHBOARD ALUMNOS =======================================================================
 
-def alumno_dashboard(request, establecimiento_id):
-    # Obtener el objeto alumno asociado al usuario
-    alumno = Alumno.objects.get(user=request.user)
-    
-    # Obtener el establecimiento asociado al alumno
-    establecimiento = alumno.establecimiento
+# ============================================================= Dashboard de Alumno ==================================================
 
-    # Verificar que el establecimiento del alumno coincide con el establecimiento_id pasado
-    if establecimiento.id != establecimiento_id:
-        # Si no coinciden, redirigir a una página de error o manejarlo de otra manera
-        return render(request, 'error.html')
-
-    # Pasar el establecimiento al contexto
-    context = {
-        'establecimiento': establecimiento,
-    }
-    
-    return render(request, 'alumno.html', context)
+@login_required
+def alumno_dashboard(request):
+    return render(request, 'alumno.html')
 
 
-# ===================================================== Vista para la consulta de asistencia ============================================================
+# ===================================================== Consulta de Asistencia del Alumno ============================================
+
 @login_required
 def alumno_consulta_asistencia(request, establecimiento_id):
     # Obtener el objeto Alumno asociado al usuario actual
@@ -556,20 +546,17 @@ def alumno_consulta_asistencia(request, establecimiento_id):
     for curso_alumno in cursos_alumno:
         curso = curso_alumno.curso  # Acceder al curso
 
-        # Recuperar todas las fechas en las que el alumno estuvo presente, ausente o justificado para el curso
+    for curso in cursos:
         fechas_presentes = set(Asistencia.objects.filter(curso=curso, alumnos_presentes=alumno).values_list('fecha', flat=True))
         fechas_ausentes = set(Asistencia.objects.filter(curso=curso, alumnos_ausentes=alumno).values_list('fecha', flat=True))
         fechas_justificados = set(Asistencia.objects.filter(curso=curso, alumnos_justificados=alumno).values_list('fecha', flat=True))
 
-        # Combinar las fechas para obtener fechas únicas
         fechas_totales = fechas_presentes | fechas_ausentes | fechas_justificados
-        total_clases = len(fechas_totales)  # Cuenta de fechas únicas
+        total_clases = len(fechas_totales)
 
-        # Calcular la asistencia
         total_asistencia = len(fechas_presentes) + len(fechas_justificados)
         porcentaje_asistencia = (total_asistencia / total_clases * 100) if total_clases > 0 else 0
 
-        # Agregar datos al contexto
         asistencias_data.append({
             'curso': curso.nombre,
             'asignatura': curso.asignatura,
@@ -578,34 +565,21 @@ def alumno_consulta_asistencia(request, establecimiento_id):
             'porcentaje_asistencia': round(porcentaje_asistencia, 2),
         })
 
-    # Renderizar el template con los datos de asistencia y el establecimiento
-    return render(request, 'alumnoConsuAsis.html', {
-        'asistencias_data': asistencias_data,
-        'establecimiento': establecimiento,  # Agregar el establecimiento al contexto
-    })
+    return render(request, 'alumnoConsuAsis.html', {'asistencias_data': asistencias_data})
 
 
-
-# =========================================================== Vista para la consulta de notas ==========================================================================
+# =========================================================== Consulta de Notas del Alumno ============================================================
 
 @login_required
 def alumno_consulta_notas(request):
-    # Obtener el alumno actual (suponiendo que el usuario esté autenticado)
     alumno = get_object_or_404(Alumno, user=request.user)
+    cursos = Curso.objects.filter(alumnos=alumno).prefetch_related('calificacion_set')
 
-    # Obtener los cursos del alumno a través de CursoAlumno
-    cursos_alumno = CursoAlumno.objects.filter(alumno=alumno)
-
-    # Agregar el promedio de notas para cada curso
     cursos_con_promedios = []
     for curso_alumno in cursos_alumno:
         curso = curso_alumno.curso  # Acceder al curso
         calificaciones = Calificacion.objects.filter(curso=curso, alumno=alumno)
-        
-        if calificaciones.exists():
-            promedio = calificaciones.aggregate(average_nota=models.Avg('nota'))['average_nota']
-        else:
-            promedio = None  # No hay notas disponibles
+        promedio = calificaciones.aggregate(average_nota=models.Avg('nota'))['average_nota'] if calificaciones.exists() else None
 
         cursos_con_promedios.append({
             'curso': curso,
@@ -616,19 +590,20 @@ def alumno_consulta_notas(request):
     return render(request, 'alumnoConsuNotas.html', {'cursos_con_promedios': cursos_con_promedios})
 
 
+# ===================================================================== Home del Alumno ====================================================================
 
-# ===================================================================== alumno home ====================================================================================
 @login_required
 def alumno_home(request):
-    # Aquí puedes obtener más información del alumno si es necesario
-    alumno = request.user.alumno  # Si tienes un modelo 'Alumno' relacionado con 'User'
-    
+    alumno = request.user.alumno
     context = {
         'alumno': alumno
     }
     return render(request, 'alumno.html', context)
 
-# ===================================================================== APODERADO =====================================================================================
+
+# ===================================================================== Vista del Apoderado ==================================================================
+
+@login_required
 def apoderado_view(request):
     apoderado = get_object_or_404(Apoderado, user=request.user)
     notificaciones_no_leidas = Notificacion.objects.filter(apoderado=apoderado, leida=False)
@@ -658,16 +633,12 @@ def historial_notificaciones(request):
 
     return render(request, 'historial_notificaciones.html', {'notificaciones': todas_notificaciones})
 
-#============================================================================= APODERADO ASISTENCIA =========================================================================================
 
-
+#============================================================================= Consulta de Asistencia del Apoderado =========================================================================================
 
 @login_required
 def apoderadoConsuAsis(request):
-    # Obtiene el apoderado actual
     apoderado = get_object_or_404(Apoderado, user=request.user)
-    
-    # Obtiene los alumnos asociados al apoderado con estado de admisión "Aprobado"
     alumnos = Alumno.objects.filter(apoderado=apoderado, estado_admision='Aprobado')
     asistencias_data = {}
 
@@ -683,11 +654,9 @@ def apoderadoConsuAsis(request):
             fechas_ausentes = set(Asistencia.objects.filter(curso=curso, alumnos_ausentes=alumno).values_list('fecha', flat=True))
             fechas_justificados = set(Asistencia.objects.filter(curso=curso, alumnos_justificados=alumno).values_list('fecha', flat=True))
 
-            # Combina las fechas para obtener fechas únicas
             fechas_totales = fechas_presentes | fechas_ausentes | fechas_justificados
-            total_clases = len(fechas_totales)  # Cuenta de fechas únicas
+            total_clases = len(fechas_totales)
 
-            # Calcula la asistencia
             total_asistencia = len(fechas_presentes) + len(fechas_justificados)
             porcentaje_asistencia = (total_asistencia / total_clases * 100) if total_clases > 0 else 0
 
@@ -705,21 +674,13 @@ def apoderadoConsuAsis(request):
     return render(request, 'apoderadoConsuAsis.html', context)
 
 
-
-# ============================================================================== APODERADO NOTAS ========================================================================================================
+# ============================================================================== Consulta de Notas del Apoderado ============================================================================
 
 @login_required
 def apoderadoConsuNotas(request):
-    try:
-        apoderado = Apoderado.objects.get(user=request.user)
-    except Apoderado.DoesNotExist:
-        return render(request, 'error.html', {'mensaje': 'No se encontró apoderado para este usuario.'})
-
+    apoderado = get_object_or_404(Apoderado, user=request.user)
     alumnos = Alumno.objects.filter(apoderado=apoderado, estado_admision="Aprobado")
-    if not alumnos.exists():
-        return render(request, 'error.html', {'mensaje': 'No se encontró un alumno asociado con este apoderado.'})
 
-    # Estructura de datos para almacenar calificaciones organizadas
     alumnos_data = []
 
     for alumno in alumnos:
@@ -736,12 +697,10 @@ def apoderadoConsuNotas(request):
             
             # Obtener las calificaciones del alumno para el curso específico
             calificaciones_curso = Calificacion.objects.filter(alumno=alumno, curso=curso)
-            # Calcular el promedio de notas
             total_notas = sum(c.nota for c in calificaciones_curso if c.nota is not None)
             count_notas = calificaciones_curso.count()
             promedio = round(total_notas / count_notas, 2) if count_notas > 0 else 0
 
-            # Crear una lista numerada de calificaciones
             calificaciones_numeradas = [{'numero': i + 1, 'nota': calificacion.nota} for i, calificacion in enumerate(calificaciones_curso)]
             
             curso_info = {
@@ -753,7 +712,6 @@ def apoderadoConsuNotas(request):
 
         alumnos_data.append(alumno_info)
 
-    # Pasar los datos al contexto para renderizar en la plantilla
     context = {
         'alumnos_data': alumnos_data,
     }
@@ -762,17 +720,14 @@ def apoderadoConsuNotas(request):
 
 # ======================================================================= APODERADO OBSERVACIONES ================================================================================================
 
+# ====================================================== Apoderado - Observaciones ======================================================
+
 @login_required
 def apoderado_observaciones(request):
-    # Obtiene el apoderado actual
     apoderado = get_object_or_404(Apoderado, user=request.user)
-    
-    # Obtiene los alumnos asociados al apoderado con estado de admisión aprobado
     alumnos_aprobados = Alumno.objects.filter(apoderado=apoderado, estado_admision="Aprobado")
     
-    # Obtiene las observaciones asociadas a estos alumnos en sus respectivos cursos
     observaciones_data = []
-    
     for alumno in alumnos_aprobados:
         # Obtener los cursos del alumno a través de CursoAlumno
         cursos_asignados = CursoAlumno.objects.filter(alumno=alumno).select_related('curso')
@@ -790,35 +745,38 @@ def apoderado_observaciones(request):
                 'observaciones': observaciones_alumno
             })
 
-    context = {
-        'observaciones_data': observaciones_data
-    }
-
-    return render(request, 'apoderadoObservaciones.html', context)
+    return render(request, 'apoderadoObservaciones.html', {'observaciones_data': observaciones_data})
 
 
-# ==================================================================== DIRECTOR =========================================================================================
+# ============================================================ Director - Dashboard =========================================================
+
 @login_required
 def director_dashboard(request):
-    return render(request, 'director.html') 
+    return render(request, 'director.html')
+
+
 @login_required
 def directorMenu(request):
-    # Aquí podrías agregar lógica para consultar informes si es necesario
     return render(request, 'directorMenu.html')
+
+
+# ============================================================ Director - Planificación Académica =========================================================
 
 @csrf_exempt
 def director_plani(request):
-    cursos = Curso.objects.all()
+    # Obtener el director autenticado y su establecimiento
+    director = Director.objects.get(user=request.user)
+    cursos = Curso.objects.filter(establecimiento=director.establecimiento)
 
     if request.method == "POST":
-        # Procesar la edición del curso con JSON
         try:
             data = json.loads(request.body)
             curso_id = data.get("curso_id")
             hora = data.get("hora")
             sala = data.get("sala")
 
-            curso = Curso.objects.get(id=curso_id)
+            # Buscar el curso específico dentro del establecimiento del director
+            curso = cursos.get(id=curso_id)
             curso.hora = hora
             curso.sala = sala
             curso.save()
@@ -829,44 +787,42 @@ def director_plani(request):
 
     return render(request, 'directorPlani.html', {'cursos': cursos})
 
+
+# ====================================================== Director - Informes Académicos ======================================================
+
 @login_required
 def informes_academicos(request):
-    cursos = Curso.objects.all()  # Obtener todos los cursos
+    # Obtiene el director que está autenticado
+    director = get_object_or_404(Director, user=request.user)
+    
+    # Filtra los cursos que pertenecen al establecimiento del director
+    cursos = Curso.objects.filter(establecimiento=director.establecimiento)
+    
+    # Prepara la lista de informes académicos solo para los cursos filtrados
     informes = []
 
     for curso in cursos:
-        alumnos = curso.alumnos.all()  # Obtener todos los alumnos del curso
-        total_alumnos = alumnos.count()  # Contar el número de alumnos inscritos
-        
-        # Calcular el promedio de calificaciones para el curso
+        alumnos = curso.alumnos.all()
+        total_alumnos = alumnos.count()
         promedio_notas = Calificacion.objects.filter(alumno__in=alumnos).aggregate(Avg('nota'))['nota__avg'] or 0
-        
-        # Calcular el total de días de asistencia y asistencias
         total_asistencias = Asistencia.objects.filter(alumnos_presentes__in=alumnos).count()
         total_dias = Asistencia.objects.filter(curso=curso).count()
+
+        promedio_asistencia = (total_asistencias / (total_alumnos * total_dias) * 100) if total_alumnos > 0 and total_dias > 0 else 0
         
-        # Verificar que no haya división por cero
-        if total_alumnos > 0 and total_dias > 0:
-            promedio_asistencia = (total_asistencias / (total_alumnos * total_dias)) * 100
-        else:
-            promedio_asistencia = 0  # Si no hay alumnos o días, el promedio de asistencia es 0
-        
-        # Crear un diccionario con la información del informe para este curso
         informes.append({
             'curso': curso,
             'total_alumnos': total_alumnos,
-            'promedio_notas': round(promedio_notas, 1),  # Redondear a un decimal
-            'promedio_asistencia': round(promedio_asistencia, 1)  # Redondear a un decimal
+            'promedio_notas': round(promedio_notas, 1),
+            'promedio_asistencia': round(promedio_asistencia, 1)
         })
 
-    context = {
-        'informes': informes
-    }
+    return render(request, 'direInfoAca.html', {'informes': informes})
 
-    return render(request, 'direInfoAca.html', context)
 
-import json
-@csrf_exempt  # Solo si es necesario; no recomendado para producción sin protección
+# ====================================================== Director - Actualizar Curso ======================================================
+
+@csrf_exempt
 def update_curso(request):
     if request.method == "POST":
         try:
@@ -875,7 +831,6 @@ def update_curso(request):
             hora = data.get("hora")
             sala = data.get("sala")
 
-            # Verifica que el curso existe
             curso = Curso.objects.get(id=curso_id)
             curso.hora = hora
             curso.sala = sala
@@ -889,147 +844,148 @@ def update_curso(request):
 
     return JsonResponse({'success': False, 'message': 'Método no permitido'}, status=405)
 
-#pdf director
+
+# ====================================================== Director - Informe Académico en PDF ======================================================
+
 @login_required
 def direcPdfInfoAca(request):
-    cursos = Curso.objects.all()  # Obtener todos los cursos
+    # Obtiene el director autenticado
+    director = get_object_or_404(Director, user=request.user)
+    
+    # Filtra los cursos que pertenecen al establecimiento del director
+    cursos = Curso.objects.filter(establecimiento=director.establecimiento)
+    
+    # Genera los informes académicos para los cursos filtrados
     informes = []
-
     for curso in cursos:
-        alumnos = curso.alumnos.all()  # Obtener todos los alumnos del curso
-        total_alumnos = alumnos.count()  # Contar el número de alumnos inscritos
-        
-        # Calcular el promedio de calificaciones para el curso
+        alumnos = curso.alumnos.all()
+        total_alumnos = alumnos.count()
         promedio_notas = Calificacion.objects.filter(alumno__in=alumnos).aggregate(Avg('nota'))['nota__avg'] or 0
-        
-        # Calcular el total de días de asistencia y asistencias
         total_asistencias = Asistencia.objects.filter(alumnos_presentes__in=alumnos).count()
         total_dias = Asistencia.objects.filter(curso=curso).count()
-        
-        # Verificar que no haya división por cero
-        if total_alumnos > 0 and total_dias > 0:
-            promedio_asistencia = (total_asistencias / (total_alumnos * total_dias)) * 100
-        else:
-            promedio_asistencia = 0  # Si no hay alumnos o días, el promedio de asistencia es 0
-        
-        # Crear un diccionario con la información del informe para este curso
+
+        promedio_asistencia = (total_asistencias / (total_alumnos * total_dias) * 100) if total_alumnos > 0 and total_dias > 0 else 0
+
         informes.append({
             'curso': curso,
             'total_alumnos': total_alumnos,
-            'promedio_notas': round(promedio_notas, 1),  # Redondear a un decimal
-            'promedio_asistencia': round(promedio_asistencia, 1)  # Redondear a un decimal
+            'promedio_notas': round(promedio_notas, 1),
+            'promedio_asistencia': round(promedio_asistencia, 1)
         })
 
-    # Crear el contexto para la plantilla PDF
-    context = {
-        'informes': informes
-    }
-
-    # Renderizar la plantilla en un string HTML
-    html_string = render_to_string('direInfoAca_pdf.html', context)
+    # Renderiza la plantilla con los informes académicos generados
+    html_string = render_to_string('direInfoAca_pdf.html', {'informes': informes})
+    
+    # Genera y configura el PDF para la descarga
     html = HTML(string=html_string)
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="informe_academico.pdf"'
     
-    # Generar el PDF
+    # Escribe el contenido del PDF en la respuesta
     html.write_pdf(response)
+    
     return response
 
+# ====================================================== Director - Planificación Académica en PDF ======================================================
 
-#informe academico
 @login_required
 def direcPdfPlanificacion(request):
-    # Obtener los cursos de la planificación académica
-    cursos = Curso.objects.all()
-
-    # Cargar la plantilla y renderizarla como HTML
+    # Obtiene el director autenticado
+    director = get_object_or_404(Director, user=request.user)
+    
+    # Filtra los cursos que pertenecen al establecimiento del director
+    cursos = Curso.objects.filter(establecimiento=director.establecimiento)
+    
+    # Renderiza la plantilla con los cursos filtrados
     html_string = render_to_string('direcPdfPlanificacion_pdf.html', {'cursos': cursos})
 
-    # Crear el PDF en un archivo temporal
+    # Genera el PDF
     html = HTML(string=html_string)
-    result = html.write_pdf()
-
-    # Generar la respuesta HTTP con el archivo PDF
-    response = HttpResponse(result, content_type='application/pdf')
+    response = HttpResponse(html.write_pdf(), content_type='application/pdf')
     response['Content-Disposition'] = 'inline; filename="planificacion_academica.pdf"'
 
     return response
 
 
-# ========================================================================= INFORME FINANCIERO ==========================================================================================
-@login_required
-def informe_financiero_view(request):
-    datos = InformeFinanciero.objects.all()
-    return render(request, 'informe_financiero.html', {'datos': datos})
+# ====================================================== Informe Financiero - Vista y Gestión ======================================================
 
 @login_required
 def informe_financiero_view(request):
+    # Obtiene el director autenticado
+    director = get_object_or_404(Director, user=request.user)
+    
+    # Filtra los informes financieros por el establecimiento del director
+    informes = InformeFinanciero.objects.filter(establecimiento=director.establecimiento)
+    
     if request.method == 'POST':
-        form = InformeFinancieroForm(request.POST)
+        # Prellenar el establecimiento en el formulario
+        form = InformeFinancieroForm(request.POST, initial={'establecimiento': director.establecimiento})
         if form.is_valid():
-            form.save()
-            return redirect('informe_financiero')  # Redirige después de agregar
+            informe = form.save(commit=False)
+            informe.establecimiento = director.establecimiento  # Asigna el establecimiento del director
+            informe.save()
+            return redirect('informe_financiero')
     else:
         form = InformeFinancieroForm()
     
-    # Obtener todos los informes financieros
-    informes = InformeFinanciero.objects.all()
+    return render(request, 'informe_financiero.html', {'form': form, 'informes': informes})
 
 
-    context = {
-        'form': form,
-        'informes': informes,
-    }
-    return render(request, 'informe_financiero.html', context)
+@login_required
+def eliminar_informe_view(request, informe_id):
+    # Obtiene el director autenticado
+    director = get_object_or_404(Director, user=request.user)
+    
+    # Busca el informe en el establecimiento del director
+    informe = get_object_or_404(InformeFinanciero, id=informe_id, establecimiento=director.establecimiento)
+    
+    if request.method == 'POST':
+        informe.delete()
+        return redirect('informe_financiero')
+    
+    return render(request, 'confirmar_eliminacion.html', {'informe': informe})
 
-# ===================================================================================================================================================================================
+
+# ====================================================== Generar PDF de Informe Financiero ======================================================
+
 @login_required
 def generar_pdf_view(request):
-    # Obtener todos los informes financieros del modelo
-    informes = InformeFinanciero.objects.all()
-
-    # Crear el contexto con los informes
+    # Obtiene el director autenticado
+    director = get_object_or_404(Director, user=request.user)
+    
+    # Filtra los informes financieros por el establecimiento del director
+    informes = InformeFinanciero.objects.filter(establecimiento=director.establecimiento)
+    
+    # Contexto para el PDF
     context = {
         'titulo': 'Informe Finanzas Primer Semestre',
         'informes': informes,
     }
 
-    # Renderizar el template a un HTML
+    # Genera el PDF
     html_string = render_to_string('pdf/informe_financiero_pdf.html', context)
-
-    # Convertir el HTML a PDF
     pdf = HTML(string=html_string).write_pdf()
-
-    # Crear una respuesta HTTP con el PDF
+    
+    # Configura la respuesta HTTP para la descarga
     response = HttpResponse(pdf, content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="informe_financiero.pdf"'
     return response
 
 
-@login_required
-def eliminar_informe_view(request, informe_id):
-    informe = get_object_or_404(InformeFinanciero, id=informe_id)
+# ====================================================== Admisión y Matrícula - Gestión de Estudiantes ======================================================
 
-    if request.method == 'POST':
-        informe.delete()
-        # Redirigir a la lista de informes después de eliminar
-        return redirect('informe_financiero')
-
-    return render(request, 'confirmar_eliminacion.html', {'informe': informe})
-# ========================================================================== ADMISION Y MATRICULA ============================================================================================
 @login_required
 def gestionar_estudiantes(request):
     alumnos_pendientes = Alumno.objects.filter(estado_admision='Pendiente')
     alumnos_aprobados = Alumno.objects.filter(estado_admision='Aprobado')
     
-    context = {
+    return render(request, 'gestionar_estudiantes.html', {
         'alumnos_pendientes': alumnos_pendientes,
         'alumnos_aprobados': alumnos_aprobados,
-    }
-    
-    return render(request, 'gestionar_estudiantes.html', context)
+    })
 
 
+# =================================================== Admisión - Agregar Alumno ===================================================
 @login_required
 def agregar_alumno(request):
     if request.method == 'POST':
@@ -1045,9 +1001,20 @@ def agregar_alumno(request):
                 form.add_error('email', 'Este correo electrónico ya está en uso.')
             else:
                 try:
-                    # Guarda el Alumno y las relaciones de CursoAlumno usando el método save del formulario
-                    form.save()
-                    return redirect('gestionar_estudiantes')  # Redirige a la página de gestión de estudiantes
+                    user = User.objects.create_user(username=email, password=password, email=email)
+                    alumno = Alumno(
+                        user=user,
+                        nombre=form.cleaned_data['nombre'],
+                        apellido=form.cleaned_data['apellido'],
+                        email=email,
+                        apoderado=form.cleaned_data['apoderado'],
+                        estado_admision=form.cleaned_data['estado_admision'],
+                        curso=form.cleaned_data['curso']
+                    )
+                    alumno.save()
+                    curso = form.cleaned_data['curso']
+                    curso.alumnos.add(alumno)
+                    return redirect('gestionar_estudiantes')
                 except IntegrityError:
                     form.add_error(None, 'Ocurrió un error al crear el usuario. Intenta nuevamente.')
                 except Exception as e:
@@ -1057,21 +1024,19 @@ def agregar_alumno(request):
             print(form.errors)
 
     else:
-        form = AlumnoForm()  # Instancia un formulario vacío si no es un POST
-
-    return render(request, 'agregar_alumno.html', {'form': form})  # Renderiza el formulario en la plantilla
-
+        form = AlumnoForm()
+    return render(request, 'agregar_alumno.html', {'form': form})
 
 
+# =================================================== Admisión - Eliminar Alumno ===================================================
 @login_required
 def eliminar_alumno(request, alumno_id):
     alumno = get_object_or_404(Alumno, id=alumno_id)
-    alumno.delete()  # Eliminar el alumno
-    return redirect('gestionar_estudiantes')  # Redirige a la lista de estudiantes
+    alumno.delete()
+    return redirect('gestionar_estudiantes')
 
 
-
-
+# =================================================== Admisión - Actualizar Matrícula ===================================================
 @login_required
 def actualizar_matricula(request, id):
     alumno = get_object_or_404(Alumno, id=id)
@@ -1081,27 +1046,29 @@ def actualizar_matricula(request, id):
         if form.is_valid():
             form.save()
             messages.success(request, 'Matrícula actualizada con éxito.')
-            return redirect('gestionar_estudiantes')  # Redirigir a la lista de estudiantes
+            return redirect('gestionar_estudiantes')
     else:
         form = AlumnoForm(instance=alumno)
 
     return render(request, 'actualizar_matricula.html', {'form': form, 'alumno': alumno})
 
 
+# =================================================== Panel de Admisión ===================================================
 @login_required
 def panel_admision(request):
-    alumnos = Alumno.objects.all()  # Obtiene todos los alumnos
+    alumnos = Alumno.objects.all()
     return render(request, 'panel_admision.html', {'alumnos': alumnos})
 
 
-# =================================================================== DASHBOARD DE ASISTENTE DE ADMISIÓN Y FINANZAS ==============================================================
+# =================================================== Asistente de Admisión y Finanzas - Dashboard ===================================================
 @login_required
 def asisAdminFinan_dashboard(request, establecimiento_id):
     establecimiento = get_object_or_404(Establecimiento, id=establecimiento_id)  # Obtén el establecimiento si necesitas usarlo en el contexto
     return render(request, 'asisAdminFinan.html', {'establecimiento': establecimiento})  # Renderiza el dashboard con el establecimiento
 
 
-# =====================================================VISTA de ASISTENTE DE ADMISIÓN Y FINANZAS ==========================================
+
+# =================================================== Asistente de Admisión y Finanzas - Gestión de Pagos ===================================================
 @login_required
 def ver_gestion_pagos_admision(request, establecimiento_id):
     # Obtener el establecimiento usando el id proporcionado
@@ -1147,7 +1114,8 @@ def agregar_alumno_asis(request, establecimiento_id):
 
 
 
-# =====================================================VISTA de ASISTENTE DE ADMISIÓN Y FINANZAS PARA ELIMINAR ALUMNO =====================
+
+# =================================================== Asistente de Admisión y Finanzas - Eliminar Alumno ===================================================
 @login_required
 def eliminar_alumno_asis(request, establecimiento_id, alumno_id):
     alumno = get_object_or_404(Alumno, id=alumno_id)
@@ -1157,7 +1125,8 @@ def eliminar_alumno_asis(request, establecimiento_id, alumno_id):
     return redirect('asisAdmiFinan_gestion_pagos', establecimiento_id=establecimiento_id)
 
 
-# =====================================================VISTA de ASISTENTE DE ADMISIÓN Y FINANZAS PARA ACTUALIZAR INFORME=====================
+
+# =================================================== Asistente de Admisión y Finanzas - Editar Informe ===================================================
 @login_required
 def editar_informe_asis(request, establecimiento_id, id):
     # Obtener el establecimiento por su ID
@@ -1170,9 +1139,7 @@ def editar_informe_asis(request, establecimiento_id, id):
     # Obtener el contrato relacionado con el alumno (si existe)
     contrato = Contrato.objects.filter(alumno=alumno).first()
     contrato_instance = Contrato.objects.filter(alumno=alumno_instance).first()
-
-    # Obtener el apoderado del alumno
-    apoderado_instance = alumno_instance.apoderado  # Asegúrate de que el modelo Alumno tenga relación con Apoderado
+    apoderado_instance = alumno_instance.apoderado
 
     if request.method == 'POST':
         # Si el formulario ha sido enviado
@@ -1209,11 +1176,9 @@ def editar_informe_asis(request, establecimiento_id, id):
 #==================================================  Generar contrato PDF =================================================================
 @login_required
 def generar_pdf_contrato(request, id):
-    # Obtener el alumno y el contrato correspondiente
     alumno = get_object_or_404(Alumno, id=id)
     contrato = Contrato.objects.filter(alumno=alumno).first()
 
-    # Verificar si el contrato existe
     if contrato is None:
         return HttpResponse("No se encontró el contrato asociado al alumno.", status=404)
 
@@ -1228,109 +1193,124 @@ def generar_pdf_contrato(request, id):
     }
 
     html_string = render_to_string('pdf/asis_pago.html', context)
-
-    # Crear el PDF
     pdf = HTML(string=html_string).write_pdf()
 
-    # Crear la respuesta HTTP con el PDF
     response = HttpResponse(pdf, content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="pago_{alumno.nombre}_{alumno.apellido}.pdf"'
-
     return response
 
 
-
-#==================================================SUBDIRECTOR=====================================================================
+# =================================================== Subdirector - Panel de Inicio ===================================================
+@login_required
 def subdirector_home(request):
     return render(request, 'subdirector.html')
 
+
+# =================================================== Subdirector - Consulta de Informes Académicos ===================================================
 def consulta_informes_academicos(request):
-    cursos = Curso.objects.all()  # Obtén todos los cursos de la base de datos
+    # Obtener el subdirector relacionado con el usuario autenticado
+    subdirector = Subdirector.objects.get(user=request.user)
+
+    # Filtrar los cursos que pertenecen al establecimiento del subdirector
+    cursos = Curso.objects.filter(establecimiento=subdirector.establecimiento)
+    
     return render(request, 'subdire_consulta_informes_academicos.html', {'cursos': cursos})
 
+
+# =================================================== Subdirector - Gestión de Recursos Académicos ===================================================
+@login_required
 def gestion_recursos_academicos(request):
-    cursos = Curso.objects.select_related('profesor').all()  # Trae todos los cursos y sus profesores asociados
+    # Obtener el subdirector relacionado con el usuario autenticado
+    subdirector = Subdirector.objects.get(user=request.user)
+
+    # Filtrar los cursos que pertenecen al establecimiento del subdirector
+    cursos = Curso.objects.filter(establecimiento=subdirector.establecimiento).select_related('profesor')
+
     return render(request, 'gestion_recursos_academicos.html', {'cursos': cursos})
 
-
+# =================================================== Subdirector - Detalle de Curso ===================================================
+@login_required
 def detalle_curso(request, curso_id):
-    curso = get_object_or_404(Curso, id=curso_id)
-    estudiantes = curso.alumnos.all()  # Obtiene todos los alumnos del curso
+    # Obtener el subdirector relacionado con el usuario autenticado
+    subdirector = Subdirector.objects.get(user=request.user)
+    
+    # Obtener el curso solo si pertenece al establecimiento del subdirector
+    curso = get_object_or_404(Curso, id=curso_id, establecimiento=subdirector.establecimiento)
+    
+    # Filtrar los estudiantes que pertenecen al mismo establecimiento que el subdirector
+    estudiantes = curso.alumnos.filter(establecimiento=subdirector.establecimiento)
 
-    # Crear una lista de estudiantes con sus promedios de calificaciones
-    estudiantes_con_promedio = []
-    for estudiante in estudiantes:
-        # Calcula el promedio de notas en las calificaciones asociadas al estudiante y curso
-        promedio_calificaciones = Calificacion.objects.filter(
-            alumno=estudiante,
-            curso=curso
-        ).aggregate(promedio=Avg('nota'))['promedio']
-
-        # Redondea el promedio a 2 decimales si no es None
-        promedio_redondeado = round(promedio_calificaciones, 2) if promedio_calificaciones is not None else "-"
-
-        estudiantes_con_promedio.append({
+    # Calcular el promedio de notas de cada estudiante
+    estudiantes_con_promedio = [
+        {
             'nombre': estudiante.nombre,
             'apellido': estudiante.apellido,
-            'promedio_notas': promedio_redondeado
-        })
+            'promedio_notas': round(Calificacion.objects.filter(alumno=estudiante, curso=curso).aggregate(promedio=Avg('nota'))['promedio'], 2) or "-"
+        }
+        for estudiante in estudiantes
+    ]
 
     return render(request, 'detalle_curso.html', {'curso': curso, 'estudiantes': estudiantes_con_promedio})
 
-def detalle_curso_pdf(request, curso_id):
-    curso = get_object_or_404(Curso, id=curso_id)
-    estudiantes = curso.alumnos.all()
 
-    # Calcular el promedio de notas y preparar datos para el PDF
-    estudiantes_con_promedio = []
-    for estudiante in estudiantes:
-        promedio_calificaciones = Calificacion.objects.filter(
-            alumno=estudiante,
-            curso=curso
-        ).aggregate(promedio=Avg('nota'))['promedio']
-        
-        promedio_redondeado = round(promedio_calificaciones, 2) if promedio_calificaciones is not None else "-"
-        
-        estudiantes_con_promedio.append({
+# =================================================== Subdirector - Detalle de Curso en PDF ===================================================
+@login_required
+def detalle_curso_pdf(request, curso_id):
+    # Obtener el subdirector relacionado con el usuario autenticado
+    subdirector = Subdirector.objects.get(user=request.user)
+    
+    # Obtener el curso solo si pertenece al establecimiento del subdirector
+    curso = get_object_or_404(Curso, id=curso_id, establecimiento=subdirector.establecimiento)
+    
+    # Filtrar los estudiantes que pertenecen al establecimiento del subdirector
+    estudiantes = curso.alumnos.filter(establecimiento=subdirector.establecimiento)
+    
+    # Calcular el promedio de notas de cada estudiante
+    estudiantes_con_promedio = [
+        {
             'nombre': estudiante.nombre,
             'apellido': estudiante.apellido,
-            'promedio_notas': promedio_redondeado
-        })
-
-    # Renderizar la plantilla HTML a un string
+            'promedio_notas': round(Calificacion.objects.filter(alumno=estudiante, curso=curso).aggregate(promedio=Avg('nota'))['promedio'], 2) or "-"
+        }
+        for estudiante in estudiantes
+    ]
+    
+    # Renderizar el HTML y generar el PDF
     html_string = render_to_string('detalle_curso_pdf.html', {'curso': curso, 'estudiantes': estudiantes_con_promedio})
-
-    # Crear el PDF usando WeasyPrint
     pdf = HTML(string=html_string).write_pdf()
 
-    # Enviar el PDF como respuesta HTTP
+    # Devolver el archivo PDF como respuesta
     response = HttpResponse(pdf, content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="{curso.nombre}_reporte.pdf"'
     return response
-
-#SOSTENEDOR
+# =================================================== Sostenedor - Información del Establecimiento ===================================================
+@login_required
 def sostenedor(request):
-    # Simplemente renderiza el template "sostenedor.html"
-    return render(request, 'sostenedor.html')
+    # Obtener todos los establecimientos de la base de datos
+    establecimientos = Establecimiento.objects.all()
+    
+    # Pasar los establecimientos al contexto
+    contexto = {
+        'establecimientos': establecimientos
+    }
+    
+    return render(request, 'sostenedor.html', contexto)
 
-def establecimientos(request):
-    # Calcular los totales para "Colegio Nuevos Horizontes"
-    total_salas = Curso.objects.count()  # Asumimos que cada curso representa una sala
-    total_alumnos = Alumno.objects.count()
-    total_cursos = Curso.objects.count()
-    total_profesores = Profesor.objects.count()
-    
-    # Contar empleados en los modelos específicos
-    total_directores = Director.objects.count()
-    total_asistentes_matricula = AsisMatricula.objects.count()
-    total_asistentes_finanza = AsisFinanza.objects.count()
-    
-    # Sumar el total de empleados (Director, Profesor, AsisMatricula, AsisFinanza)
+
+@login_required
+def establecimientos(request, establecimiento_id):
+    establecimiento = get_object_or_404(Establecimiento, id=establecimiento_id)
+    total_salas = Curso.objects.filter(establecimiento=establecimiento).values('sala').distinct().count()
+    total_alumnos = Alumno.objects.filter(establecimiento=establecimiento).count()
+    total_cursos = Curso.objects.filter(establecimiento=establecimiento).count()
+    total_profesores = Profesor.objects.filter(establecimiento=establecimiento).count()
+    total_directores = Director.objects.filter(establecimiento=establecimiento).count()
+    total_asistentes_matricula = AsisMatricula.objects.filter(establecimiento=establecimiento).count()
+    total_asistentes_finanza = AsisFinanza.objects.filter(establecimiento=establecimiento).count()
     total_empleados = total_directores + total_profesores + total_asistentes_matricula + total_asistentes_finanza
 
-    # Pasar los totales al template
     contexto = {
-        'colegio_nombre': 'Colegio Nuevos Horizontes',
+        'colegio_nombre': establecimiento.nombre,
         'total_salas': total_salas,
         'total_alumnos': total_alumnos,
         'total_cursos': total_cursos,

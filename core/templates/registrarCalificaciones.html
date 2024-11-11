@@ -188,6 +188,19 @@
     <div class="sidebar">
         <h2>Menú</h2>
         <ul>
+<<<<<<< HEAD
+            <li><a href="{% url 'profesor' establecimiento_id=curso.establecimiento_id %}">Profesor</a></li>
+            <li><a href="{% url 'profesor_cursos' establecimiento_id=curso.establecimiento_id %}">Mis cursos</a></li>
+            <li><a href="{% url 'registrar_asistencia' establecimiento_id=curso.establecimiento_id curso_id=curso.id %}">Registrar asistencia</a></li>
+            <li><a href="{% url 'registrar_calificaciones' establecimiento_id=curso.establecimiento_id curso_id=curso.id %}">Registrar calificaciones</a></li>
+            <li><a href="{% url 'registro_academico' establecimiento_id=curso.establecimiento_id curso_id=curso.id %}">Registro Académico</a></li>
+            <li><a href="{% url 'generar_informes' establecimiento_id=curso.establecimiento_id curso_id=curso.id %}">Generar Informes</a></li>
+            {% for alumno in alumnos %}
+            <a href="{% url 'observaciones' establecimiento_id=curso.establecimiento_id alumno_id=alumno.id %}">
+                <button>Observaciones de {{ alumno.nombre }}</button>
+            </a>
+        {% endfor %}
+=======
             <li><a href="{% url 'profesor' establecimiento_id=establecimiento.id %}">Profesor</a></li>
             <li><a href="{% url 'profesor_cursos' establecimiento_id=establecimiento.id %}">Mis cursos</a></li>
             <li><a href="{% url 'registrar_asistencia' establecimiento_id=establecimiento.id curso_id=curso.id %}">Registrar asistencia</a></li>
@@ -197,6 +210,7 @@
             <li><a href="{% url 'observaciones' establecimiento_id=establecimiento.id curso_id=curso.id %}">Observaciones</a></li>
             <li><a href="{% url 'historial_bitacoras' establecimiento_id=curso.establecimiento.id curso_id=curso.id %}">Historial de Bitácoras</a></li>
             <li>
+>>>>>>> 0a8adaebda7543fd12cebfee7af3c4a308e30ef2
                 <form action="{% url 'logout' %}" method="post" style="display: inline;">
                     {% csrf_token %}
                     <button type="submit">Cerrar sesión</button>
