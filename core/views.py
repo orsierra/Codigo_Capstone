@@ -70,6 +70,10 @@ def login_view(request):
             elif hasattr(user, 'subdirector'):
                 login(request, user)
                 return redirect('subdirector_home')
+            
+            elif hasattr(user, 'sostenedor'):
+                login(request, user)
+                return redirect('sostenedor')
 
             elif hasattr(user, 'asisfinanza'):
                 asisfinanza = user.asisfinanza  # Obtener el objeto profesor
