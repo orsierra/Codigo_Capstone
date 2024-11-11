@@ -109,7 +109,7 @@ def profesor_dashboard(request, establecimiento_id):
     return render(request, 'profesor.html', {'establecimiento': establecimiento})
 
 # =================================================================== profesor cursos =====================================================================
-# Profesor - cursos asignados
+# Profesor - cursos 
 @login_required
 def profesor_cursos(request, establecimiento_id):
     establecimiento = get_object_or_404(Establecimiento, id=establecimiento_id)
