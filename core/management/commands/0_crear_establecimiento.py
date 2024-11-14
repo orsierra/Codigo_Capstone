@@ -2,10 +2,10 @@ from django.core.management.base import BaseCommand
 from core.models import Establecimiento
 
 class Command(BaseCommand):
-    help = 'Crear registros de establecimientos en la base de datos si no existen'
+    help = 'Crear o actualizar registros de establecimientos en la base de datos'
 
     def handle(self, *args, **kwargs):
-        # Crear los establecimientos solo si no existen
+        # Crear o actualizar los establecimientos
         establecimientos_data = [
             {
                 'id': 1,
@@ -31,8 +31,8 @@ class Command(BaseCommand):
         ]
 
         for establecimiento in establecimientos_data:
-            # Usamos get_or_create para evitar duplicados
-            obj, created = Establecimiento.objects.get_or_create(
+            # Usamos update_or_create para crear o actualizar
+            obj, created = Establecimiento.objects.update_or_create(
                 id=establecimiento['id'],
                 defaults=establecimiento
             )
@@ -40,5 +40,4 @@ class Command(BaseCommand):
             if created:
                 self.stdout.write(self.style.SUCCESS(f'Establecimiento {obj.nombre} creado con éxito.'))
             else:
-                self.stdout.write(self.style.WARNING(f'El establecimiento {obj.nombre} ya existe.'))
-
+                self.stdout.write(self.style.SUCCESS(f'Establecimiento {obj.nombre} actualizado con éxito.'))

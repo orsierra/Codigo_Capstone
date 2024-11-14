@@ -1125,8 +1125,6 @@ def generar_pdf_view(request):
 
 
 # ====================================================== Admisión y Matrícula - Gestión de Estudiantes ======================================================
-from django.shortcuts import get_object_or_404, render
-from .models import Alumno, AsisMatricula
 
 @login_required
 def gestionar_estudiantes(request):
