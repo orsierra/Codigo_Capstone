@@ -14,7 +14,10 @@
             margin: 0;
             padding: 0;
             background-color: #f4f4f4;
+            display: flex;
+            height: 100vh;
         }
+
         /* Barra lateral */
         .sidebar {
             width: 250px;
@@ -23,6 +26,10 @@
             position: fixed;
             height: 100%;
             padding: 20px;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
         }
         .sidebar h2 {
             text-align: center;
@@ -31,6 +38,7 @@
         .sidebar ul {
             list-style: none;
             padding: 0;
+            flex-grow: 1;
         }
         .sidebar ul li {
             margin: 15px 0;
@@ -95,16 +103,18 @@
             background-color: #ffc107;
             color: #343a40;
         }
-        
+
         /* Contenedor principal y formulario */
         .main-content {
-            margin-left: 270px;
+            margin-left: 250px;  /* Ajustar para que el contenido no se solape con el sidebar */
             padding: 20px;
-            width: calc(100% - 320px);
+            width: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            box-sizing: border-box;
+            flex-direction: column;
         }
         .form-container {
             width: 100%;
@@ -241,8 +251,13 @@
                         {{ form.password }}
                         {{ form.password.errors }}
                     </div>
+                    <div>
+                        <label for="{{ form.establecimiento_nombre.id_for_label }}">{{ form.establecimiento_nombre.label }}</label>
+                        {{ form.establecimiento_nombre }}  <!-- Mostrar el establecimiento como solo lectura -->
+                        {{ form.establecimiento_nombre.errors }}
+                    </div>
                 </fieldset>
-
+        
                 <div class="button-container">
                     <button type="submit">Agregar Alumno</button>
                     <a class="btn-back" href="{% url 'asisAdmiFinan_gestion_pagos' establecimiento.id %}">Volver</a>
@@ -255,7 +270,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <script>
         $(document).ready(function() {
-            $('.CursoAlumno').select2();
+            $('.CursoAlumno').select2();  // Activar Select2 para los selectores de curso
         });
     </script>
 </body>

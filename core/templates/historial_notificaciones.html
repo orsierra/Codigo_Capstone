@@ -126,7 +126,7 @@
             <p>No tienes notificaciones.</p>
         {% endfor %}
         
-        <a href="{% url 'apoderado_view' %}" class="btn-volver">Volver</a>
+        <a href="{% url 'apoderado_view' establecimiento_id=establecimiento.id %}" class="btn-volver">Volver</a>
     </div>
 </body>
 </html>
