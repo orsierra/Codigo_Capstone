@@ -1,0 +1,55 @@
+2024-11-13 18:46:47,810 - INFO - Iniciando el script de respaldo diario.
+2024-11-13 18:46:47,810 - INFO - Conectado a la base de datos.
+2024-11-13 18:46:47,811 - INFO - Tablas obtenidas: [('core_profesor',), ('core_asistencia',), ('core_asistencia_alumnos_presentes',), ('core_informe',), ('core_observacion',), ('core_registroacademico',), ('core_asistencia_alumnos_ausentes',), ('core_asistencia_alumnos_justificados',), ('core_curso',), ('core_curso_alumnos',), ('core_calificacion',), ('core_apoderado',), ('core_informefinanciero',), ('core_informeacademico',), ('core_director',), ('core_contrato',), ('core_asisfinanza',), ('core_asismatricula',), ('core_establecimiento',), ('core_subdirector',), ('core_notificacion',), ('core_cursoalumno',), ('core_bitacoraclase',), ('core_alumno',), ('core_sostenedor',)]
+2024-11-13 18:46:48,067 - INFO - Respaldo diario guardado en C:\Users\GOLDEN GAMERS\Desktop\Capstone\Codigo_Capstone\scripts\backups\respaldo_2024-11-13.xlsx
+2024-11-13 18:46:48,068 - INFO - Conexión cerrada.
+2024-11-13 18:50:00,560 - INFO - Iniciando el script de respaldo diario.
+2024-11-13 18:50:00,560 - INFO - Conectado a la base de datos.
+2024-11-13 18:50:00,561 - INFO - Tablas obtenidas: [('core_profesor',), ('core_asistencia',), ('core_asistencia_alumnos_presentes',), ('core_informe',), ('core_observacion',), ('core_registroacademico',), ('core_asistencia_alumnos_ausentes',), ('core_asistencia_alumnos_justificados',), ('core_curso',), ('core_curso_alumnos',), ('core_calificacion',), ('core_apoderado',), ('core_informefinanciero',), ('core_informeacademico',), ('core_director',), ('core_contrato',), ('core_asisfinanza',), ('core_asismatricula',), ('core_establecimiento',), ('core_subdirector',), ('core_notificacion',), ('core_cursoalumno',), ('core_bitacoraclase',), ('core_alumno',), ('core_sostenedor',)]
+2024-11-13 18:50:00,824 - INFO - Respaldo diario guardado en C:\Users\GOLDEN GAMERS\Desktop\Capstone\Codigo_Capstone\scripts\backups\respaldo_2024-11-13.xlsx
+2024-11-13 18:50:00,824 - INFO - Conexión cerrada.
+2024-11-13 18:56:28,955 - INFO - Iniciando el script de respaldo diario.
+2024-11-13 18:56:28,955 - INFO - Conectado a la base de datos.
+2024-11-13 18:56:28,956 - INFO - Tablas obtenidas: [('core_profesor',), ('core_asistencia',), ('core_asistencia_alumnos_presentes',), ('core_informe',), ('core_observacion',), ('core_registroacademico',), ('core_asistencia_alumnos_ausentes',), ('core_asistencia_alumnos_justificados',), ('core_curso',), ('core_curso_alumnos',), ('core_calificacion',), ('core_apoderado',), ('core_informefinanciero',), ('core_informeacademico',), ('core_director',), ('core_contrato',), ('core_asisfinanza',), ('core_asismatricula',), ('core_establecimiento',), ('core_subdirector',), ('core_notificacion',), ('core_cursoalumno',), ('core_bitacoraclase',), ('core_alumno',), ('core_sostenedor',)]
+2024-11-13 18:56:29,216 - INFO - Respaldo diario guardado en C:\Users\GOLDEN GAMERS\Desktop\Capstone\Codigo_Capstone\scripts\backups\respaldo_2024-11-13.xlsx
+2024-11-13 18:56:29,216 - INFO - ConexiÃ³n cerrada.
+2024-11-13 19:13:49,014 - INFO - Iniciando el script de respaldo diario.
+2024-11-13 19:13:49,018 - INFO - Conectado a la base de datos.
+2024-11-13 19:13:49,022 - INFO - Tablas obtenidas: []
+2024-11-13 19:13:49,022 - INFO - No se encontraron tablas en la base de datos con el prefijo 'core_'. No se generó el respaldo.
+2024-11-13 19:13:49,022 - INFO - Conexión cerrada.
+2024-11-13 19:14:31,056 - INFO - Iniciando el script de respaldo diario.
+2024-11-13 19:14:31,056 - INFO - Conectado a la base de datos.
+2024-11-13 19:14:31,056 - INFO - Tablas obtenidas: []
+2024-11-13 19:14:31,056 - INFO - No se encontraron tablas en la base de datos con el prefijo 'core_'. No se generó el respaldo.
+2024-11-13 19:14:31,056 - INFO - Conexión cerrada.
+2024-11-13 19:16:10,079 - INFO - Iniciando el script de respaldo diario.
+2024-11-13 19:16:10,080 - INFO - Conectado a la base de datos.
+2024-11-13 19:16:10,084 - INFO - Tablas obtenidas: [('core_profesor',), ('core_asistencia',), ('core_asistencia_alumnos_presentes',), ('core_informe',), ('core_observacion',), ('core_registroacademico',), ('core_asistencia_alumnos_ausentes',), ('core_asistencia_alumnos_justificados',), ('core_curso',), ('core_curso_alumnos',), ('core_calificacion',), ('core_apoderado',), ('core_informefinanciero',), ('core_informeacademico',), ('core_director',), ('core_contrato',), ('core_asisfinanza',), ('core_asismatricula',), ('core_establecimiento',), ('core_subdirector',), ('core_notificacion',), ('core_cursoalumno',), ('core_bitacoraclase',), ('core_alumno',), ('core_sostenedor',)]
+2024-11-13 19:16:10,464 - INFO - Respaldo diario guardado en C:\Users\GOLDEN GAMERS\Desktop\Capstone\Codigo_Capstone\scripts\backups\respaldo_2024-11-13.xlsx
+2024-11-13 19:16:10,464 - INFO - Conexión cerrada.
+2024-11-13 19:32:22,956 - INFO - Iniciando el script de respaldo diario.
+2024-11-13 19:32:22,972 - INFO - Conectado a la base de datos.
+2024-11-13 19:32:23,001 - INFO - Tablas obtenidas: [('core_profesor',), ('core_asistencia',), ('core_asistencia_alumnos_presentes',), ('core_informe',), ('core_observacion',), ('core_registroacademico',), ('core_asistencia_alumnos_ausentes',), ('core_asistencia_alumnos_justificados',), ('core_curso',), ('core_curso_alumnos',), ('core_calificacion',), ('core_apoderado',), ('core_informefinanciero',), ('core_informeacademico',), ('core_director',), ('core_contrato',), ('core_asisfinanza',), ('core_asismatricula',), ('core_establecimiento',), ('core_subdirector',), ('core_notificacion',), ('core_cursoalumno',), ('core_bitacoraclase',), ('core_alumno',), ('core_sostenedor',)]
+2024-11-13 19:32:24,159 - INFO - Respaldo diario guardado en C:\Users\GOLDEN GAMERS\Desktop\Capstone\Codigo_Capstone\scripts\backups\respaldo_2024-11-13.xlsx
+2024-11-13 19:32:24,166 - INFO - Conexión cerrada.
+2024-11-13 19:35:08,714 - INFO - Iniciando el script de respaldo diario.
+2024-11-13 19:35:08,714 - INFO - Conectado a la base de datos.
+2024-11-13 19:35:08,715 - INFO - Tablas obtenidas: [('core_profesor',), ('core_asistencia',), ('core_asistencia_alumnos_presentes',), ('core_informe',), ('core_observacion',), ('core_registroacademico',), ('core_asistencia_alumnos_ausentes',), ('core_asistencia_alumnos_justificados',), ('core_curso',), ('core_curso_alumnos',), ('core_calificacion',), ('core_apoderado',), ('core_informefinanciero',), ('core_informeacademico',), ('core_director',), ('core_contrato',), ('core_asisfinanza',), ('core_asismatricula',), ('core_establecimiento',), ('core_subdirector',), ('core_notificacion',), ('core_cursoalumno',), ('core_bitacoraclase',), ('core_alumno',), ('core_sostenedor',)]
+2024-11-13 19:35:08,980 - INFO - Respaldo diario guardado en C:\Users\GOLDEN GAMERS\Desktop\Capstone\Codigo_Capstone\scripts\backups\respaldo_2024-11-13.xlsx
+2024-11-13 19:35:08,980 - INFO - Conexión cerrada.
+2024-11-13 19:35:53,444 - INFO - Iniciando el script de respaldo diario.
+2024-11-13 19:35:53,444 - INFO - Conectado a la base de datos.
+2024-11-13 19:35:53,445 - INFO - Tablas obtenidas: [('core_profesor',), ('core_asistencia',), ('core_asistencia_alumnos_presentes',), ('core_informe',), ('core_observacion',), ('core_registroacademico',), ('core_asistencia_alumnos_ausentes',), ('core_asistencia_alumnos_justificados',), ('core_curso',), ('core_curso_alumnos',), ('core_calificacion',), ('core_apoderado',), ('core_informefinanciero',), ('core_informeacademico',), ('core_director',), ('core_contrato',), ('core_asisfinanza',), ('core_asismatricula',), ('core_establecimiento',), ('core_subdirector',), ('core_notificacion',), ('core_cursoalumno',), ('core_bitacoraclase',), ('core_alumno',), ('core_sostenedor',)]
+2024-11-13 19:35:53,696 - INFO - Respaldo diario guardado en C:\Users\GOLDEN GAMERS\Desktop\Capstone\Codigo_Capstone\scripts\backups\respaldo_2024-11-13.xlsx
+2024-11-13 19:35:53,696 - INFO - Conexión cerrada.
+2024-11-14 14:01:04,978 - INFO - Iniciando el script de respaldo diario.
+2024-11-14 14:01:04,979 - INFO - Conectado a la base de datos.
+2024-11-14 14:01:04,979 - INFO - Tablas obtenidas: [('core_profesor',), ('core_asistencia',), ('core_asistencia_alumnos_presentes',), ('core_informe',), ('core_observacion',), ('core_registroacademico',), ('core_asistencia_alumnos_ausentes',), ('core_asistencia_alumnos_justificados',), ('core_curso',), ('core_curso_alumnos',), ('core_calificacion',), ('core_apoderado',), ('core_informefinanciero',), ('core_informeacademico',), ('core_director',), ('core_contrato',), ('core_asisfinanza',), ('core_asismatricula',), ('core_establecimiento',), ('core_subdirector',), ('core_notificacion',), ('core_cursoalumno',), ('core_bitacoraclase',), ('core_alumno',), ('core_sostenedor',)]
+2024-11-14 14:01:05,295 - INFO - Respaldo diario guardado en C:\Users\GOLDEN GAMERS\Desktop\Capstone\Codigo_Capstone\scripts\backups\respaldo_2024-11-14.xlsx
+2024-11-14 14:01:05,296 - INFO - Conexión cerrada.
+2024-11-14 16:20:23,546 - INFO - Iniciando el script de respaldo diario.
+2024-11-14 16:20:23,549 - INFO - Conectado a la base de datos.
+2024-11-14 16:20:23,553 - INFO - Tablas obtenidas: [('core_profesor',), ('core_asistencia',), ('core_asistencia_alumnos_presentes',), ('core_informe',), ('core_observacion',), ('core_registroacademico',), ('core_asistencia_alumnos_ausentes',), ('core_asistencia_alumnos_justificados',), ('core_curso',), ('core_curso_alumnos',), ('core_calificacion',), ('core_apoderado',), ('core_informefinanciero',), ('core_informeacademico',), ('core_director',), ('core_contrato',), ('core_asisfinanza',), ('core_asismatricula',), ('core_establecimiento',), ('core_subdirector',), ('core_notificacion',), ('core_cursoalumno',), ('core_bitacoraclase',), ('core_alumno',), ('core_sostenedor',)]
+2024-11-14 16:20:23,894 - INFO - Respaldo diario guardado en C:\Users\GOLDEN GAMERS\Desktop\Capstone\Codigo_Capstone\scripts\backups\respaldo_2024-11-14.xlsx
+2024-11-14 16:20:23,894 - INFO - Conexión cerrada.
