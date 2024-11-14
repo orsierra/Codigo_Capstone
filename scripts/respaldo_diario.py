@@ -5,15 +5,19 @@ from datetime import datetime
 import os
 import time
 
+# Directorio base del proyecto (un nivel arriba de la carpeta actual)
+base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 # Configuración de logging
-logging.basicConfig(filename="C:\\Users\\GOLDEN GAMERS\\Desktop\\Capstone\\Codigo_Capstone\\scripts\\respaldo_log.txt",
+log_path = os.path.join(base_dir, "scripts", "respaldo_log.txt")
+logging.basicConfig(filename=log_path,
                     level=logging.INFO,
                     format="%(asctime)s - %(levelname)s - %(message)s")
 
 logging.info("Iniciando el script de respaldo diario.")
 
 # Ruta de la base de datos
-db_path = "C:\\Users\\GOLDEN GAMERS\\Desktop\\Capstone\\Codigo_Capstone\\db.sqlite3"
+db_path = os.path.join(base_dir, "db.sqlite3")
 
 # Intentar conectar a la base de datos hasta 3 veces en caso de error
 max_attempts = 3
@@ -35,7 +39,6 @@ for attempt in range(max_attempts):
 
 # Si la conexión fue exitosa, proceder con el respaldo
 if conn:
-    # Obtener todas las tablas de la base de datos que comienzan con "core_"
     try:
         cursor = conn.cursor()
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'core_%';")
@@ -46,19 +49,16 @@ if conn:
         conn.close()
         exit()
 
-    # Solo proceder si hay tablas en la base de datos
     if tables:
         # Ruta de respaldo
         fecha_actual = datetime.now().strftime("%Y-%m-%d")
-        backup_dir = "C:\\Users\\GOLDEN GAMERS\\Desktop\\Capstone\\Codigo_Capstone\\scripts\\backups"
+        backup_dir = os.path.join(base_dir, "scripts", "backups")
         os.makedirs(backup_dir, exist_ok=True)
         excel_path = os.path.join(backup_dir, f"respaldo_{fecha_actual}.xlsx")
 
-        # Exportar cada tabla que empiece con "core_" a una hoja de Excel
         try:
             with pd.ExcelWriter(excel_path, engine='openpyxl') as writer:
                 for table_name, in tables:
-                    # Limitar el nombre de la hoja a 31 caracteres
                     sheet_name = table_name[:31]
                     df = pd.read_sql_query(f"SELECT * FROM {table_name}", conn)
                     df.to_excel(writer, sheet_name=sheet_name, index=False, na_rep="")
@@ -68,6 +68,5 @@ if conn:
     else:
         logging.info("No se encontraron tablas en la base de datos con el prefijo 'core_'. No se generó el respaldo.")
 
-    # Cerrar la conexión
     conn.close()
     logging.info("Conexión cerrada.")
