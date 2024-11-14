@@ -816,21 +816,24 @@ def apoderadoConsuNotas(request, establecimiento_id):
             'cursos': []
         }
 
-        # Crear un conjunto para evitar cursos repetidos
-        cursos_vistos = set()
+        # Usamos un conjunto para registrar los IDs de asignaturas ya vistas
+        asignaturas_vistas = set()
 
         # Obtener los cursos asignados al alumno
-        cursos_asignados = CursoAlumno.objects.filter(alumno=alumno).select_related('curso').distinct()
+        cursos_asignados = CursoAlumno.objects.filter(alumno=alumno).select_related('curso')
 
         for curso_alumno in cursos_asignados:
             curso = curso_alumno.curso
 
-            # Verificar si el curso ya fue agregado
-            if curso.id in cursos_vistos:
-                continue
-            cursos_vistos.add(curso.id)
+            # Verificar si el curso ya ha sido agregado
+            if curso.id in asignaturas_vistas:
+                print(f"Curso duplicado encontrado: {curso.asignatura}")  # Debug: Mostrar cursos duplicados
+                continue  # Si ya está, ignoramos esta entrada
 
-            # Obtener las calificaciones del alumno para este curso
+            # Añadir el curso al conjunto para evitar duplicados
+            asignaturas_vistas.add(curso.id)
+
+            # Obtener las calificaciones del alumno para esta asignatura
             calificaciones_curso = Calificacion.objects.filter(alumno=alumno, curso=curso)
 
             # Calcular el promedio de las calificaciones
@@ -841,7 +844,7 @@ def apoderadoConsuNotas(request, establecimiento_id):
             # Crear la lista de calificaciones numeradas
             calificaciones_numeradas = [{'numero': i + 1, 'nota': calificacion.nota} for i, calificacion in enumerate(calificaciones_curso)]
 
-            # Agregar la información del curso
+            # Agregar la información del curso al alumno_info
             curso_info = {
                 'curso': curso,
                 'calificaciones': calificaciones_numeradas,
@@ -849,12 +852,14 @@ def apoderadoConsuNotas(request, establecimiento_id):
             }
             alumno_info['cursos'].append(curso_info)
 
+        # Agregar los datos del alumno a la lista final
         alumnos_data.append(alumno_info)
 
     context = {
         'alumnos_data': alumnos_data,
         'establecimiento': establecimiento,
     }
+
     return render(request, 'apoderadoConsuNotas.html', context)
 
 # ======================================================================= APODERADO OBSERVACIONES ================================================================================================

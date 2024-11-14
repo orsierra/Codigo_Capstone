@@ -165,11 +165,26 @@
                 width: 100%;
                 height: auto;
                 position: relative;
+                display: none; /* Ocultar la barra lateral por defecto */
             }
 
             .main-content {
                 margin-left: 0;
                 width: 100%;
+            }
+
+            .sidebar.active {
+                display: block; /* Mostrar cuando la clase active esté presente */
+            }
+
+            .toggle-sidebar {
+                display: block;
+                background-color: #343a40;
+                color: white;
+                padding: 10px;
+                cursor: pointer;
+                margin: 10px;
+                border-radius: 5px;
             }
         }
     </style>
@@ -194,6 +209,11 @@
         <div class="footer">
             <a href="#">Nuevos horizontes</a>
         </div>
+    </div>
+
+    <!-- Botón para mostrar/ocultar la barra lateral en móviles -->
+    <div class="toggle-sidebar" onclick="document.querySelector('.sidebar').classList.toggle('active')">
+        <i class="fas fa-bars"></i> Menú
     </div>
 
     <div class="main-content">
@@ -248,6 +268,10 @@
                 this.querySelector('i').classList.toggle('fa-chevron-down');
                 this.querySelector('i').classList.toggle('fa-chevron-up');
             });
+
+            // Mostrar las notas por defecto (si lo prefieres)
+            var cursoId = asignatura.getAttribute('data-curso-id');
+            document.getElementById('notas-' + cursoId).style.display = 'block';
         });
     </script>
 
