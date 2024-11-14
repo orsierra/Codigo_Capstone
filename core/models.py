@@ -255,7 +255,7 @@ class AsisMatricula(models.Model):
 
 
 class CursoAlumno(models.Model):
-    establecimiento = models.ForeignKey(Establecimiento, on_delete=models.CASCADE, related_name='curso_alumno_relaciones', null=True, blank=True)
+
     curso = models.ForeignKey(Curso, on_delete=models.SET_NULL, related_name='curso_alumno_relacion', null=True, blank=True)
     alumno = models.ForeignKey(Alumno, on_delete=models.SET_NULL, related_name='curso_alumno_relacion', null=True, blank=True)
 
@@ -267,7 +267,7 @@ class CursoAlumno(models.Model):
     def __str__(self):
         curso_nombre = self.curso.nombre if self.curso else "Curso no asignado"
         alumno_nombre = f"{self.alumno.nombre} {self.alumno.apellido}" if self.alumno else "Alumno no asignado"
-        return f"{alumno_nombre} inscrito en {curso_nombre} - {self.establecimiento.nombre if self.establecimiento else 'Sin Establecimiento'}"
+        return f"{alumno_nombre} inscrito en {curso_nombre} "
 
 
 

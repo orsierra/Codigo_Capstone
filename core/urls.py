@@ -53,7 +53,7 @@ urlpatterns = [
     path('gestionar_estudiantes/', views.gestionar_estudiantes, name='gestionar_estudiantes'),
     path('agregar_alumno/', views.agregar_alumno, name='agregar_alumno'),
     path('actualizar_matricula/<int:id>/', views.actualizar_matricula, name='actualizar_matricula'),
-    path('panel_admision/', views.panel_admision, name='panel_admision'),
+    path('panel_admision/<int:establecimiento_id>/', views.panel_admision, name='panel_admision'),
     path('eliminar_alumno/<int:alumno_id>/', views.eliminar_alumno, name='eliminar_alumno'),
     # Asistente de admision y finanza
     path('panel_asisAdminFinan/<int:establecimiento_id>/', views.asisAdminFinan_dashboard, name='panel_asisAdminFinan'),

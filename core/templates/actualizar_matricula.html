@@ -198,7 +198,7 @@
     <div class="sidebar">
         <h2>Menú</h2>
         <ul>
-            <li><a href="{% url 'panel_admision' %}">Panel de Admisión</a></li>
+            <li><a href="{% url 'panel_admision' establecimiento_id=establecimiento.id %}">Inicio</a></li>
             <li><a href="{% url 'gestionar_estudiantes' %}">Lista de Estudiantes</a></li>
             <li><a href="{% url 'logout' %}">Cerrar sesión</a></li>
         </ul>
