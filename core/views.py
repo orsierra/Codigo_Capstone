@@ -1528,8 +1528,3 @@ def establecimientos(request, establecimiento_id):
     return render(request, 'establecimientos.html', contexto)
 
 
-
-
-
-
-
