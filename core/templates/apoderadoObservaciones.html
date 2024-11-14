@@ -18,7 +18,7 @@
             font-family: 'Arial', sans-serif;
             display: flex;
             min-height: 100vh;
-            background-color: #f8f9fa;
+            background-color: #f0f2f5;
         }
 
         .sidebar {
@@ -104,47 +104,69 @@
             font-size: 2em;
             text-align: center;
             color: #343a40;
-            margin-bottom: 20px;
-        }
-
-        .alumno-section {
             margin-bottom: 30px;
         }
 
-        .alumno-section h2 {
-            color: #495057;
-            font-size: 1.4em;
-            background-color: #007bff;
-            color: #fff;
-            padding: 10px;
-            border-radius: 5px;
-            text-align: center;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
+        .alumno-section {
             background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
-            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            padding: 20px;
         }
 
-        th, td {
-            padding: 15px;
-            text-align: center;
-            border-bottom: 1px solid #dee2e6;
-        }
-
-        th {
-            background-color: #007bff;
-            color: #fff;
+        .alumno-header {
+            color: #007bff;
+            font-size: 1.4em;
             font-weight: bold;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 10px;
+            text-align: center;
         }
 
-        tr:nth-child(even) {
+        .observacion-card {
             background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .observacion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #495057;
+            font-size: 1em;
+            margin-bottom: 5px;
+        }
+
+        .observacion-header span {
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .observacion-content {
+            font-size: 1em;
+            color: #333;
+            margin-top: 5px;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .no-observacion {
+            font-style: italic;
+            color: #6c757d;
+            text-align: center;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border: 1px dashed #dee2e6;
         }
 
         .buttons {
@@ -166,13 +188,6 @@
 
         .btn:hover {
             background-color: #0056b3;
-        }
-
-        .no-data {
-            text-align: center;
-            color: #6c757d;
-            font-style: italic;
-            padding: 15px;
         }
 
         /* Responsividad para pantallas pequeñas */
@@ -208,7 +223,6 @@
             <li><a href="{% url 'apoderadoObservaciones' establecimiento_id=establecimiento.id %}">Observaciones</a></li>
             <li><a href="{% url 'historial_notificaciones' establecimiento_id=establecimiento.id %}">Notificaciones</a></li>
             <li>
-                <!-- Botón de Cerrar sesión estilo enlace -->
                 <form action="{% url 'logout' %}" method="post" style="display: inline;">
                     {% csrf_token %}
                     <button type="submit">Cerrar sesión</button>
@@ -226,34 +240,29 @@
         {% if observaciones_data %}
             {% for data in observaciones_data %}
                 <div class="alumno-section">
-                    <h2>{{ data.alumno.nombre }} {{ data.alumno.apellido }}</h2>
+                    <div class="alumno-header">
+                        {{ data.alumno.nombre }} {{ data.alumno.apellido }}
+                    </div>
                     
                     {% if data.observaciones %}
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Curso</th>
-                                    <th>Fecha</th>
-                                    <th>Observación</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for observacion in data.observaciones %}
-                                    <tr>
-                                        <td>{{ observacion.curso.nombre }}</td>
-                                        <td>{{ observacion.fecha }}</td>
-                                        <td>{{ observacion.contenido }}</td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                        {% for observacion in data.observaciones %}
+                            <div class="observacion-card">
+                                <div class="observacion-header">
+                                    <span>Asignatura: {{ observacion.curso.nombre }}</span>
+                                    <span>{{ observacion.fecha }}</span>
+                                </div>
+                                <div class="observacion-content">
+                                    {{ observacion.contenido }}
+                                </div>
+                            </div>
+                        {% endfor %}
                     {% else %}
-                        <p class="no-data">No hay observaciones registradas para este alumno.</p>
+                        <div class="no-observacion">No hay observaciones registradas para este alumno.</div>
                     {% endif %}
                 </div>
             {% endfor %}
         {% else %}
-            <p class="no-data">No tienes alumnos asociados con observaciones registradas.</p>
+            <p class="no-observacion">No tienes alumnos asociados con observaciones registradas.</p>
         {% endif %}
         
         <div class="buttons">
