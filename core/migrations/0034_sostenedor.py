@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0033_merge_20241111_1652'),
+        ('core', '0033_notificacion_establecimiento'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
