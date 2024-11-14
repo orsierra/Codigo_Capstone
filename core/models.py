@@ -2,8 +2,19 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 
+#MODELO SOSTENEDOR
+class Sostenedor(models.Model):
+    # Relación uno a uno con el modelo de usuario para autenticación y gestión de permisos
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    
+    # Campos adicionales
+    nombre = models.CharField(max_length=100)
+    apellido = models.CharField(max_length=100)
+    email = models.EmailField(unique=True)
+    telefono = models.CharField(max_length=15, blank=True, null=True)
 
-
+    def __str__(self):
+        return f"{self.nombre} {self.apellido}"
 # modelo profesor, apoderado y alumno
 # Nuevo modelo de Establecimiento
 class Establecimiento(models.Model):
@@ -244,6 +255,7 @@ class CursoAlumno(models.Model):
         curso_nombre = self.curso.nombre if self.curso else "Curso no asignado"
         alumno_nombre = f"{self.alumno.nombre} {self.alumno.apellido}" if self.alumno else "Alumno no asignado"
         return f"{alumno_nombre} inscrito en {curso_nombre}"
+        return f"{alumno_nombre} inscrito en {curso_nombre} "
 
 
 

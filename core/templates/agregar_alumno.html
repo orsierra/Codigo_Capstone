@@ -178,7 +178,14 @@
     <div class="sidebar">
         <h2>Menú</h2>
         <ul>
-            <li><a href="{% url 'panel_admision' %}">Inicio</a></li>
+            <li>
+                {% if establecimiento and establecimiento.id %}
+                    <a href="{% url 'panel_admision' establecimiento_id=establecimiento.id %}">Inicio</a>
+                {% else %}
+                    <span>Inicio</span>  <!-- O puedes redirigir a alguna página predeterminada en caso de que no haya establecimiento -->
+                {% endif %}
+            </li>
+            
             <li><a href="{% url 'gestionar_estudiantes' %}">Lista de Estudiantes</a></li>
         </ul>
         <div class="footer">

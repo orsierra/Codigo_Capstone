@@ -215,7 +215,7 @@
     <div class="sidebar">
         <h2>Menú</h2>
         <ul>
-            <li><a href="{% url 'panel_admision' %}">Inicio</a></li>
+            <li><a href="{% url 'panel_admision' establecimiento_id=establecimiento.id %}">Inicio</a></li>
             <li><a href="{% url 'agregar_alumno' %}">Agregar Alumno</a></li>
             <li>
                 <!-- Botón de Cerrar sesión estilo enlace -->
@@ -301,7 +301,8 @@
             </tbody>
         </table>
 
-        <a href="{% url 'panel_admision' %}" class="btn-volver">Volver</a>
+        <a href="{% url 'panel_admision' establecimiento_id=establecimiento.id %}" class="btn-volver">Volver</a>
+
     </div>
 
 </body>
