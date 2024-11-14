@@ -747,49 +747,49 @@ def historial_notificaciones(request, establecimiento_id):
 
 @login_required
 def apoderadoConsuAsis(request, establecimiento_id):
-    # Obtener el apoderado relacionado con el usuario actual
+    # Obtener el apoderado y el establecimiento
     apoderado = get_object_or_404(Apoderado, user=request.user)
-    
-    # Verificar si el apoderado está asociado con el establecimiento solicitado
     establecimiento = get_object_or_404(Establecimiento, id=establecimiento_id)
-    if apoderado.establecimiento != establecimiento:
-        # Si no está asociado con este establecimiento, redirigir o mostrar un error
-        return redirect('error_page')  # Cambia esto a una vista de error adecuada si es necesario
 
-    # Obtener los alumnos del apoderado que estén aprobados
+    # Verificar que el apoderado esté asociado al establecimiento
+    if apoderado.establecimiento != establecimiento:
+        return redirect('error_page')
+
+    # Obtener los alumnos aprobados del apoderado
     alumnos = Alumno.objects.filter(apoderado=apoderado, estado_admision='Aprobado')
     asistencias_data = {}
 
     for alumno in alumnos:
-        # Obtiene los cursos asignados a cada alumno
-        cursos_asignados = CursoAlumno.objects.filter(alumno=alumno).select_related('curso')
+        # Obtener cursos únicos en el establecimiento actual asignados al alumno usando la relación correcta
+        cursos_asignados = Curso.objects.filter(curso_alumno_relacion__alumno=alumno, establecimiento=establecimiento).distinct()
+
         asistencias_data[alumno] = []
 
-        for curso_alumno in cursos_asignados:
-            curso = curso_alumno.curso  # Obtener el curso desde CursoAlumno
-            # Recupera todas las fechas en las que el alumno estuvo en algún estado de asistencia
+        for curso in cursos_asignados:
+            # Obtener todas las fechas de asistencia relacionadas con el alumno y el curso
             fechas_presentes = set(Asistencia.objects.filter(curso=curso, alumnos_presentes=alumno).values_list('fecha', flat=True))
             fechas_ausentes = set(Asistencia.objects.filter(curso=curso, alumnos_ausentes=alumno).values_list('fecha', flat=True))
             fechas_justificados = set(Asistencia.objects.filter(curso=curso, alumnos_justificados=alumno).values_list('fecha', flat=True))
 
+            # Calcular totales de clases y asistencia
             fechas_totales = fechas_presentes | fechas_ausentes | fechas_justificados
             total_clases = len(fechas_totales)
 
             total_asistencia = len(fechas_presentes) + len(fechas_justificados)
             porcentaje_asistencia = (total_asistencia / total_clases * 100) if total_clases > 0 else 0
 
+            # Añadir la información del curso y asistencia al contexto de cada alumno
             asistencias_data[alumno].append({
-                'curso': curso.nombre,  # Nombre del curso
+                'curso': curso.nombre,
                 'total_clases': total_clases,
                 'asistencia': total_asistencia,
                 'porcentaje_asistencia': round(porcentaje_asistencia, 2),
             })
 
-    # Pasar el 'establecimiento_id' al contexto
     context = {
         'alumnos': alumnos,
         'asistencias_data': asistencias_data,
-        'establecimiento_id': establecimiento.id,  # Agregar el establecimiento_id al contexto
+        'establecimiento_id': establecimiento.id,
     }
     return render(request, 'apoderadoConsuAsis.html', context)
 
@@ -798,10 +798,11 @@ def apoderadoConsuAsis(request, establecimiento_id):
 # ============================================================================== Consulta de Notas del Apoderado ============================================================================
 @login_required
 def apoderadoConsuNotas(request, establecimiento_id):
-    # Obtener el apoderado y establecimiento
+    # Obtener el apoderado y el establecimiento
     apoderado = get_object_or_404(Apoderado, user=request.user)
     establecimiento = get_object_or_404(Establecimiento, id=establecimiento_id)
 
+    # Verificar que el apoderado esté asociado al establecimiento
     if apoderado.establecimiento != establecimiento:
         return redirect('error_page')
 
@@ -811,82 +812,65 @@ def apoderadoConsuNotas(request, establecimiento_id):
     alumnos_data = []
 
     for alumno in alumnos:
-        alumno_info = {
-            'alumno': alumno,
-            'cursos': []
-        }
+        # Obtener los cursos únicos del alumno en el establecimiento específico
+        cursos_alumno = CursoAlumno.objects.filter(
+            alumno=alumno,
+            curso__establecimiento=establecimiento
+        ).select_related('curso').prefetch_related('curso__calificacion_set')
 
-        # Crear un conjunto para evitar cursos repetidos
-        cursos_vistos = set()
+        cursos_con_promedios = []
 
-        # Obtener los cursos asignados al alumno
-        cursos_asignados = CursoAlumno.objects.filter(alumno=alumno).select_related('curso').distinct()
-
-        for curso_alumno in cursos_asignados:
+        for curso_alumno in cursos_alumno:
             curso = curso_alumno.curso
 
-            # Verificar si el curso ya fue agregado
-            if curso.id in cursos_vistos:
-                continue
-            cursos_vistos.add(curso.id)
+            # Filtrar las calificaciones del alumno para este curso
+            calificaciones = Calificacion.objects.filter(alumno=alumno, curso=curso)
+            promedio = calificaciones.aggregate(average_nota=Avg('nota'))['average_nota'] if calificaciones.exists() else None
 
-            # Obtener las calificaciones del alumno para este curso
-            calificaciones_curso = Calificacion.objects.filter(alumno=alumno, curso=curso)
-
-            # Calcular el promedio de las calificaciones
-            total_notas = sum(c.nota for c in calificaciones_curso if c.nota is not None)
-            count_notas = calificaciones_curso.filter(nota__isnull=False).count()
-            promedio = round(total_notas / count_notas, 2) if count_notas > 0 else 0
-
-            # Crear la lista de calificaciones numeradas
-            calificaciones_numeradas = [{'numero': i + 1, 'nota': calificacion.nota} for i, calificacion in enumerate(calificaciones_curso)]
-
-            # Agregar la información del curso
-            curso_info = {
+            # Agregar el curso, calificaciones y promedio a la lista de cursos
+            cursos_con_promedios.append({
                 'curso': curso,
-                'calificaciones': calificaciones_numeradas,
-                'promedio': promedio
-            }
-            alumno_info['cursos'].append(curso_info)
+                'calificaciones': calificaciones,
+                'promedio': round(promedio, 2) if promedio is not None else None
+            })
 
-        alumnos_data.append(alumno_info)
+        # Agregar los datos del alumno y sus cursos al contexto
+        alumnos_data.append({
+            'alumno': alumno,
+            'cursos': cursos_con_promedios
+        })
 
     context = {
         'alumnos_data': alumnos_data,
         'establecimiento': establecimiento,
     }
     return render(request, 'apoderadoConsuNotas.html', context)
-
 # ======================================================================= APODERADO OBSERVACIONES ================================================================================================
 
 @login_required
 def apoderado_observaciones(request, establecimiento_id):
-    # Obtener el apoderado relacionado con el usuario actual
+    # Obtener el apoderado y el establecimiento
     apoderado = get_object_or_404(Apoderado, user=request.user)
-    
-    # Obtener el establecimiento a través del id pasado como parámetro
     establecimiento = get_object_or_404(Establecimiento, id=establecimiento_id)
-    
-    # Verificar si el apoderado está asociado con el establecimiento
+
+    # Verificar que el apoderado esté asociado al establecimiento
     if apoderado.establecimiento != establecimiento:
-        return redirect('error_page')  # Cambia esto a una página de error o muestra un mensaje adecuado
-    
+        return redirect('error_page')
+
     # Obtener los alumnos aprobados del apoderado
     alumnos_aprobados = Alumno.objects.filter(apoderado=apoderado, estado_admision="Aprobado")
     
     observaciones_data = []
-    
+
     for alumno in alumnos_aprobados:
-        # Obtener los cursos del alumno a través de CursoAlumno
-        cursos_asignados = CursoAlumno.objects.filter(alumno=alumno).select_related('curso')
-        
-        for curso_alumno in cursos_asignados:
-            curso = curso_alumno.curso  # Obtener el curso desde CursoAlumno
-            
-            # Obtener las observaciones del alumno para el curso específico
+        # Obtener cursos únicos del alumno para el establecimiento actual
+        cursos_asignados = Curso.objects.filter(curso_alumno_relacion__alumno=alumno, establecimiento=establecimiento).distinct()
+
+        for curso in cursos_asignados:
+            # Obtener observaciones únicas del alumno para el curso específico
             observaciones_alumno = Observacion.objects.filter(alumno=alumno, curso=curso)
-            
-            # Almacenar los datos de observaciones en la lista
+
+            # Agregar datos de observaciones de cada curso a la lista
             observaciones_data.append({
                 'alumno': alumno,
                 'curso': curso,
@@ -896,7 +880,7 @@ def apoderado_observaciones(request, establecimiento_id):
     # Pasar el establecimiento al contexto
     return render(request, 'apoderadoObservaciones.html', {
         'observaciones_data': observaciones_data,
-        'establecimiento': establecimiento,  # Incluir el establecimiento en el contexto
+        'establecimiento': establecimiento,
     })
 
 

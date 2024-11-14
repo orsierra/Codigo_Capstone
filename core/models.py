@@ -255,7 +255,7 @@ class CursoAlumno(models.Model):
         curso_nombre = self.curso.nombre if self.curso else "Curso no asignado"
         alumno_nombre = f"{self.alumno.nombre} {self.alumno.apellido}" if self.alumno else "Alumno no asignado"
         return f"{alumno_nombre} inscrito en {curso_nombre}"
-        return f"{alumno_nombre} inscrito en {curso_nombre} "
+
 
 
 

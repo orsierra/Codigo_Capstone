@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -63,7 +63,7 @@
             background: none;
             border: none;
             cursor: pointer;
-            font-size: 1em; /* Asegura el mismo tamaño de fuente */
+            font-size: 1em;
             font-family: inherit;
         }
 
@@ -237,25 +237,24 @@
                 <div id="panel-{{ alumno.id }}" class="panel-content">
                     {% if asistencias %}
                         {% for asistencia in asistencias %}
-                        <div>
-                            <h3>{{ asistencia.curso.nombre }} - {{ asistencia.curso.asignatura }}</h3>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Total de Clases</th>
-                                        <th>Asistencia</th>
-                                        <th>Porcentaje de Asistencia</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>{{ asistencia.total_clases }}</td>
-                                        <td>{{ asistencia.asistencia }}</td>
-                                        <td>{{ asistencia.porcentaje_asistencia }}%</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Asignatura</th>
+                                    <th>Total de Clases</th>
+                                    <th>Asistencia</th>
+                                    <th>Porcentaje de Asistencia</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>{{ asistencia.curso }}</td>
+                                    <td>{{ asistencia.total_clases }}</td>
+                                    <td>{{ asistencia.asistencia }}</td>
+                                    <td>{{ asistencia.porcentaje_asistencia }}%</td>
+                                </tr>
+                            </tbody>
+                        </table>
                         {% endfor %}
                     {% else %}
                         <p class="no-data">No hay datos de asistencia para este alumno.</p>
