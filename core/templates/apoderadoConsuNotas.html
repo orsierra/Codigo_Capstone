@@ -63,7 +63,7 @@
             background: none;
             border: none;
             cursor: pointer;
-            font-size: 1em; /* Asegura el mismo tamaño de fuente */
+            font-size: 1em;
             font-family: inherit;
         }
 
@@ -207,12 +207,11 @@
         <h2>Menú</h2>
         <ul>
             <li><a href="{% url 'apoderado_view' establecimiento_id=establecimiento.id %}">Apoderado</a></li>
-            <li><a href="{% url 'apoderadoConsuAsis'  establecimiento_id=establecimiento.id %}">Asistencia</a></li>
+            <li><a href="{% url 'apoderadoConsuAsis' establecimiento_id=establecimiento.id %}">Asistencia</a></li>
             <li><a href="{% url 'apoderadoConsuNotas' establecimiento_id=establecimiento.id %}">Notas</a></li>
             <li><a href="{% url 'apoderadoObservaciones' establecimiento_id=establecimiento.id %}">Observaciones</a></li>
             <li><a href="{% url 'historial_notificaciones' establecimiento_id=establecimiento.id %}">Notificaciones</a></li>
             <li>
-                <!-- Formulario para cerrar sesión -->
                 <form action="{% url 'logout' %}" method="post" style="display: inline;">
                     {% csrf_token %}
                     <button type="submit">Cerrar sesión</button>
