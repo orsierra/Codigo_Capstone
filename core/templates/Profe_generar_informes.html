@@ -92,14 +92,25 @@
 
         /* Contenido principal */
         .main-content {
-            margin-left: 270px;
+            margin-left: 270px;  /* Ajusta para que se aleje del sidebar */
             padding: 30px;
-            width: calc(100% - 270px);
+            width: calc(100% - 270px);  /* Asegura que el contenido ocupe el resto del espacio */
             overflow-y: auto;
             background-color: #ffffff;
             display: flex;
-            flex-direction: column;
+            justify-content: center; /* Centra el contenido */
             align-items: center;
+            box-sizing: border-box;  /* Asegura que el padding no afecte el tamaño del contenido */
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px; /* Da espacio entre el header y el contenido */
         }
 
         h1 {
@@ -111,15 +122,6 @@
             color: white;
             padding: 15px;
             border-radius: 8px;
-        }
-
-        .container {
-            width: 90%;
-            max-width: 1200px;
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
         .card {
@@ -180,22 +182,23 @@
         </div>
     </div>
 
-    <div class="container">
-        <h1>Informe de Alumnos - {{ curso.nombre }}</h1>
-    
-        {% if alumnos_aprobados %}
-            <div class="row">
-                {% for alumno in alumnos_aprobados %}
-                    <div class="card">
-                        <h5>{{ alumno.nombre }} {{ alumno.apellido }}</h5>
-                        <a href="{% url 'alumno_detalle' establecimiento.id alumno.id %}" class="btn">Ver detalle</a>
-                    </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <p>No hay alumnos aprobados para este curso.</p>
-        {% endif %}
-    </div>
+    <div class="main-content">
+        <div class="container">
+            <h1>Informe de Alumnos - {{ curso.nombre }}</h1>
+        
+            {% if alumnos_aprobados %}
+                <div class="row">
+                    {% for alumno in alumnos_aprobados %}
+                        <div class="card">
+                            <h5>{{ alumno.nombre }} {{ alumno.apellido }}</h5>
+                            <a href="{% url 'alumno_detalle' establecimiento.id alumno.id %}" class="btn">Ver detalle</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>No hay alumnos aprobados para este curso.</p>
+            {% endif %}
+        </div>
     </div>
 </body>
 </html>

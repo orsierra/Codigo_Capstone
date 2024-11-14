@@ -46,28 +46,34 @@ def login_view(request):
         if user is not None:
             if hasattr(user, 'alumno'):
                 alumno = Alumno.objects.get(user=user)
-    
                 if alumno.estado_admision == 'Pendiente':
                     messages.error(request, 'Su estado de admisión está pendiente. No puede acceder al sistema.')
                     return render(request, 'login.html')
+                establecimiento_id = alumno.establecimiento_id  # Similar a cómo se hace con el profesor
                 login(request, user)
-                return redirect('alumno_dashboard')
-
+                return redirect('alumno_dashboard',establecimiento_id=establecimiento_id)
+    
             if hasattr(user, 'profesor'):
-                profesor = user.profesor  # Obtener el objeto profesor
-                establecimiento_id = profesor.establecimiento_id  # Asegúrate de que el modelo Profesor tenga un campo `establecimiento`
+                profesor = user.profesor  #
+                establecimiento_id = profesor.establecimiento_id 
                 login(request, user)
-                return redirect('profesor', establecimiento_id=establecimiento_id)  # Pasa el establecimiento_id aquí
+                return redirect('profesor', establecimiento_id=establecimiento_id)  
 
             elif hasattr(user, 'apoderado'):
+                apoderado = user.apoderado  
+                establecimiento_id = apoderado.establecimiento_id  
                 login(request, user)
-                return redirect('apoderado_view')
-
+                return redirect('apoderado_view', establecimiento_id=establecimiento_id) 
+                
             elif hasattr(user, 'director'):
+                director = user.director
+                establecimiento_id = director.establecimiento_id
                 login(request, user)
                 return redirect('director_dashboard')
             
             elif hasattr(user, 'subdirector'):
+                subdirector = user.subdirector
+                establecimiento_id = subdirector.establecimiento_id 
                 login(request, user)
                 return redirect('subdirector_home')
 
@@ -79,6 +85,8 @@ def login_view(request):
             
                 #Verificar si es asisMatricula
             elif hasattr(user, 'asismatricula'):
+                asismatricula = user.asismatricula
+                establecimiento_id = asismatricula.establecimiento_id  # Asegúrate de que el modelo Profesor tenga un campo `establecimiento`
                 login(request, user)
                 return redirect('panel_admision')
             else:
@@ -90,12 +98,12 @@ def login_view(request):
     
     return render(request, 'login.html')
 
-# Logout
+#==================================================================== Logout ==========================================================
 def logout_view(request):
     logout(request)
     return redirect('inicio') 
 
-# Dashboard de profesor
+# =====================================================================Dashboard de profesor ==========================================================
 @login_required
 def profesor_dashboard(request, establecimiento_id):
     # Verificar que el establecimiento_id no sea vacío o inválido
@@ -129,7 +137,10 @@ def profesor_cursos(request, establecimiento_id):
 def libro_clases(request, establecimiento_id, curso_id):
     establecimiento = get_object_or_404(Establecimiento, id=establecimiento_id)
     curso = get_object_or_404(Curso, id=curso_id, establecimiento=establecimiento)
-    alumnos = Alumno.objects.filter(curso=curso)  # Filtra los alumnos en el curso
+
+    # Obtener los alumnos del curso a través de la relación CursoAlumno
+    curso_alumnos = CursoAlumno.objects.filter(curso=curso)
+    alumnos = Alumno.objects.filter(id__in=curso_alumnos.values('alumno_id'))  # Filtra los alumnos según los cursos a los que están asignados
 
     context = {
         'curso': curso,
@@ -139,20 +150,22 @@ def libro_clases(request, establecimiento_id, curso_id):
     return render(request, 'profesorLibro.html', context)
 
 
-# Registrar asistencia
+
+# ============================================Registrar asistencia ================================================================
 @login_required
 def registrar_asistencia(request, establecimiento_id, curso_id):
     establecimiento = get_object_or_404(Establecimiento, id=establecimiento_id)
     curso = get_object_or_404(Curso, id=curso_id, establecimiento=establecimiento)
     profesor = curso.profesor
 
-    # Obtener los alumnos aprobados para el curso específico y establecimiento
+    # Filtrar los alumnos aprobados para el curso y establecimiento específico
     alumnos_aprobados = CursoAlumno.objects.filter(
-        curso=curso, 
-        alumno__estado_admision='Aprobado', 
-        curso__establecimiento=establecimiento
+        curso=curso,
+        alumno__estado_admision='Aprobado',
+        alumno__establecimiento=establecimiento  # Asegurarse de que el alumno pertenece al mismo establecimiento
     ).select_related('alumno')
 
+    # Verificamos si existen alumnos aprobados
     if not alumnos_aprobados.exists():
         messages.warning(request, f"No hay alumnos aprobados asociados al curso {curso.nombre}.")
         return redirect('profesor_cursos', establecimiento_id=establecimiento_id)
@@ -160,9 +173,11 @@ def registrar_asistencia(request, establecimiento_id, curso_id):
     success_message = None
 
     if request.method == 'POST':
+        # Obtener las actividades y observaciones desde el formulario
         actividades_realizadas = request.POST.get('actividades_realizadas')
         observaciones = request.POST.get('observaciones')
 
+        # Validamos que las actividades hayan sido ingresadas
         if not actividades_realizadas:
             success_message = "Debe registrar las actividades realizadas en la bitácora antes de guardar la asistencia."
         else:
@@ -175,34 +190,52 @@ def registrar_asistencia(request, establecimiento_id, curso_id):
                 observaciones=observaciones,
             )
 
-            # Crear y guardar el objeto de Asistencia
-            asistencia = Asistencia(curso=curso, fecha=timezone.now(), establecimiento=establecimiento)
-            asistencia.save()
+            # Crear el formulario de asistencia con los alumnos aprobados
+            form = AsistenciaForm(request.POST, establecimiento=establecimiento)
 
-            # Registrar el estado de asistencia para cada alumno aprobado
-            for curso_alumno in alumnos_aprobados:
-                alumno = curso_alumno.alumno
-                asistencia_estado = request.POST.get(f'asistencia_{alumno.id}')
+            if form.is_valid():
+                # Guardar la asistencia
+                asistencia = form.save(commit=False)
+                asistencia.curso = curso
+                asistencia.fecha = timezone.now()
+                asistencia.save()
 
-                if asistencia_estado == 'presente':
-                    asistencia.alumnos_presentes.add(alumno)
-                elif asistencia_estado == 'ausente':
-                    asistencia.alumnos_ausentes.add(alumno)
-                elif asistencia_estado == 'justificado':
-                    asistencia.alumnos_justificados.add(alumno)
+                # Registrar el estado de asistencia para cada alumno aprobado
+                for alumno in alumnos_aprobados:
+                    alumno_instance = alumno.alumno  # Asegúrate de que 'alumno' es una instancia de Alumno
+                    if not isinstance(alumno_instance, Alumno):
+                        raise ValueError(f"Se esperaba una instancia de Alumno, pero se recibió: {type(alumno_instance)}")
+                    
+                    # Obtener el estado de asistencia para este alumno desde el formulario
+                    estado_presente = form.cleaned_data.get(f'presente_{alumno_instance.id}')
+                    estado_ausente = form.cleaned_data.get(f'ausente_{alumno_instance.id}')
+                    estado_justificado = form.cleaned_data.get(f'justificado_{alumno_instance.id}')
 
-            success_message = "Bitácora y asistencia registradas exitosamente."
-            messages.success(request, success_message)
-            return redirect('registrar_asistencia', establecimiento_id=establecimiento_id, curso_id=curso.id)
+                    # Asignar el estado de asistencia de acuerdo a lo recibido en el formulario
+                    if estado_presente:
+                        asistencia.alumnos_presentes.add(alumno_instance)
+                    if estado_ausente:
+                        asistencia.alumnos_ausentes.add(alumno_instance)
+                    if estado_justificado:
+                        asistencia.alumnos_justificados.add(alumno_instance)
+
+                success_message = "Bitácora y asistencia registradas exitosamente."
+                messages.success(request, success_message)
+                return redirect('registrar_asistencia', establecimiento_id=establecimiento_id, curso_id=curso.id)
+            else:
+                success_message = "Hubo un error en el formulario. Por favor, intente nuevamente."
+
+    else:
+        form = AsistenciaForm(establecimiento=establecimiento)
 
     return render(request, 'registrarAsistencia.html', {
+        'form': form,
         'curso': curso,
         'alumnos_aprobados': alumnos_aprobados,
         'success_message': success_message,
         'establecimiento': establecimiento,
     })
-
-
+#========================================================== HISTORIAL BITACORA =============================================================
 
 @login_required
 def historial_bitacoras(request, establecimiento_id, curso_id):
@@ -210,20 +243,41 @@ def historial_bitacoras(request, establecimiento_id, curso_id):
     establecimiento = get_object_or_404(Establecimiento, id=establecimiento_id)
     
     # Obtener el curso asociado al establecimiento
-    curso = get_object_or_404(Curso, id=curso_id, establecimiento=establecimiento)  # Aseguramos que el curso pertenece al establecimiento
+    curso = get_object_or_404(Curso, id=curso_id, establecimiento=establecimiento)
     
     # Obtener las bitácoras asociadas al curso
-    bitacoras = BitacoraClase.objects.filter(curso=curso).order_by('-fecha')  # Ordenadas por fecha descendente
+    bitacoras = BitacoraClase.objects.filter(curso=curso).order_by('-fecha')
     
-    # Preparar el contexto para la plantilla
+    # Obtener los alumnos matriculados en el curso
+    alumnos = CursoAlumno.objects.filter(curso=curso)
+    
+    # Contar los alumnos presentes por cada bitácora
+    for bitacora in bitacoras:
+        # Buscar las asistencias correspondientes a la fecha de la bitácora
+        asistencia = Asistencia.objects.filter(
+            curso=curso, 
+            fecha=bitacora.fecha
+        ).first()  # Utilizamos `first()` para obtener la primera asistencia (puede haber solo una por fecha)
+        
+        if asistencia:
+            # Contar los alumnos presentes en esa asistencia
+            alumnos_presentes_count = asistencia.alumnos_presentes.count()
+        else:
+            alumnos_presentes_count = 0
+
+        # Asignamos el conteo de los alumnos presentes en la bitácora
+        bitacora.alumnos_presentes_count = alumnos_presentes_count
+    
     context = {
         'curso': curso,
-        'establecimiento': establecimiento,  # Agregar establecimiento al contexto
+        'establecimiento': establecimiento,
         'bitacoras': bitacoras,
     }
+    
     return render(request, 'historial_bitacoras.html', context)
 
 
+#=================================================== ELIMINAR BITACORA==============================================================
 
 
 @login_required
@@ -245,8 +299,6 @@ def eliminar_bitacora(request, establecimiento_id, bitacora_id):
 
 #=============================================================== REGISTRAR CALIFICACIONES =======================================================================
 
-
-
 @login_required
 def registrar_calificaciones(request, establecimiento_id, curso_id):
     establecimiento = get_object_or_404(Establecimiento, id=establecimiento_id)
@@ -254,11 +306,11 @@ def registrar_calificaciones(request, establecimiento_id, curso_id):
     errores = {}
     form_list = {}
 
-    # Obtener alumnos aprobados para el curso y establecimiento específicos
+    # Filtrar alumnos aprobados para el curso y establecimiento específicos
     alumnos_aprobados = CursoAlumno.objects.filter(
         curso=curso, 
-        alumno__estado_admision='Aprobado', 
-        curso__establecimiento=establecimiento
+        alumno__estado_admision='Aprobado',
+        alumno__establecimiento=establecimiento  # Asegurarse de que el alumno pertenece al establecimiento
     ).select_related('alumno')
 
     if request.method == 'POST':
@@ -270,7 +322,7 @@ def registrar_calificaciones(request, establecimiento_id, curso_id):
                 calificacion, created = Calificacion.objects.get_or_create(
                     alumno=alumno,
                     curso=curso,
-                    establecimiento=establecimiento,
+                    establecimiento=curso_alumno.establecimiento,  # Usar establecimiento desde CursoAlumno
                     defaults={'nota': form.cleaned_data['nota']}
                 )
                 if not created:
@@ -294,6 +346,7 @@ def registrar_calificaciones(request, establecimiento_id, curso_id):
         'errores': errores,
         'establecimiento': establecimiento,
     })
+
 # =================================================== REGISTRO ACADEMICO =====================================================================================
 
 @login_required
@@ -302,10 +355,10 @@ def registro_academico(request, establecimiento_id, curso_id):
     curso = get_object_or_404(Curso, id=curso_id, establecimiento=establecimiento)
 
     # Filtrar solo alumnos aprobados en el curso y establecimiento especificados
-    curso_alumnos = CursoAlumno.objects.filter(curso=curso, alumno__estado_admision='Aprobado')
+    curso_alumnos = CursoAlumno.objects.filter(curso=curso, alumno__estado_admision='Aprobado', alumno__establecimiento=establecimiento)
     alumnos_aprobados = [curso_alumno.alumno for curso_alumno in curso_alumnos]
 
-    # Obtener calificaciones y asistencias para el curso
+    # Obtener calificaciones y asistencias para el curso, filtradas por establecimiento
     calificaciones = Calificacion.objects.filter(curso=curso, establecimiento=establecimiento)
     asistencias = Asistencia.objects.filter(curso=curso)
 
@@ -315,6 +368,7 @@ def registro_academico(request, establecimiento_id, curso_id):
     asistencias_por_alumno = {}
 
     for alumno in alumnos_aprobados:
+        # Filtrar calificaciones por alumno
         calificaciones_alumno = calificaciones.filter(alumno=alumno)
         calificaciones_por_alumno[alumno] = calificaciones_alumno
         promedio = calificaciones_alumno.aggregate(Avg('nota'))['nota__avg'] or 0
@@ -336,7 +390,6 @@ def registro_academico(request, establecimiento_id, curso_id):
         'establecimiento': establecimiento,
     }
     return render(request, 'registroAcademico.html', context)
-
 
 
 
@@ -419,35 +472,6 @@ def alumno_detalle(request, establecimiento_id, alumno_id):
 
 ##============================================ generar pdf por alumno: asistencia y calificaciones================================
 
-@login_required
-def descargar_pdf_alumno(request, establecimiento_id, alumno_id):
-    establecimiento = get_object_or_404(Establecimiento, id=establecimiento_id)
-    alumno = get_object_or_404(Alumno, id=alumno_id, establecimiento=establecimiento)
-    
-    # Obtener las calificaciones, asistencias, y observaciones del alumno
-    calificaciones = Calificacion.objects.filter(alumno=alumno)
-    asistencias = Asistencia.objects.filter(alumnos_presentes=alumno)
-    ausencias = Asistencia.objects.filter(alumnos_ausentes=alumno)
-    justificaciones = Asistencia.objects.filter(alumnos_justificados=alumno)
-    observaciones = Observacion.objects.filter(alumno=alumno)  # Obtener las observaciones del alumno
-
-    # Calcular el promedio de calificaciones
-    promedio = calificaciones.aggregate(promedio=Avg('nota'))['promedio'] or 0
-
-    # Preparar el contexto para la plantilla
-    context = {
-        'alumno': alumno,
-        'calificaciones': calificaciones,
-        'asistencias': asistencias,
-        'ausencias': ausencias,
-        'justificaciones': justificaciones,
-        'observaciones': observaciones,  # Añadir las observaciones al contexto
-        'promedio': promedio,
-        'establecimiento': establecimiento,
-        'curso': curso,  # Asegúrate de pasar el objeto curso al contexto
-    }
-    return render(request, 'alumno_detalle.html', context)
-
 
 # Descargar PDF de alumno
 @login_required
@@ -482,45 +506,68 @@ def descargar_pdf_alumno(request, establecimiento_id, alumno_id):
 def observaciones(request, establecimiento_id, curso_id):
     # Obtener el establecimiento y el curso asociado al establecimiento
     establecimiento = get_object_or_404(Establecimiento, id=establecimiento_id)  # Obtener el establecimiento
-    curso = get_object_or_404(Curso, id=curso_id)  # Obtener el curso
+    curso = get_object_or_404(Curso, id=curso_id, establecimiento=establecimiento)  # Obtener el curso
     observaciones = Observacion.objects.filter(curso=curso)
 
-    # Filtra solo los alumnos aprobados a través de CursoAlumno
-    alumnos_aprobados = Alumno.objects.filter(curso_alumno_relacion__curso=curso, estado_admision='Aprobado')
+    # Filtra solo los alumnos aprobados a través de la relación CursoAlumno, asegurando el filtro por establecimiento y curso
+    alumnos_aprobados = CursoAlumno.objects.filter(
+        curso=curso,
+        alumno__estado_admision='Aprobado', 
+        curso__establecimiento=establecimiento
+    ).select_related('alumno')
+
+    if not alumnos_aprobados.exists():
+        messages.warning(request, f"No hay alumnos aprobados asociados al curso {curso.nombre}.")
+        return redirect('profesor_cursos', establecimiento_id=establecimiento_id)
+
+    success_message = None
 
     if request.method == 'POST':
+        # Eliminar observación
         if 'eliminar' in request.POST:
             observacion_id = request.POST.get('observacion_id')
             observacion = get_object_or_404(Observacion, id=observacion_id)
             observacion.delete()
+            success_message = "Observación eliminada exitosamente."
+            messages.success(request, success_message)
             return redirect('observaciones', establecimiento_id=establecimiento.id, curso_id=curso.id)  # Redirigir después de eliminar
 
         # Lógica para agregar una nueva observación
         form = ObservacionForm(request.POST)
-        form.fields['alumno'].queryset = alumnos_aprobados  # Filtrar alumnos aprobados
+        # Aquí pasamos el queryset de alumnos aprobados con las instancias completas de los alumnos
+        form.fields['alumno'].queryset = Alumno.objects.filter(id__in=alumnos_aprobados.values_list('alumno', flat=True), establecimiento=establecimiento)
         if form.is_valid():
             observacion = form.save(commit=False)
             observacion.curso = curso  # Asociar la observación al curso
             observacion.save()
+            success_message = "Observación registrada exitosamente."
+            messages.success(request, success_message)
             return redirect('observaciones', establecimiento_id=establecimiento.id, curso_id=curso.id)  # Redirigir después de guardar
     else:
         form = ObservacionForm()
-        form.fields['alumno'].queryset = alumnos_aprobados  # Filtrar alumnos aprobados
+        # Filtra los alumnos aprobados para que solo se muestren en el formulario
+        form.fields['alumno'].queryset = Alumno.objects.filter(id__in=alumnos_aprobados.values_list('alumno', flat=True), establecimiento=establecimiento)
 
     return render(request, 'observaciones.html', {
         'establecimiento': establecimiento,  # Añadir el establecimiento al contexto
         'curso': curso,  # Añadir el curso al contexto
         'observaciones': observaciones,
         'form': form,
+        'success_message': success_message,
     })
 
-
-
+     
 # ============================================================= Dashboard de Alumno ==================================================
 
 @login_required
-def alumno_dashboard(request):
-    return render(request, 'alumno.html')
+def alumno_dashboard(request, establecimiento_id):
+    # Opcional: Obtener el establecimiento del alumno si necesitas datos adicionales
+    establecimiento = get_object_or_404(Establecimiento, id=establecimiento_id)
+    context = {
+        'establecimiento': establecimiento,
+        # Agrega otros datos necesarios para el template
+    }
+    return render(request, 'alumno.html', context)
 
 
 # ===================================================== Consulta de Asistencia del Alumno ============================================
@@ -530,8 +577,11 @@ def alumno_consulta_asistencia(request, establecimiento_id):
     # Obtener el objeto Alumno asociado al usuario actual
     alumno = get_object_or_404(Alumno, user=request.user)
 
-    # Obtener el establecimiento por el ID pasado como parámetro
+    # Obtener el establecimiento por el ID pasado como parámetro y validar que sea el mismo del alumno
     establecimiento = get_object_or_404(Establecimiento, id=establecimiento_id)
+    if alumno.establecimiento != establecimiento:
+        messages.error(request, 'No tiene permiso para consultar asistencias en este establecimiento.')
+        return redirect('alumno_home')
 
     # Verificar el estado de admisión del alumno
     if alumno.estado_admision != 'Aprobado':
@@ -540,23 +590,35 @@ def alumno_consulta_asistencia(request, establecimiento_id):
 
     asistencias_data = []
 
-    # Obtener los cursos en los que está inscrito el alumno a través de CursoAlumno
-    cursos_alumno = CursoAlumno.objects.filter(alumno=alumno)
+    # Obtener los cursos en los que está inscrito el alumno en el establecimiento especificado
+    cursos_alumno = CursoAlumno.objects.filter(alumno=alumno, curso__establecimiento=establecimiento)
 
     for curso_alumno in cursos_alumno:
         curso = curso_alumno.curso  # Acceder al curso
 
-    for curso in cursos:
-        fechas_presentes = set(Asistencia.objects.filter(curso=curso, alumnos_presentes=alumno).values_list('fecha', flat=True))
-        fechas_ausentes = set(Asistencia.objects.filter(curso=curso, alumnos_ausentes=alumno).values_list('fecha', flat=True))
-        fechas_justificados = set(Asistencia.objects.filter(curso=curso, alumnos_justificados=alumno).values_list('fecha', flat=True))
+        # Obtener las fechas de asistencia para el alumno en el curso específico
+        fechas_presentes = set(Asistencia.objects.filter(
+            curso=curso,
+            alumnos_presentes=alumno
+        ).values_list('fecha', flat=True))
 
+        fechas_ausentes = set(Asistencia.objects.filter(
+            curso=curso,
+            alumnos_ausentes=alumno
+        ).values_list('fecha', flat=True))
+
+        fechas_justificados = set(Asistencia.objects.filter(
+            curso=curso,
+            alumnos_justificados=alumno
+        ).values_list('fecha', flat=True))
+
+        # Calcular el total de clases y el porcentaje de asistencia
         fechas_totales = fechas_presentes | fechas_ausentes | fechas_justificados
         total_clases = len(fechas_totales)
-
         total_asistencia = len(fechas_presentes) + len(fechas_justificados)
         porcentaje_asistencia = (total_asistencia / total_clases * 100) if total_clases > 0 else 0
 
+        # Agregar los datos al diccionario
         asistencias_data.append({
             'curso': curso.nombre,
             'asignatura': curso.asignatura,
@@ -565,65 +627,104 @@ def alumno_consulta_asistencia(request, establecimiento_id):
             'porcentaje_asistencia': round(porcentaje_asistencia, 2),
         })
 
-    return render(request, 'alumnoConsuAsis.html', {'asistencias_data': asistencias_data})
+    return render(request, 'alumnoConsuAsis.html', {
+        'asistencias_data': asistencias_data,
+        'establecimiento': establecimiento,
+    })
+
 
 
 # =========================================================== Consulta de Notas del Alumno ============================================================
 
 @login_required
-def alumno_consulta_notas(request):
+def alumno_consulta_notas(request, establecimiento_id):
+    # Obtener el objeto Alumno asociado al usuario actual
     alumno = get_object_or_404(Alumno, user=request.user)
-    cursos = Curso.objects.filter(alumnos=alumno).prefetch_related('calificacion_set')
+
+    # Verificar que el alumno pertenece al establecimiento dado
+    if alumno.establecimiento.id != establecimiento_id:
+        # Redirige o lanza un error si el alumno no pertenece al establecimiento
+        return render(request, 'error.html', {'mensaje': 'El alumno no pertenece a este establecimiento.'})
+
+    # Obtener los cursos del alumno en el establecimiento actual
+    cursos_alumno = CursoAlumno.objects.filter(
+        alumno=alumno,
+        curso__establecimiento_id=establecimiento_id  # Filtrar por establecimiento
+    ).select_related('curso').prefetch_related('curso__calificacion_set')
 
     cursos_con_promedios = []
+
+    # Iterar sobre los cursos en los que está inscrito el alumno
     for curso_alumno in cursos_alumno:
         curso = curso_alumno.curso  # Acceder al curso
+
+        # Filtrar las calificaciones del alumno en el curso actual
         calificaciones = Calificacion.objects.filter(curso=curso, alumno=alumno)
         promedio = calificaciones.aggregate(average_nota=models.Avg('nota'))['average_nota'] if calificaciones.exists() else None
 
+        # Agregar los datos del curso, calificaciones y promedio a la lista
         cursos_con_promedios.append({
             'curso': curso,
             'calificaciones': calificaciones,
-            'promedio': promedio
+            'promedio': round(promedio, 2) if promedio is not None else None
         })
 
-    return render(request, 'alumnoConsuNotas.html', {'cursos_con_promedios': cursos_con_promedios})
-
-
-# ===================================================================== Home del Alumno ====================================================================
-
-@login_required
-def alumno_home(request):
-    alumno = request.user.alumno
-    context = {
-        'alumno': alumno
-    }
-    return render(request, 'alumno.html', context)
+    return render(request, 'alumnoConsuNotas.html', {
+        'cursos_con_promedios': cursos_con_promedios,
+        'establecimiento_id': establecimiento_id
+    })
 
 
 # ===================================================================== Vista del Apoderado ==================================================================
 
 @login_required
-def apoderado_view(request):
+def apoderado_view(request, establecimiento_id):  # Recibimos 'establecimiento_id' como parámetro
+    # Obtener el objeto Apoderado asociado al usuario actual
     apoderado = get_object_or_404(Apoderado, user=request.user)
+
+    # Asegurarse de que el establecimiento_id corresponda con el del apoderado
+    if establecimiento_id != apoderado.establecimiento_id:
+        return redirect('error_view')  # Redirigir a una página de error si los IDs no coinciden
+
+    # Obtener las notificaciones no leídas para este apoderado y su establecimiento
     notificaciones_no_leidas = Notificacion.objects.filter(apoderado=apoderado, leida=False)
 
     context = {
         'notificaciones_no_leidas': notificaciones_no_leidas,
+        'establecimiento_id': establecimiento_id,  # Pasar el establecimiento_id al contexto
     }
+
     return render(request, 'apoderado.html', context)
 
+
+#=========================================== APODERADO NOTIFICACIONES ======================================================================
+@login_required
 def marcar_notificacion_como_leida(request, notificacion_id):
+    # Obtener la notificación asociada al apoderado actual y al ID de la notificación
     notificacion = get_object_or_404(Notificacion, id=notificacion_id, apoderado__user=request.user)
+
+    # Marcar la notificación como leída
     notificacion.leida = True
     notificacion.save()
-    return redirect('apoderado_view')
 
+    # Obtener el establecimiento_id del apoderado
+    establecimiento_id = notificacion.apoderado.establecimiento.id
+
+    # Redirigir a la vista de apoderado con el establecimiento_id como argumento
+    return redirect('apoderado_view', establecimiento_id=establecimiento_id)
+
+#================================================== HISTORIAL NOTFICACIONES ===============================================================
 @login_required
-def historial_notificaciones(request):
+def historial_notificaciones(request, establecimiento_id):
+    # Obtener el establecimiento desde la URL usando el parámetro 'establecimiento_id'
+    establecimiento = get_object_or_404(Establecimiento, id=establecimiento_id)
+    
+    # Obtener el apoderado actual
     apoderado = get_object_or_404(Apoderado, user=request.user)
     
-    # Obtén todas las notificaciones del apoderado
+    # Aquí no es necesario actualizar 'establecimiento_id', ya que ya lo tienes con el parámetro 'establecimiento_id'
+    
+    # Obtener todas las notificaciones del apoderado, ordenadas por fecha de creación
     todas_notificaciones = Notificacion.objects.filter(apoderado=apoderado).order_by('-fecha_creacion')
     
     # Marcar como leídas todas las notificaciones no leídas
@@ -631,25 +732,38 @@ def historial_notificaciones(request):
     if notificaciones_no_leidas.exists():
         notificaciones_no_leidas.update(leida=True)
 
-    return render(request, 'historial_notificaciones.html', {'notificaciones': todas_notificaciones})
+    # Pasar las notificaciones y el establecimiento al contexto
+    return render(request, 'historial_notificaciones.html', {
+        'notificaciones': todas_notificaciones,
+        'establecimiento': establecimiento  # Pasar el objeto establecimiento completo al contexto
+    })
 
 
 #============================================================================= Consulta de Asistencia del Apoderado =========================================================================================
 
 @login_required
-def apoderadoConsuAsis(request):
+def apoderadoConsuAsis(request, establecimiento_id):
+    # Obtener el apoderado relacionado con el usuario actual
     apoderado = get_object_or_404(Apoderado, user=request.user)
+    
+    # Verificar si el apoderado está asociado con el establecimiento solicitado
+    establecimiento = get_object_or_404(Establecimiento, id=establecimiento_id)
+    if apoderado.establecimiento != establecimiento:
+        # Si no está asociado con este establecimiento, redirigir o mostrar un error
+        return redirect('error_page')  # Cambia esto a una vista de error adecuada si es necesario
+
+    # Obtener los alumnos del apoderado que estén aprobados
     alumnos = Alumno.objects.filter(apoderado=apoderado, estado_admision='Aprobado')
     asistencias_data = {}
 
     for alumno in alumnos:
-        # Obtiene los cursos asociados al alumno a través del modelo CursoAlumno
+        # Obtiene los cursos asignados a cada alumno
         cursos_asignados = CursoAlumno.objects.filter(alumno=alumno).select_related('curso')
         asistencias_data[alumno] = []
 
         for curso_alumno in cursos_asignados:
             curso = curso_alumno.curso  # Obtener el curso desde CursoAlumno
-            # Recupera todas las fechas en las que el alumno estuvo en algún estado de asistencia para el curso
+            # Recupera todas las fechas en las que el alumno estuvo en algún estado de asistencia
             fechas_presentes = set(Asistencia.objects.filter(curso=curso, alumnos_presentes=alumno).values_list('fecha', flat=True))
             fechas_ausentes = set(Asistencia.objects.filter(curso=curso, alumnos_ausentes=alumno).values_list('fecha', flat=True))
             fechas_justificados = set(Asistencia.objects.filter(curso=curso, alumnos_justificados=alumno).values_list('fecha', flat=True))
@@ -661,24 +775,33 @@ def apoderadoConsuAsis(request):
             porcentaje_asistencia = (total_asistencia / total_clases * 100) if total_clases > 0 else 0
 
             asistencias_data[alumno].append({
-                'curso': curso.nombre,  # Acceder al nombre del curso
+                'curso': curso.nombre,  # Nombre del curso
                 'total_clases': total_clases,
                 'asistencia': total_asistencia,
                 'porcentaje_asistencia': round(porcentaje_asistencia, 2),
             })
 
+    # Pasar el 'establecimiento_id' al contexto
     context = {
         'alumnos': alumnos,
         'asistencias_data': asistencias_data,
+        'establecimiento_id': establecimiento.id,  # Agregar el establecimiento_id al contexto
     }
     return render(request, 'apoderadoConsuAsis.html', context)
 
 
-# ============================================================================== Consulta de Notas del Apoderado ============================================================================
 
+# ============================================================================== Consulta de Notas del Apoderado ============================================================================
 @login_required
-def apoderadoConsuNotas(request):
+def apoderadoConsuNotas(request, establecimiento_id):
+    # Obtener el apoderado y establecimiento
     apoderado = get_object_or_404(Apoderado, user=request.user)
+    establecimiento = get_object_or_404(Establecimiento, id=establecimiento_id)
+
+    if apoderado.establecimiento != establecimiento:
+        return redirect('error_page')
+
+    # Obtener los alumnos aprobados del apoderado
     alumnos = Alumno.objects.filter(apoderado=apoderado, estado_admision="Aprobado")
 
     alumnos_data = []
@@ -689,20 +812,32 @@ def apoderadoConsuNotas(request):
             'cursos': []
         }
 
-        # Obtener los cursos asignados al alumno a través de CursoAlumno
-        cursos_asignados = CursoAlumno.objects.filter(alumno=alumno).select_related('curso')
-        
+        # Crear un conjunto para evitar cursos repetidos
+        cursos_vistos = set()
+
+        # Obtener los cursos asignados al alumno
+        cursos_asignados = CursoAlumno.objects.filter(alumno=alumno).select_related('curso').distinct()
+
         for curso_alumno in cursos_asignados:
-            curso = curso_alumno.curso  # Obtener el curso desde CursoAlumno
-            
-            # Obtener las calificaciones del alumno para el curso específico
+            curso = curso_alumno.curso
+
+            # Verificar si el curso ya fue agregado
+            if curso.id in cursos_vistos:
+                continue
+            cursos_vistos.add(curso.id)
+
+            # Obtener las calificaciones del alumno para este curso
             calificaciones_curso = Calificacion.objects.filter(alumno=alumno, curso=curso)
+
+            # Calcular el promedio de las calificaciones
             total_notas = sum(c.nota for c in calificaciones_curso if c.nota is not None)
-            count_notas = calificaciones_curso.count()
+            count_notas = calificaciones_curso.filter(nota__isnull=False).count()
             promedio = round(total_notas / count_notas, 2) if count_notas > 0 else 0
 
+            # Crear la lista de calificaciones numeradas
             calificaciones_numeradas = [{'numero': i + 1, 'nota': calificacion.nota} for i, calificacion in enumerate(calificaciones_curso)]
-            
+
+            # Agregar la información del curso
             curso_info = {
                 'curso': curso,
                 'calificaciones': calificaciones_numeradas,
@@ -714,20 +849,29 @@ def apoderadoConsuNotas(request):
 
     context = {
         'alumnos_data': alumnos_data,
+        'establecimiento': establecimiento,
     }
     return render(request, 'apoderadoConsuNotas.html', context)
 
-
 # ======================================================================= APODERADO OBSERVACIONES ================================================================================================
 
-# ====================================================== Apoderado - Observaciones ======================================================
-
 @login_required
-def apoderado_observaciones(request):
+def apoderado_observaciones(request, establecimiento_id):
+    # Obtener el apoderado relacionado con el usuario actual
     apoderado = get_object_or_404(Apoderado, user=request.user)
+    
+    # Obtener el establecimiento a través del id pasado como parámetro
+    establecimiento = get_object_or_404(Establecimiento, id=establecimiento_id)
+    
+    # Verificar si el apoderado está asociado con el establecimiento
+    if apoderado.establecimiento != establecimiento:
+        return redirect('error_page')  # Cambia esto a una página de error o muestra un mensaje adecuado
+    
+    # Obtener los alumnos aprobados del apoderado
     alumnos_aprobados = Alumno.objects.filter(apoderado=apoderado, estado_admision="Aprobado")
     
     observaciones_data = []
+    
     for alumno in alumnos_aprobados:
         # Obtener los cursos del alumno a través de CursoAlumno
         cursos_asignados = CursoAlumno.objects.filter(alumno=alumno).select_related('curso')
@@ -745,7 +889,11 @@ def apoderado_observaciones(request):
                 'observaciones': observaciones_alumno
             })
 
-    return render(request, 'apoderadoObservaciones.html', {'observaciones_data': observaciones_data})
+    # Pasar el establecimiento al contexto
+    return render(request, 'apoderadoObservaciones.html', {
+        'observaciones_data': observaciones_data,
+        'establecimiento': establecimiento,  # Incluir el establecimiento en el contexto
+    })
 
 
 # ============================================================ Director - Dashboard =========================================================
@@ -1077,10 +1225,10 @@ def ver_gestion_pagos_admision(request, establecimiento_id):
     # Filtrar los alumnos relacionados con el establecimiento
     alumnos = Alumno.objects.filter(establecimiento=establecimiento)
 
-    # Pasar el establecimiento_id en el contexto
+    # Pasar tanto los alumnos como el establecimiento_id en el contexto
     context = {
         'alumnos': alumnos,
-        'establecimiento_id': establecimiento.id,  # solo pasamos el ID
+        'establecimiento_id': establecimiento.id,  # Pasamos el ID correctamente
     }
 
     return render(request, 'asisAdmiFinan_gestion_pagos.html', context)

@@ -202,11 +202,11 @@
     <div class="sidebar">
         <h2>Menú</h2>
         <ul>
-            <li><a href="{% url 'apoderado_view' %}">Apoderado</a></li>
-            <li><a href="{% url 'apoderadoConsuAsis' %}">Asistencia</a></li>
-            <li><a href="{% url 'apoderadoConsuNotas' %}">Notas</a></li>
-            <li><a href="{% url 'apoderadoObservaciones' %}">Observaciones</a></li>
-            <li><a href="{% url 'historial_notificaciones' %}">Notificaciones</a></li>
+            <li><a href="{% url 'apoderado_view' establecimiento_id=establecimiento.id %}">Apoderado</a></li>
+            <li><a href="{% url 'apoderadoConsuAsis' establecimiento_id=establecimiento.id %}">Asistencia</a></li>
+            <li><a href="{% url 'apoderadoConsuNotas' establecimiento_id=establecimiento.id %}">Notas</a></li>
+            <li><a href="{% url 'apoderadoObservaciones' establecimiento_id=establecimiento.id %}">Observaciones</a></li>
+            <li><a href="{% url 'historial_notificaciones' establecimiento_id=establecimiento.id %}">Notificaciones</a></li>
             <li>
                 <!-- Botón de Cerrar sesión estilo enlace -->
                 <form action="{% url 'logout' %}" method="post" style="display: inline;">
@@ -257,7 +257,7 @@
         {% endif %}
         
         <div class="buttons">
-            <a href="{% url 'apoderado_view' %}" class="btn">Regresar</a>
+            <a href="{% url 'apoderado_view' establecimiento_id=establecimiento.id %}" class="btn">Regresar</a>
         </div>
     </div>
 

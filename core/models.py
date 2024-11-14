@@ -15,18 +15,6 @@ class Establecimiento(models.Model):
     def __str__(self):
         return self.nombre
 
-
-
-# Nuevo modelo de Establecimiento
-class Establecimiento(models.Model):
-    nombre = models.CharField(max_length=200, unique=True)
-    direccion = models.CharField(max_length=255, blank=True, null=True)
-    telefono = models.CharField(max_length=15, blank=True, null=True)
-    email = models.EmailField(blank=True, null=True)
-
-    def __str__(self):
-        return self.nombre
-
 # Modelo Profesor
 class Profesor(models.Model):
     establecimiento = models.ForeignKey(Establecimiento, on_delete=models.CASCADE, related_name='profesores', null=True, blank=True)
@@ -244,7 +232,6 @@ class AsisMatricula(models.Model):
 
 
 class CursoAlumno(models.Model):
-    establecimiento = models.ForeignKey(Establecimiento, on_delete=models.CASCADE, related_name='curso_alumno_relaciones', null=True, blank=True)
     curso = models.ForeignKey(Curso, on_delete=models.SET_NULL, related_name='curso_alumno_relacion', null=True, blank=True)
     alumno = models.ForeignKey(Alumno, on_delete=models.SET_NULL, related_name='curso_alumno_relacion', null=True, blank=True)
 
@@ -256,12 +243,11 @@ class CursoAlumno(models.Model):
     def __str__(self):
         curso_nombre = self.curso.nombre if self.curso else "Curso no asignado"
         alumno_nombre = f"{self.alumno.nombre} {self.alumno.apellido}" if self.alumno else "Alumno no asignado"
-        return f"{alumno_nombre} inscrito en {curso_nombre} - {self.establecimiento.nombre if self.establecimiento else 'Sin Establecimiento'}"
+        return f"{alumno_nombre} inscrito en {curso_nombre}"
 
 
 
 class BitacoraClase(models.Model):
-    establecimiento = models.ForeignKey(Establecimiento, on_delete=models.CASCADE, related_name='bitacoras_clase', null=True, blank=True)
     curso = models.ForeignKey(Curso, on_delete=models.CASCADE)
     fecha = models.DateField()
     profesor = models.ForeignKey(Profesor, on_delete=models.CASCADE)
@@ -269,5 +255,5 @@ class BitacoraClase(models.Model):
     observaciones = models.TextField(blank=True, null=True)  # Añade este campo para las observaciones opcionales
 
     def __str__(self):
-        return f"Bitácora de {self.curso} el {self.fecha} - {self.establecimiento.nombre if self.establecimiento else 'Sin Establecimiento'}"
+        return f"Bitácora de {self.curso} el {self.fecha} "
 

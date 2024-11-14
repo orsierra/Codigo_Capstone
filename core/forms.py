@@ -1,23 +1,47 @@
 from django import forms
-from .models import Asistencia, Alumno, Calificacion, Observacion, Apoderado, Curso, InformeFinanciero, Contrato, CursoAlumno
+from .models import Asistencia, Alumno, Calificacion, Observacion, Apoderado, Curso, InformeFinanciero, Contrato, CursoAlumno, Establecimiento
 from django.core.exceptions import ValidationError
 from django_select2.forms import Select2MultipleWidget
 from django.contrib.auth.models import User
 
 
 class AsistenciaForm(forms.ModelForm):
+    establecimiento = forms.ModelChoiceField(
+        queryset=Establecimiento.objects.all(),
+        required=True,
+        label="Establecimiento",
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    
     class Meta:
         model = Asistencia
-        fields = ['curso', 'fecha']  # Puedes quitar el campo 'alumno' porque será manejado en la vista y el HTML.
+        fields = ['curso', 'fecha', 'establecimiento']  # Agregado 'establecimiento'
 
     # Agregar campos dinámicamente para los alumnos
     def __init__(self, *args, **kwargs):
+        establecimiento = kwargs.pop('establecimiento', None)
         super().__init__(*args, **kwargs)
-        if 'alumnos' in kwargs:
-            for alumno in kwargs['alumnos']:
-                self.fields[f'presente_{alumno.id}'] = forms.BooleanField(required=False, label=f'{alumno.nombre} {alumno.apellido} presente')
-                self.fields[f'ausente_{alumno.id}'] = forms.BooleanField(required=False, label=f'{alumno.nombre} {alumno.apellido} ausente')
-                self.fields[f'justificado_{alumno.id}'] = forms.BooleanField(required=False, label=f'{alumno.nombre} {alumno.apellido} justificado')
+
+        # Filtrar los alumnos según el establecimiento proporcionado
+        if establecimiento:
+            alumnos = Alumno.objects.filter(establecimiento=establecimiento)
+        else:
+            alumnos = Alumno.objects.none()  # Si no hay establecimiento, no mostrar alumnos
+
+        # Crear campos de asistencia para cada alumno
+        for alumno in alumnos:
+            self.fields[f'presente_{alumno.id}'] = forms.BooleanField(
+                required=False,
+                label=f'{alumno.nombre} {alumno.apellido} presente'
+            )
+            self.fields[f'ausente_{alumno.id}'] = forms.BooleanField(
+                required=False,
+                label=f'{alumno.nombre} {alumno.apellido} ausente'
+            )
+            self.fields[f'justificado_{alumno.id}'] = forms.BooleanField(
+                required=False,
+                label=f'{alumno.nombre} {alumno.apellido} justificado'
+            )
 
 
 class CalificacionForm(forms.ModelForm):
@@ -68,10 +92,15 @@ class ApoderadoForm(forms.ModelForm):
 class AlumnoForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
     cursos = forms.ModelMultipleChoiceField(
-        queryset=Curso.objects.all(),
-        widget=Select2MultipleWidget(attrs={'class': 'CursoAlumno'}),  # Using the Select2 widget
+        queryset=Curso.objects.none(),  # Inicialmente no hay cursos
+        widget=Select2MultipleWidget(attrs={'class': 'CursoAlumno'}),  # Usando el widget Select2
         required=True,
         label="Cursos"
+    )
+    apoderado = forms.ModelChoiceField(
+        queryset=Apoderado.objects.none(),  # Inicialmente no hay apoderados
+        required=True,
+        label="Apoderado"
     )
     establecimiento_nombre = forms.CharField(
         label='Establecimiento',
@@ -97,8 +126,13 @@ class AlumnoForm(forms.ModelForm):
         # Obtener el establecimiento desde kwargs
         establecimiento_instance = kwargs.pop('establecimiento_instance', None)
         alumno_instance = kwargs.get('instance')
-        
+
         super().__init__(*args, **kwargs)
+
+        # Filtrar los cursos asociados con el establecimiento relacionado
+        if establecimiento_instance:
+            self.fields['cursos'].queryset = Curso.objects.filter(establecimiento=establecimiento_instance)
+            self.fields['apoderado'].queryset = Apoderado.objects.filter(establecimiento=establecimiento_instance)
 
         # Si se proporciona un establecimiento, mostrar su nombre como solo lectura
         if establecimiento_instance:
@@ -134,7 +168,6 @@ class AlumnoForm(forms.ModelForm):
             CursoAlumno.objects.get_or_create(alumno=alumno, curso=curso)
 
         return alumno
-
 
     
 class InformeFinancieroForm(forms.ModelForm):

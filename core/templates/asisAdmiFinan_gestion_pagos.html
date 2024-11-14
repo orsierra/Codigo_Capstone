@@ -198,7 +198,7 @@
     <div class="sidebar">
         <h2>Menú</h2>
         <ul>
-            <li><a href="{% url 'panel_asisAdminFinan' establecimiento_id=establecimiento_id %}">Inicio</a></li>
+            <li><a href="{% url 'panel_asisAdminFinan' establecimiento_id %}">Inicio</a></li>
 
             <li>
                 <form action="{% url 'logout' %}" method="post" style="display: inline;">
@@ -214,7 +214,7 @@
 
     <div class="content">
         <!-- Botón de Agregar Alumno -->
-        <a href="{% url 'agregar_alumno_asis' establecimiento_id=establecimiento_id %}" class="add-student">Agregar Alumno</a>
+        <a href="{% url 'agregar_alumno_asis' establecimiento_id %}" class="add-student">Agregar Alumno</a>
 
         <h1>Gestión de Pagos y Admisión</h1>
 

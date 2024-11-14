@@ -80,7 +80,9 @@
         <div class="notification-container">
             {% for notificacion in notificaciones_no_leidas %}
                 <div class="notification-item">
-                    {{ notificacion.mensaje }}
+                    <p>{{ notificacion.mensaje }}</p>
+                    <!-- Puedes agregar un enlace para marcar la notificación como leída si lo deseas -->
+                    <a href="{% url 'marcar_como_leida' notificacion.id %}" class="mark-as-read">Marcar como leída</a>
                 </div>
             {% endfor %}
         </div>
@@ -88,9 +90,14 @@
 
     <div class="dashboard-container">
         <h1>Apoderado</h1>
-        <a href="{% url 'apoderadoConsuAsis' %}" class="btn">Consulta de Asistencia</a>
-        <a href="{% url 'apoderadoConsuNotas' %}" class="btn">Consulta de Notas</a>
-        <a href="{% url 'apoderadoObservaciones' %}" class="btn">Observaciones</a>
+
+        <!-- Asegúrate de pasar el establecimiento_id en los enlaces -->
+        <div class="btn-container">
+            <a href="{% url 'apoderadoConsuAsis' establecimiento_id=establecimiento_id %}" class="btn">Consulta de Asistencia</a>
+            <a href="{% url 'apoderadoConsuNotas' establecimiento_id=establecimiento_id %}" class="btn">Consulta de Notas</a>
+            <a href="{% url 'apoderadoObservaciones' establecimiento_id=establecimiento_id %}" class="btn">Observaciones</a>
+        </div>
+
         <footer>
             <p>Colegio Nuevos Horizontes</p>
             <div>
@@ -99,4 +106,5 @@
         </footer>
     </div>
 </body>
+
 </html>

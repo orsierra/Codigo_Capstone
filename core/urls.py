@@ -26,18 +26,18 @@ urlpatterns = [
     #alumno
     path('alumno/<int:establecimiento_id>/', views.alumno_dashboard, name='alumno_dashboard'),
     path('alumno/asistencia/<int:establecimiento_id>/', views.alumno_consulta_asistencia, name='alumnoConsuAsis'),
-
-
-    path('alumno/notas/', views.alumno_consulta_notas, name='alumnoConsuNotas'),
-    path('alumno/', views.alumno_home, name='alumno_home'),
+    path('alumno/notas/<int:establecimiento_id>/', views.alumno_consulta_notas, name='alumnoConsuNotas'),
     #Apoderado
-    path('apoderado/', apoderado_view, name='apoderado_view'),  # Dashboard del apoderado
+    path('apoderado/<int:establecimiento_id>/consulta_asistencia/', views.apoderadoConsuAsis, name='apoderadoConsuAsis'),
+    path('apoderado/<int:establecimiento_id>/consulta_notas/', views.apoderadoConsuNotas, name='apoderadoConsuNotas'),
+    path('apoderado/<int:establecimiento_id>/observaciones/', views.apoderado_observaciones, name='apoderadoObservaciones'),
+    path('apoderado/<int:establecimiento_id>/', views.apoderado_view, name='apoderado_view'),
+    path('historial-notificaciones/<int:establecimiento_id>/', views.historial_notificaciones, name='historial_notificaciones'),
+
+    
     path('notificacion/<int:notificacion_id>/leer/', views.marcar_notificacion_como_leida, name='marcar_notificacion_como_leida'),
     path('marcar-notificacion/<int:notificacion_id>/', views.marcar_notificacion_como_leida, name='marcar_notificacion_como_leida'),
-    path('historial-notificaciones/', views.historial_notificaciones, name='historial_notificaciones'),
-    path('consulta-asistencia/', apoderadoConsuAsis, name='apoderadoConsuAsis'),  # Consulta de asistencia
-    path('apoderado/consulta-notas/', apoderadoConsuNotas, name='apoderadoConsuNotas'),  # Consulta de notas
-    path('observaciones/', views.apoderado_observaciones, name='apoderadoObservaciones'),
+
     #Director
     path('director/', director_dashboard, name='director_dashboard'),
     path('director/consulta-informes/', views.directorMenu, name='director_menu'),
@@ -75,8 +75,5 @@ urlpatterns = [
     path('sostenedor/', views.sostenedor, name='sostenedor'),
     path('establecimientos/<int:establecimiento_id>/', views.establecimientos, name='establecimientos'),
 
-
-
-    
 
 ]

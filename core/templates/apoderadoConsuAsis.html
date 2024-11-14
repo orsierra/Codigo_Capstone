@@ -206,11 +206,11 @@
     <div class="sidebar">
         <h2>Menú</h2>
         <ul>
-            <li><a href="{% url 'apoderado_view' %}">Apoderado</a></li>
-            <li><a href="{% url 'apoderadoConsuAsis' %}">Asistencia</a></li>
-            <li><a href="{% url 'apoderadoConsuNotas' %}">Notas</a></li>
-            <li><a href="{% url 'apoderadoObservaciones' %}">Observaciones</a></li>
-            <li><a href="{% url 'historial_notificaciones' %}">Notificaciones</a></li>
+            <li><a href="{% url 'apoderado_view' establecimiento_id=establecimiento_id %}">Apoderado</a></li>
+            <li><a href="{% url 'apoderadoConsuAsis' establecimiento_id=establecimiento_id %}">Asistencia</a></li>
+            <li><a href="{% url 'apoderadoConsuNotas' establecimiento_id=establecimiento_id %}">Notas</a></li>
+            <li><a href="{% url 'apoderadoObservaciones' establecimiento_id=establecimiento_id %}">Observaciones</a></li>
+            <li><a href="{% url 'historial_notificaciones' establecimiento_id=establecimiento_id %}">Notificaciones</a></li>
             <li>
                 <!-- Formulario para cerrar sesión -->
                 <form action="{% url 'logout' %}" method="post" style="display: inline;">
