@@ -149,8 +149,7 @@
         <div class="sidebar-header">Menú</div>
         <ul>
             <li><a href="{% url 'profesor' establecimiento_id=establecimiento.id %}">Profesor</a></li>
-            <a href="{% url 'profesor_cursos' establecimiento_id=establecimiento.id %}">Mis cursos</a>
-
+            <li><a href="{% url 'profesor_cursos' establecimiento_id=establecimiento.id %}">Mis cursos</a></li>
             <li>
                 <!-- Botón de Cerrar sesión estilo enlace -->
                 <form action="{% url 'logout' %}" method="post" style="display: inline;">

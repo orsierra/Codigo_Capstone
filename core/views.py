@@ -156,6 +156,7 @@ def libro_clases(request, establecimiento_id, curso_id):
 
 
 # ============================================Registrar asistencia ================================================================
+
 @login_required
 def registrar_asistencia(request, establecimiento_id, curso_id):
     establecimiento = get_object_or_404(Establecimiento, id=establecimiento_id)
@@ -166,10 +167,9 @@ def registrar_asistencia(request, establecimiento_id, curso_id):
     alumnos_aprobados = CursoAlumno.objects.filter(
         curso=curso,
         alumno__estado_admision='Aprobado',
-        alumno__establecimiento=establecimiento  # Asegurarse de que el alumno pertenece al mismo establecimiento
+        alumno__establecimiento=establecimiento
     ).select_related('alumno')
 
-    # Verificamos si existen alumnos aprobados
     if not alumnos_aprobados.exists():
         messages.warning(request, f"No hay alumnos aprobados asociados al curso {curso.nombre}.")
         return redirect('profesor_cursos', establecimiento_id=establecimiento_id)
@@ -177,13 +177,11 @@ def registrar_asistencia(request, establecimiento_id, curso_id):
     success_message = None
 
     if request.method == 'POST':
-        # Obtener las actividades y observaciones desde el formulario
         actividades_realizadas = request.POST.get('actividades_realizadas')
         observaciones = request.POST.get('observaciones')
 
-        # Validamos que las actividades hayan sido ingresadas
         if not actividades_realizadas:
-            success_message = "Debe registrar las actividades realizadas en la bitácora antes de guardar la asistencia."
+            messages.error(request, "Debe registrar las actividades realizadas en la bitácora antes de guardar la asistencia.")
         else:
             # Guardar en la bitácora de clase
             BitacoraClase.objects.create(
@@ -194,84 +192,46 @@ def registrar_asistencia(request, establecimiento_id, curso_id):
                 observaciones=observaciones,
             )
 
-            # Crear el formulario de asistencia con los alumnos aprobados
-            form = AsistenciaForm(request.POST, establecimiento=establecimiento)
+            # Crear registro de asistencia
+            asistencia = Asistencia.objects.create(
+                curso=curso,
+                fecha=timezone.now(),
+                establecimiento=establecimiento
+            )
 
-            if form.is_valid():
-                # Guardar la asistencia
-                asistencia = form.save(commit=False)
-                asistencia.curso = curso
-                asistencia.fecha = timezone.now()
-                asistencia.save()
+            # Registrar el estado de asistencia para cada alumno aprobado
+            for alumno in alumnos_aprobados:
+                alumno_instance = alumno.alumno
+                estado = request.POST.get(f'asistencia_{alumno_instance.id}')
+                
+                if estado == 'presente':
+                    asistencia.alumnos_presentes.add(alumno_instance)
+                elif estado == 'ausente':
+                    asistencia.alumnos_ausentes.add(alumno_instance)
+                elif estado == 'justificado':
+                    asistencia.alumnos_justificados.add(alumno_instance)
 
-                # Registrar el estado de asistencia para cada alumno aprobado
-                for alumno in alumnos_aprobados:
-                    alumno_instance = alumno.alumno  # Asegúrate de que 'alumno' es una instancia de Alumno
-                    if not isinstance(alumno_instance, Alumno):
-                        raise ValueError(f"Se esperaba una instancia de Alumno, pero se recibió: {type(alumno_instance)}")
-                    
-                    # Obtener el estado de asistencia para este alumno desde el formulario
-                    estado_presente = form.cleaned_data.get(f'presente_{alumno_instance.id}')
-                    estado_ausente = form.cleaned_data.get(f'ausente_{alumno_instance.id}')
-                    estado_justificado = form.cleaned_data.get(f'justificado_{alumno_instance.id}')
-
-                    # Asignar el estado de asistencia de acuerdo a lo recibido en el formulario
-                    if estado_presente:
-                        asistencia.alumnos_presentes.add(alumno_instance)
-                    if estado_ausente:
-                        asistencia.alumnos_ausentes.add(alumno_instance)
-                    if estado_justificado:
-                        asistencia.alumnos_justificados.add(alumno_instance)
-
-                success_message = "Bitácora y asistencia registradas exitosamente."
-                messages.success(request, success_message)
-                return redirect('registrar_asistencia', establecimiento_id=establecimiento_id, curso_id=curso.id)
-            else:
-                success_message = "Hubo un error en el formulario. Por favor, intente nuevamente."
-
-    else:
-        form = AsistenciaForm(establecimiento=establecimiento)
+            success_message = "Bitácora y asistencia registradas exitosamente."
 
     return render(request, 'registrarAsistencia.html', {
-        'form': form,
         'curso': curso,
         'alumnos_aprobados': alumnos_aprobados,
-        'success_message': success_message,
         'establecimiento': establecimiento,
+        'success_message': success_message,  # Enviar mensaje de éxito al template
     })
+
 #========================================================== HISTORIAL BITACORA =============================================================
+
 
 @login_required
 def historial_bitacoras(request, establecimiento_id, curso_id):
-    # Obtener el establecimiento
+    # Obtener el establecimiento y el curso
     establecimiento = get_object_or_404(Establecimiento, id=establecimiento_id)
-    
-    # Obtener el curso asociado al establecimiento
     curso = get_object_or_404(Curso, id=curso_id, establecimiento=establecimiento)
     
-    # Obtener las bitácoras asociadas al curso
+    # Obtener las bitácoras asociadas al curso, ordenadas por fecha descendente
     bitacoras = BitacoraClase.objects.filter(curso=curso).order_by('-fecha')
-    
-    # Obtener los alumnos matriculados en el curso
-    alumnos = CursoAlumno.objects.filter(curso=curso)
-    
-    # Contar los alumnos presentes por cada bitácora
-    for bitacora in bitacoras:
-        # Buscar las asistencias correspondientes a la fecha de la bitácora
-        asistencia = Asistencia.objects.filter(
-            curso=curso, 
-            fecha=bitacora.fecha
-        ).first()  # Utilizamos `first()` para obtener la primera asistencia (puede haber solo una por fecha)
-        
-        if asistencia:
-            # Contar los alumnos presentes en esa asistencia
-            alumnos_presentes_count = asistencia.alumnos_presentes.count()
-        else:
-            alumnos_presentes_count = 0
 
-        # Asignamos el conteo de los alumnos presentes en la bitácora
-        bitacora.alumnos_presentes_count = alumnos_presentes_count
-    
     context = {
         'curso': curso,
         'establecimiento': establecimiento,
@@ -309,12 +269,13 @@ def registrar_calificaciones(request, establecimiento_id, curso_id):
     curso = get_object_or_404(Curso, id=curso_id, establecimiento=establecimiento)
     errores = {}
     form_list = {}
+    success_message = None  # Variable para almacenar el mensaje de éxito
 
     # Filtrar alumnos aprobados para el curso y establecimiento específicos
     alumnos_aprobados = CursoAlumno.objects.filter(
         curso=curso, 
         alumno__estado_admision='Aprobado',
-        alumno__establecimiento=establecimiento  # Asegurarse de que el alumno pertenece al establecimiento
+        alumno__establecimiento=establecimiento
     ).select_related('alumno')
 
     if request.method == 'POST':
@@ -322,23 +283,19 @@ def registrar_calificaciones(request, establecimiento_id, curso_id):
             alumno = curso_alumno.alumno
             form = CalificacionForm(request.POST, prefix=str(alumno.id))
             if form.is_valid():
-                # Obtener o crear la calificación del alumno
-                calificacion, created = Calificacion.objects.get_or_create(
+                # Crear una nueva calificación en lugar de actualizar la existente
+                Calificacion.objects.create(
                     alumno=alumno,
                     curso=curso,
-                    establecimiento=curso_alumno.establecimiento,  # Usar establecimiento desde CursoAlumno
-                    defaults={'nota': form.cleaned_data['nota']}
+                    establecimiento=curso.establecimiento,
+                    nota=form.cleaned_data['nota']
                 )
-                if not created:
-                    # Si ya existe la calificación, actualizar la nota
-                    calificacion.nota = form.cleaned_data['nota']
-                    calificacion.save()
             else:
                 errores[alumno] = form.errors
 
+        # Verificar si no hubo errores en ningún formulario
         if not errores:
-            messages.success(request, "Se han guardado los cambios exitosamente.")
-            return redirect('registrar_calificaciones', establecimiento_id=establecimiento_id, curso_id=curso_id)
+            success_message = "Se han guardado los cambios exitosamente."
 
     else:
         # Crear un formulario vacío para cada alumno aprobado
@@ -348,6 +305,7 @@ def registrar_calificaciones(request, establecimiento_id, curso_id):
         'curso': curso,
         'form_list': form_list,
         'errores': errores,
+        'success_message': success_message,  # Pasar el mensaje de éxito al contexto
         'establecimiento': establecimiento,
     })
 
@@ -508,12 +466,10 @@ def descargar_pdf_alumno(request, establecimiento_id, alumno_id):
 # =============================================================== OBSERVACIONES =========================================================================
 @login_required
 def observaciones(request, establecimiento_id, curso_id):
-    # Obtener el establecimiento y el curso asociado al establecimiento
-    establecimiento = get_object_or_404(Establecimiento, id=establecimiento_id)  # Obtener el establecimiento
-    curso = get_object_or_404(Curso, id=curso_id, establecimiento=establecimiento)  # Obtener el curso
+    establecimiento = get_object_or_404(Establecimiento, id=establecimiento_id)
+    curso = get_object_or_404(Curso, id=curso_id, establecimiento=establecimiento)
     observaciones = Observacion.objects.filter(curso=curso)
 
-    # Filtra solo los alumnos aprobados a través de la relación CursoAlumno, asegurando el filtro por establecimiento y curso
     alumnos_aprobados = CursoAlumno.objects.filter(
         curso=curso,
         alumno__estado_admision='Aprobado', 
@@ -524,41 +480,34 @@ def observaciones(request, establecimiento_id, curso_id):
         messages.warning(request, f"No hay alumnos aprobados asociados al curso {curso.nombre}.")
         return redirect('profesor_cursos', establecimiento_id=establecimiento_id)
 
-    success_message = None
-
     if request.method == 'POST':
-        # Eliminar observación
         if 'eliminar' in request.POST:
             observacion_id = request.POST.get('observacion_id')
             observacion = get_object_or_404(Observacion, id=observacion_id)
             observacion.delete()
-            success_message = "Observación eliminada exitosamente."
-            messages.success(request, success_message)
-            return redirect('observaciones', establecimiento_id=establecimiento.id, curso_id=curso.id)  # Redirigir después de eliminar
+            messages.success(request, "Observación eliminada exitosamente.")
+            return redirect('observaciones', establecimiento_id=establecimiento.id, curso_id=curso.id)
 
-        # Lógica para agregar una nueva observación
         form = ObservacionForm(request.POST)
-        # Aquí pasamos el queryset de alumnos aprobados con las instancias completas de los alumnos
         form.fields['alumno'].queryset = Alumno.objects.filter(id__in=alumnos_aprobados.values_list('alumno', flat=True), establecimiento=establecimiento)
         if form.is_valid():
             observacion = form.save(commit=False)
-            observacion.curso = curso  # Asociar la observación al curso
+            observacion.curso = curso
             observacion.save()
-            success_message = "Observación registrada exitosamente."
-            messages.success(request, success_message)
-            return redirect('observaciones', establecimiento_id=establecimiento.id, curso_id=curso.id)  # Redirigir después de guardar
+            messages.success(request, "Observación registrada exitosamente.")
+            return redirect('observaciones', establecimiento_id=establecimiento.id, curso_id=curso.id)
+
     else:
         form = ObservacionForm()
-        # Filtra los alumnos aprobados para que solo se muestren en el formulario
         form.fields['alumno'].queryset = Alumno.objects.filter(id__in=alumnos_aprobados.values_list('alumno', flat=True), establecimiento=establecimiento)
 
     return render(request, 'observaciones.html', {
-        'establecimiento': establecimiento,  # Añadir el establecimiento al contexto
-        'curso': curso,  # Añadir el curso al contexto
+        'establecimiento': establecimiento,
+        'curso': curso,
         'observaciones': observaciones,
         'form': form,
-        'success_message': success_message,
     })
+
 
      
 # ============================================================= Dashboard de Alumno ==================================================

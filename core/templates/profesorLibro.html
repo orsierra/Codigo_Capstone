@@ -34,6 +34,7 @@
             text-align: center;
             margin-bottom: 30px;
             font-weight: bold;
+            color: #ffc107;
         } 
         
         .sidebar ul {
@@ -109,12 +110,14 @@
             margin-top: auto;
             text-align: center;
             font-size: 14px;
+            color: #ffc107;
         }
         
         .footer a {
             color: #17a2b8;
             text-decoration: none;
             font-weight: 500;
+            transition: color 0.3s;
         }
 
         .footer a:hover {
@@ -128,7 +131,7 @@
         <h2>Libro de Clase</h2>
         <ul>
             <li><a href="{% url 'profesor' establecimiento_id=establecimiento.id %}">Profesor</a></li>
-            <a href="{% url 'profesor_cursos' establecimiento_id=establecimiento.id %}">Mis cursos</a>
+            <li><a href="{% url 'profesor_cursos' establecimiento_id=establecimiento.id %}">Mis cursos</a></li>
         </ul>
         <div class="footer">
             <a href="#">Nuevos Horizontes</a>
@@ -145,7 +148,6 @@
             <a href="{% url 'generar_informes' curso.establecimiento_id curso.id %}"><button>Generar Informe</button></a>
             <a href="{% url 'observaciones' establecimiento_id=curso.establecimiento_id curso_id=curso.id %}"><button>Observaciones</button></a>
             <a href="{% url 'historial_bitacoras' establecimiento_id=curso.establecimiento_id curso_id=curso.id %}"><button>Ver Historial de Bitácoras</button></a>
-
         </div>
     </div>
 </body>
