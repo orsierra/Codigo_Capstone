@@ -8,27 +8,32 @@ from django.contrib.auth.models import User
 class AsistenciaForm(forms.ModelForm):
     establecimiento = forms.ModelChoiceField(
         queryset=Establecimiento.objects.all(),
-        required=True,
+        required=False,  # Cambiado a False
         label="Establecimiento",
         widget=forms.Select(attrs={'class': 'form-control'})
     )
     
     class Meta:
         model = Asistencia
-        fields = ['curso', 'fecha', 'establecimiento']  # Agregado 'establecimiento'
+        fields = ['curso', 'fecha', 'establecimiento']
+        widgets = {
+            'curso': forms.HiddenInput(),  # Curso como campo oculto
+            'fecha': forms.HiddenInput(),  # Fecha como campo oculto
+        }
 
-    # Agregar campos dinámicamente para los alumnos
     def __init__(self, *args, **kwargs):
         establecimiento = kwargs.pop('establecimiento', None)
         super().__init__(*args, **kwargs)
+        
+        self.fields['curso'].required = False  # Cambiado a False
+        self.fields['fecha'].required = False  # Cambiado a False
 
         # Filtrar los alumnos según el establecimiento proporcionado
         if establecimiento:
             alumnos = Alumno.objects.filter(establecimiento=establecimiento)
         else:
-            alumnos = Alumno.objects.none()  # Si no hay establecimiento, no mostrar alumnos
+            alumnos = Alumno.objects.none()
 
-        # Crear campos de asistencia para cada alumno
         for alumno in alumnos:
             self.fields[f'presente_{alumno.id}'] = forms.BooleanField(
                 required=False,
