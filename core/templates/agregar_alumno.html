@@ -186,7 +186,7 @@
                 {% endif %}
             </li>
             
-            <li><a href="{% url 'gestionar_estudiantes' %}">Lista de Estudiantes</a></li>
+            <li><a href="{% url 'gestionar_estudiantes' establecimiento.id %}">Lista de Estudiantes</a></li>
         </ul>
         <div class="footer">
             <a href="#">Nuevos Horizontes</a>
@@ -200,53 +200,76 @@
             {% if form.non_field_errors %}
                 <div class="error">{{ form.non_field_errors }}</div>
             {% endif %}
+
+            <!-- Mostrar el establecimiento como campo de solo lectura -->
+            <fieldset>
+                <legend>Establecimiento</legend>
+                <div>
+                    <label for="establecimiento_nombre">Establecimiento</label>
+                    <input type="text" id="establecimiento_nombre" name="establecimiento_nombre" value="{{ establecimiento.nombre }}" readonly>
+                </div>
+            </fieldset>
+    
             <fieldset>
                 <legend>Información Personal</legend>
                 <div>
                     <label for="{{ form.nombre.id_for_label }}">{{ form.nombre.label }}</label>
                     {{ form.nombre }}
-                    {{ form.nombre.errors }}
+                    {% for error in form.nombre.errors %}
+                        <div class="error">{{ error }}</div>
+                    {% endfor %}
                 </div>
                 <div>
                     <label for="{{ form.apellido.id_for_label }}">{{ form.apellido.label }}</label>
                     {{ form.apellido }}
-                    {{ form.apellido.errors }}
+                    {% for error in form.apellido.errors %}
+                        <div class="error">{{ error }}</div>
+                    {% endfor %}
                 </div>
                 <div>
                     <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
                     {{ form.email }}
-                    {{ form.email.errors }}
+                    {% for error in form.email.errors %}
+                        <div class="error">{{ error }}</div>
+                    {% endfor %}
                 </div>
             </fieldset>
-        
+    
             <fieldset>
                 <legend>Información de Admisión</legend>
                 <div>
                     <label for="{{ form.apoderado.id_for_label }}">{{ form.apoderado.label }}</label>
                     {{ form.apoderado }}
-                    {{ form.apoderado.errors }}
+                    {% for error in form.apoderado.errors %}
+                        <div class="error">{{ error }}</div>
+                    {% endfor %}
                 </div>
                 <div>
                     <label for="{{ form.cursos.id_for_label }}">{{ form.cursos.label }}</label>
-                    {{ form.cursos }}  <!-- El widget de Select2 se aplicará aquí -->
-                    {{ form.cursos.errors }}
+                    {{ form.cursos }}
+                    {% for error in form.cursos.errors %}
+                        <div class="error">{{ error }}</div>
+                    {% endfor %}
                 </div>
-                
                 <div>
                     <label for="{{ form.estado_admision.id_for_label }}">{{ form.estado_admision.label }}</label>
                     {{ form.estado_admision }}
-                    {{ form.estado_admision.errors }}
+                    {% for error in form.estado_admision.errors %}
+                        <div class="error">{{ error }}</div>
+                    {% endfor %}
                 </div>
                 <div>
                     <label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
                     {{ form.password }}
-                    {{ form.password.errors }}
+                    {% for error in form.password.errors %}
+                        <div class="error">{{ error }}</div>
+                    {% endfor %}
                 </div>
             </fieldset>
-        
+    
             <div class="button-container">
                 <button type="submit">Agregar Alumno</button>
-                <a class="btn-back" href="{% url 'gestionar_estudiantes' %}">Volver</a>
+                <a class="btn-back" href="{% url 'gestionar_estudiantes' establecimiento.id %}">Volver</a>
             </div>
         </form>
     </div>

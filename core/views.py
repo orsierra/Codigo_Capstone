@@ -1112,71 +1112,48 @@ def generar_pdf_view(request):
 # ====================================================== Admisión y Matrícula - Gestión de Estudiantes ======================================================
 
 @login_required
-def gestionar_estudiantes(request):
-    # Obtener el `AsisMatricula` asociado al usuario actual
-    try:
-        asistente_matricula = AsisMatricula.objects.get(user=request.user)
-    except AsisMatricula.DoesNotExist:
-        return HttpResponse("No existe un AsisMatricula asociado a este usuario.")
+def gestionar_estudiantes(request, establecimiento_id):
+    # Obtener el establecimiento por su ID
+    establecimiento = get_object_or_404(Establecimiento, id=establecimiento_id)
+
+    # Filtrar alumnos por estado de admisión y por establecimiento
+    alumnos_pendientes = Alumno.objects.filter(estado_admision='Pendiente', establecimiento=establecimiento)
+    alumnos_aprobados = Alumno.objects.filter(estado_admision='Aprobado', establecimiento=establecimiento)
     
-    # Filtrar alumnos por estado de admisión y por establecimiento del asistente de matrícula
-    alumnos_pendientes = Alumno.objects.filter(estado_admision='Pendiente', establecimiento=asistente_matricula.establecimiento)
-    alumnos_aprobados = Alumno.objects.filter(estado_admision='Aprobado', establecimiento=asistente_matricula.establecimiento)
-    
-    # Renderizar la plantilla con los alumnos filtrados
+    # Renderizar la plantilla con los alumnos filtrados y el establecimiento
     return render(request, 'gestionar_estudiantes.html', {
         'alumnos_pendientes': alumnos_pendientes,
         'alumnos_aprobados': alumnos_aprobados,
-        'establecimiento': asistente_matricula.establecimiento
+        'establecimiento': establecimiento
     })
-
 
 
 # =================================================== Admisión - Agregar Alumno ===================================================
 @login_required
-def agregar_alumno(request):
-    # Obtener el establecimiento asociado al usuario actual
-    try:
-        asistente_matricula = AsisMatricula.objects.get(user=request.user)
-    except AsisMatricula.DoesNotExist:
-        messages.error(request, 'No existe un AsisMatricula asociado a este usuario.')
-        return redirect('gestionar_estudiantes')  # O cualquier otra vista de error o redirección
-    
-    establecimiento = asistente_matricula.establecimiento  # Establecer el establecimiento
-    
+def agregar_alumno(request, establecimiento_id):
+    # Obtener el establecimiento por su ID
+    establecimiento = get_object_or_404(Establecimiento, id=establecimiento_id)
+
     if request.method == 'POST':
-        # Crear el formulario con el establecimiento como argumento
         form = AlumnoForm(request.POST, establecimiento_instance=establecimiento)
 
         if form.is_valid():
             try:
-                # Guardar el alumno sin los cursos por ahora
-                alumno = form.save(commit=False)  # No guardar aún
-                alumno.establecimiento = establecimiento  # Asociar el establecimiento
-                alumno.save()  # Ahora sí guardamos el alumno, lo que asigna un id
-
-                # Asociar los cursos seleccionados con el alumno
-                selected_cursos = form.cleaned_data['cursos']
-                for curso in selected_cursos:
-                    # Crear o recuperar la relación ManyToMany entre el alumno y el curso
-                    CursoAlumno.objects.get_or_create(alumno=alumno, curso=curso)
-
-                # Mensaje de éxito y redirección
-                messages.success(request, 'Alumno agregado con éxito.')
-                return redirect('gestionar_estudiantes')
+                # Guardar el alumno
+                form.save()
+                return redirect('gestionar_estudiantes', establecimiento_id=establecimiento.id)
             except IntegrityError:
                 form.add_error(None, 'Ocurrió un error al crear el usuario. Intenta nuevamente.')
             except Exception as e:
                 form.add_error(None, f'Ocurrió un error inesperado: {str(e)}')
-        else:
-            # Mostrar errores del formulario si no es válido
-            print(form.errors)
     else:
-        # Crear el formulario con el establecimiento como argumento
         form = AlumnoForm(establecimiento_instance=establecimiento)
-    
-    return render(request, 'agregar_alumno.html', {'form': form})
 
+    return render(request, 'agregar_alumno.html', {'form': form, 'establecimiento': establecimiento})
+
+
+   
+    
 # =================================================== Admisión - Eliminar Alumno ===================================================
 @login_required
 def eliminar_alumno(request, alumno_id):
@@ -1187,7 +1164,7 @@ def eliminar_alumno(request, alumno_id):
         asistente_matricula = AsisMatricula.objects.get(user=request.user)
     except AsisMatricula.DoesNotExist:
         messages.error(request, 'No existe un AsisMatricula asociado a este usuario.')
-        return redirect('gestionar_estudiantes')
+        return redirect('gestionar_estudiantes', establecimiento_id=alumno.establecimiento.id)  # Pasa el ID aquí
     
     if alumno.establecimiento == asistente_matricula.establecimiento:
         alumno.delete()
@@ -1195,7 +1172,7 @@ def eliminar_alumno(request, alumno_id):
     else:
         messages.error(request, 'No tienes permiso para eliminar este alumno.')
     
-    return redirect('gestionar_estudiantes')
+    return redirect('gestionar_estudiantes', establecimiento_id=alumno.establecimiento.id)  # Pasa el ID aquí
 
 
 # =================================================== Admisión - Actualizar Matrícula ===================================================
@@ -1208,27 +1185,29 @@ def actualizar_matricula(request, id):
         asistente_matricula = AsisMatricula.objects.get(user=request.user)
     except AsisMatricula.DoesNotExist:
         messages.error(request, 'No existe un AsisMatricula asociado a este usuario.')
-        return redirect('gestionar_estudiantes')
+        return redirect('gestionar_estudiantes', establecimiento_id=alumno.establecimiento.id)  # Pasa el ID aquí
     
     if alumno.establecimiento != asistente_matricula.establecimiento:
         messages.error(request, 'No tienes permiso para actualizar este alumno.')
-        return redirect('gestionar_estudiantes')
+        return redirect('gestionar_estudiantes', establecimiento_id=alumno.establecimiento.id)  # Pasa el ID aquí
 
     if request.method == 'POST':
-        form = AlumnoForm(request.POST, instance=alumno)
+        # Pasamos el establecimiento actual al formulario
+        form = AlumnoForm(request.POST, instance=alumno, establecimiento_instance=alumno.establecimiento)
         if form.is_valid():
             form.save()
             messages.success(request, 'Matrícula actualizada con éxito.')
-            return redirect('gestionar_estudiantes')
+            return redirect('gestionar_estudiantes', establecimiento_id=alumno.establecimiento.id)  # Pasa el ID aquí
     else:
-        form = AlumnoForm(instance=alumno)
+        # Al cargar el formulario, pasamos el establecimiento actual
+        form = AlumnoForm(instance=alumno, establecimiento_instance=alumno.establecimiento)
 
-    # Asegúrate de pasar el establecimiento en el contexto
     return render(request, 'actualizar_matricula.html', {
         'form': form,
         'alumno': alumno,
         'establecimiento': alumno.establecimiento  # Asegúrate de pasar esto
     })
+
 
 
 
@@ -1290,7 +1269,7 @@ def agregar_alumno_asis(request, establecimiento_id):
             try:
                 # Guardar el alumno, incluyendo el establecimiento y los cursos seleccionados
                 form.save()
-                return redirect('gestion_pagos_admision', establecimiento_id=establecimiento.id)
+                return redirect('asisAdmiFinan_gestion_pagos', establecimiento_id=establecimiento.id)
             except IntegrityError:
                 form.add_error(None, 'Ocurrió un error al crear el usuario. Intenta nuevamente.')
             except Exception as e:

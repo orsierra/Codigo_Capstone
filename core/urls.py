@@ -50,8 +50,8 @@ urlpatterns = [
     path('informe-financiero/eliminar/<int:informe_id>/', views.eliminar_informe_view, name='eliminar_informe'),
     path('informe-financiero/pdf/', views.generar_pdf_view, name='descargar_pdf'),
     # Asistente De admision y Matricula
-    path('gestionar_estudiantes/', views.gestionar_estudiantes, name='gestionar_estudiantes'),
-    path('agregar_alumno/', views.agregar_alumno, name='agregar_alumno'),
+    path('gestionar_estudiantes/<int:establecimiento_id>/', views.gestionar_estudiantes, name='gestionar_estudiantes'),
+    path('agregar_alumno/<int:establecimiento_id>/', views.agregar_alumno, name='agregar_alumno'),
     path('actualizar_matricula/<int:id>/', views.actualizar_matricula, name='actualizar_matricula'),
     path('panel_admision/<int:establecimiento_id>/', views.panel_admision, name='panel_admision'),
     path('eliminar_alumno/<int:alumno_id>/', views.eliminar_alumno, name='eliminar_alumno'),

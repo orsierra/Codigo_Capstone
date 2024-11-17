@@ -15,8 +15,10 @@
             padding: 0;
             background-color: #f4f4f4;
             display: flex;
-            height: 100vh;
+            flex-direction: column;
+            height: auto;  /* Ajusta el height al contenido */
         }
+        
 
         /* Barra lateral */
         .sidebar {
@@ -106,16 +108,17 @@
 
         /* Contenedor principal y formulario */
         .main-content {
-            margin-left: 250px;  /* Ajustar para que el contenido no se solape con el sidebar */
+            margin-left: 250px;  /* Ajusta el margen para no superponerse al sidebar */
             padding: 20px;
-            width: 100%;
+            width: calc(100% - 250px);  /* Ajusta el ancho restando el ancho del sidebar */
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;  /* Cambié 'center' por 'flex-start' para alinear los elementos en la parte superior */
             min-height: 100vh;
             box-sizing: border-box;
             flex-direction: column;
         }
+        
         .form-container {
             width: 100%;
             max-width: 900px;
@@ -135,7 +138,9 @@
             margin-bottom: 20px;
             background: #fff;
             border-radius: 4px;
+            overflow: visible;  /* Asegura que el contenido no esté oculto */
         }
+        
         legend {
             font-weight: bold;
             padding: 0 10px;
