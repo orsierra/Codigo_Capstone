@@ -805,7 +805,7 @@ def apoderadoConsuNotas(request, establecimiento_id):
     # Verificar que el apoderado esté asociado al establecimiento
     if apoderado.establecimiento != establecimiento:
         return redirect('error_page')
-
+ 
     # Obtener los alumnos aprobados del apoderado
     alumnos = Alumno.objects.filter(apoderado=apoderado, estado_admision="Aprobado")
 
@@ -844,6 +844,7 @@ def apoderadoConsuNotas(request, establecimiento_id):
         'alumnos_data': alumnos_data,
         'establecimiento': establecimiento,
     }
+
     return render(request, 'apoderadoConsuNotas.html', context)
 # ======================================================================= APODERADO OBSERVACIONES ================================================================================================
 
@@ -1109,8 +1110,6 @@ def generar_pdf_view(request):
 
 
 # ====================================================== Admisión y Matrícula - Gestión de Estudiantes ======================================================
-from django.shortcuts import get_object_or_404, render
-from .models import Alumno, AsisMatricula
 
 @login_required
 def gestionar_estudiantes(request):
