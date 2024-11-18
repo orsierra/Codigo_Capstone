@@ -33,11 +33,8 @@ urlpatterns = [
     path('apoderado/<int:establecimiento_id>/observaciones/', views.apoderado_observaciones, name='apoderadoObservaciones'),
     path('apoderado/<int:establecimiento_id>/', views.apoderado_view, name='apoderado_view'),
     path('historial-notificaciones/<int:establecimiento_id>/', views.historial_notificaciones, name='historial_notificaciones'),
-
-    
-    path('notificacion/<int:notificacion_id>/leer/', views.marcar_notificacion_como_leida, name='marcar_notificacion_como_leida'),
-    path('marcar-notificacion/<int:notificacion_id>/', views.marcar_notificacion_como_leida, name='marcar_notificacion_como_leida'),
-
+    path('apoderado/<int:establecimiento_id>/notificacion/<int:notificacion_id>/leer/', views.marcar_notificacion_como_leida, name='marcar_notificacion_como_leida'),
+    path('apoderado/<int:establecimiento_id>/marcar-notificacion/<int:notificacion_id>/', views.marcar_notificacion_como_leida, name='marcar_notificacion_como_leida_alt'),
     #Director
     path('director/', director_dashboard, name='director_dashboard'),
     path('director/consulta-informes/', views.directorMenu, name='director_menu'),
@@ -62,8 +59,6 @@ urlpatterns = [
     path('generar_pdf_contrato/<int:id>/', views.generar_pdf_contrato, name='generar_pdf_contrato'),
     path('agregar-alumno/<int:establecimiento_id>/', views.agregar_alumno_asis, name='agregar_alumno_asis'),
     path('eliminar-alumno/<int:establecimiento_id>/<int:alumno_id>/', views.eliminar_alumno_asis, name='eliminar_alumno_asis'),
-   
-    
     #SUBDIRECTOR
     path('subdirector/', views.subdirector_home, name='subdirector_home'),
     path('subdirector/informes/', views.consulta_informes_academicos, name='consulta_informes_academicos'),
@@ -75,6 +70,4 @@ urlpatterns = [
     #SOSTENEDOR
     path('sostenedor/', views.sostenedor, name='sostenedor'),
     path('establecimientos/<int:establecimiento_id>/', views.establecimientos, name='establecimientos'),
-
-
 ]

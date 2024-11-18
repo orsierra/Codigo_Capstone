@@ -15,8 +15,8 @@
             align-items: center;
             height: 100vh;
             background-image: url("{% static 'img/fondo.jpg' %}");
-            background-size: cover; /* Cubrir toda la pantalla */
-            background-position: center; /* Centrar la imagen */
+            background-size: cover;
+            background-position: center;
         }
         .dashboard-container {
             display: flex;
@@ -42,10 +42,23 @@
             color: white;
             text-decoration: none;
             border-radius: 5px;
-            margin-top: 20px;
+            margin-top: 15px;
+            width: 100%;
+            max-width: 300px;
+            box-sizing: border-box;
+            transition: background-color 0.3s;
         }
         .btn:hover {
             background-color: #333;
+        }
+        .divider {
+            width: 100%;
+            max-width: 300px;
+            border-top: 2px solid #555;
+            margin: 15px 0;
+        }
+        .btn-logout {
+            padding: 10px 30px; /* Ajuste de padding para que el botón sea más delgado */
         }
         footer {
             margin-top: 50px;
@@ -58,7 +71,13 @@
         <h1>Panel de Admisión y Matrícula</h1>
         <a href="{% url 'gestionar_estudiantes' establecimiento.id %}" class="btn">Gestionar Estudiantes</a>
         <a href="{% url 'agregar_alumno' establecimiento.id %}" class="btn">Ingresar Nuevo Estudiante</a>
+        
+        <div class="divider"></div>
 
+        <form action="{% url 'logout' %}" method="post" style="width: 100%; max-width: 300px;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-logout" style="width: 100%;">Cerrar Sesión</button>
+        </form>
 
         <footer>
             <p>Colegio Nuevos Horizontes</p>

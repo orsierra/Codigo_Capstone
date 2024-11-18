@@ -14,9 +14,10 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-image: url("{% static 'img/fondo.jpg' %}"); /* Imagen de fondo */
-            background-size: cover; /* Cubrir toda la pantalla */
-            background-position: center; /* Centrar la imagen */
+            background-image: url("{% static 'img/fondo.jpg' %}");
+            background-size: cover;
+            background-position: center;
+            position: relative;
         }
         .dashboard-container {
             display: flex;
@@ -24,31 +25,48 @@
             align-items: center;
             text-align: center;
             background-color: white;
-            padding: 80px; /* Aumentar el padding para hacer el cuadro más grande */
+            padding: 80px;
             border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Sombra más prominente */
-            max-width: 600px; /* Establecer un ancho máximo */
-            width: 100%; /* Hacer que ocupe el 100% del contenedor */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            max-width: 600px;
+            width: 100%;
         }
         h1 {
             font-size: 36px;
             margin-bottom: 30px;
         }
+        .btn-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px; /* Espacio entre los botones */
+            width: 100%;
+        }
         .btn {
-            display: inline-block;
-            padding: 15px 30px;
+            padding: 15px 0; /* Ajuste de altura uniforme */
             font-size: 18px;
             background-color: black;
             color: white;
             text-decoration: none;
             border-radius: 5px;
-            margin-top: 20px; /* Añadir un margen superior al botón */
+            width: 100%; /* Ancho del botón al 100% del contenedor */
+            max-width: 300px; /* Limitar el ancho del botón */
+            text-align: center;
+            transition: background-color 0.3s;
+            border: none; /* Eliminar borde para consistencia */
+            box-sizing: border-box; /* Asegura que el padding no aumente el ancho */
         }
         .btn:hover {
             background-color: #333;
         }
+        .divider {
+            width: 100%;
+            max-width: 300px;
+            border-top: 1px solid #555;
+            margin: 10px 0;
+        }
         footer {
-            margin-top: 50px;
+            margin-top: 30px;
             font-size: 14px;
         }
     </style>
@@ -56,10 +74,21 @@
 <body>
     <div class="dashboard-container">
         <h1>Alumno</h1>
-        <!-- Botón Consulta de asistencia -->
-        <a href="{% url 'alumnoConsuAsis' establecimiento_id=establecimiento.id %}" class="btn">Ver asistencia</a>
-        <!-- Botón Consulta de notas -->
-        <a href="{% url 'alumnoConsuNotas' establecimiento_id=establecimiento.id %}" class="btn">Consulta de notas</a>
+
+        <!-- Colocar los botones en una columna vertical -->
+        <div class="btn-container">
+            <a href="{% url 'alumnoConsuAsis' establecimiento_id=establecimiento.id %}" class="btn">Ver asistencia</a>
+            <a href="{% url 'alumnoConsuNotas' establecimiento_id=establecimiento.id %}" class="btn">Consulta de notas</a>
+            
+            <div class="divider"></div> <!-- Línea divisora para separar "Cerrar Sesión" -->
+
+            <!-- Botón de Cerrar Sesión -->
+            <form action="{% url 'logout' %}" method="post" style="width: 100%; max-width: 300px;">
+                {% csrf_token %}
+                <button type="submit" class="btn">Cerrar Sesión</button>
+            </form>
+        </div>
+
         <footer>
             <p>Colegio Nuevos Horizontes</p>
             <div>

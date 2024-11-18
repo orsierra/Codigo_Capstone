@@ -13,14 +13,13 @@
             padding: 0;
             display: flex;
             height: 100vh;
-            background: url("{% static 'img/Login.jpg' %}") no-repeat center center fixed; /* Imagen de fondo */
-            background-size: cover; /* Para cubrir toda la pantalla */
+            background: url("{% static 'img/Login.jpg' %}") no-repeat center center fixed;
+            background-size: cover;
         }
 
-        /* Barra lateral */
         .sidebar {
             width: 250px;
-            background-color: rgba(0, 0, 0, 0.8); /* Fondo negro con opacidad */
+            background-color: rgba(0, 0, 0, 0.8);
             color: white;
             padding: 20px;
             display: flex;
@@ -31,7 +30,7 @@
 
         .sidebar h2 {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             font-weight: bold;
             font-size: 22px;
         }
@@ -42,7 +41,7 @@
         }
 
         .sidebar ul li {
-            margin: 15px 0;
+            margin: 10px 0; /* Reduce el espacio entre los elementos */
         }
 
         .sidebar ul li a {
@@ -56,11 +55,27 @@
             color: #17a2b8;
         }
 
-        /* Contenido principal */
+        .logout-button {
+            width: 100%;
+            background: none;
+            border: none;
+            color: white;
+            text-align: left;
+            padding: 0; /* Elimina el padding para reducir el espacio */
+            font-weight: 500;
+            cursor: pointer;
+            transition: color 0.3s;
+            margin-top: 5px; /* Ajusta el margen superior */
+        }
+
+        .logout-button:hover {
+            color: #17a2b8;
+        }
+
         .main-content {
             flex-grow: 1;
             padding: 40px;
-            background-color: rgba(255, 255, 255, 0.9); /* Fondo blanco con opacidad */
+            background-color: rgba(255, 255, 255, 0.9);
             overflow-y: auto;
             box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
@@ -75,7 +90,6 @@
             font-weight: bold;
         }
 
-        /* Contenedor de botones */
         .button-container {
             display: flex;
             flex-direction: column;
@@ -89,7 +103,6 @@
             margin: 10px 0;
         }
 
-        /* Estilos para los botones */
         .button-container button {
             background-color: #007bff;
             color: white;
@@ -108,7 +121,6 @@
             transform: scale(1.02);
         }
 
-        /* Pie de página */
         .footer {
             margin-top: auto;
             text-align: center;
@@ -134,11 +146,16 @@
         <h2>Menú</h2>
         <ul>
             <li><a href="{% url 'director_dashboard' %}">Director</a></li>
-
         </ul>
+
+        <!-- Botón de Cerrar sesión -->
+        <form action="{% url 'logout' %}" method="post" style="margin-top: 5px;">
+            {% csrf_token %}
+            <button type="submit" class="logout-button">Cerrar sesión</button>
+        </form>
+
         <div class="footer">
             <a href="#">Nuevos Horizontes</a>
-
         </div>
     </div>
 

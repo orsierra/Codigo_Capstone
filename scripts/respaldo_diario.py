@@ -43,7 +43,7 @@ if conn:
         cursor = conn.cursor()
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'core_%';")
         tables = cursor.fetchall()
-        logging.info("Tablas obtenidas: %s", tables)
+        logging.info("Tablas obtenidas: %s", [table[0] for table in tables])
     except Exception as e:
         logging.error("Error al obtener tablas: %s", e)
         conn.close()
@@ -60,7 +60,17 @@ if conn:
             with pd.ExcelWriter(excel_path, engine='openpyxl') as writer:
                 for table_name, in tables:
                     sheet_name = table_name[:31]
+                    # Obtener datos de la tabla
                     df = pd.read_sql_query(f"SELECT * FROM {table_name}", conn)
+                    logging.info(f"Datos de la tabla {table_name}: {df.head()}")
+                    
+                    # Verificar si la columna de calificaciones existe y tiene datos
+                    if 'calificacion' in df.columns:
+                        logging.info(f"Tabla {table_name} tiene columna 'calificacion' con datos: {df['calificacion'].head()}")
+                    else:
+                        logging.warning(f"Tabla {table_name} no contiene la columna 'calificacion'")
+                    
+                    # Exportar a Excel
                     df.to_excel(writer, sheet_name=sheet_name, index=False, na_rep="")
             logging.info("Respaldo diario guardado en %s", excel_path)
         except Exception as e:
