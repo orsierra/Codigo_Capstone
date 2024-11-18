@@ -56,6 +56,13 @@
             font-size: 36px;
             margin-bottom: 30px;
         }
+        .btn-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px; /* Espacio entre botones */
+            margin-top: 20px;
+        }
         .btn {
             display: inline-block;
             padding: 15px 30px;
@@ -64,7 +71,8 @@
             color: white;
             text-decoration: none;
             border-radius: 5px;
-            margin-top: 20px;
+            width: 100%; /* Hace que los botones ocupen todo el ancho dentro de la columna */
+            text-align: center;
         }
         .btn:hover {
             background-color: #333;
@@ -81,8 +89,7 @@
             {% for notificacion in notificaciones_no_leidas %}
                 <div class="notification-item">
                     <p>{{ notificacion.mensaje }}</p>
-                    <!-- Puedes agregar un enlace para marcar la notificación como leída si lo deseas -->
-                    <a href="{% url 'marcar_como_leida' notificacion.id %}" class="mark-as-read">Marcar como leída</a>
+                    <a href="{% url 'marcar_notificacion_como_leida' establecimiento_id=establecimiento_id notificacion_id=notificacion.id %}" class="mark-as-read">Marcar como leída</a>
                 </div>
             {% endfor %}
         </div>
@@ -91,7 +98,7 @@
     <div class="dashboard-container">
         <h1>Apoderado</h1>
 
-        <!-- Asegúrate de pasar el establecimiento_id en los enlaces -->
+        <!-- Colocar los botones en una columna vertical -->
         <div class="btn-container">
             <a href="{% url 'apoderadoConsuAsis' establecimiento_id=establecimiento_id %}" class="btn">Consulta de Asistencia</a>
             <a href="{% url 'apoderadoConsuNotas' establecimiento_id=establecimiento_id %}" class="btn">Consulta de Notas</a>
@@ -106,5 +113,4 @@
         </footer>
     </div>
 </body>
-
 </html>

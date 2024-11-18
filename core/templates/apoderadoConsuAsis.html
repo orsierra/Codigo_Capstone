@@ -1,4 +1,6 @@
-<!DOCTYPE html> 
+{% load static %}
+
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -16,7 +18,7 @@
             font-family: Arial, sans-serif;
             display: flex;
             height: 100vh;
-            background-color: #f8f9fa;
+            background-color: #f4f6f9;
         }
 
         .sidebar {
@@ -49,7 +51,7 @@
             margin: 20px 0;
         }
 
-        .sidebar ul li a, 
+        .sidebar ul li a,
         .sidebar ul li form button {
             color: #ced4da;
             text-decoration: none;
@@ -67,7 +69,7 @@
             font-family: inherit;
         }
 
-        .sidebar ul li a:hover, 
+        .sidebar ul li a:hover,
         .sidebar ul li form button:hover {
             background-color: #ffc107;
             color: #343a40;
@@ -93,7 +95,7 @@
         .main-content {
             margin-left: 270px;
             padding: 20px;
-            width: 100%;
+            width: calc(100% - 270px);
             overflow-y: auto;
         }
 
@@ -105,14 +107,15 @@
         }
 
         .accordion {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
         }
 
         .panel {
-            border: 1px solid #ccc;
-            margin: 10px 0;
-            border-radius: 5px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
             overflow: hidden;
         }
 
@@ -135,22 +138,22 @@
         .panel-content {
             display: none;
             padding: 20px;
-            background-color: #fff;
+            background-color: #f8f9fa;
             border-top: 1px solid #ddd;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
             background-color: #fff;
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 15px;
         }
 
         th, td {
-            padding: 12px;
+            padding: 15px;
             text-align: center;
             border-bottom: 1px solid #dee2e6;
         }
@@ -163,6 +166,16 @@
 
         tr:nth-child(even) {
             background-color: #f8f9fa;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+            padding: 15px;
+            background-color: #fff;
+            border: 1px dashed #dee2e6;
+            border-radius: 5px;
         }
 
         .buttons {
@@ -185,13 +198,6 @@
         .btn-back:hover {
             background-color: #0056b3;
         }
-
-        .no-data {
-            text-align: center;
-            color: #6c757d;
-            font-style: italic;
-            padding: 15px;
-        }
     </style>
     <script>
         function togglePanel(panelId) {
@@ -212,7 +218,6 @@
             <li><a href="{% url 'apoderadoObservaciones' establecimiento_id=establecimiento_id %}">Observaciones</a></li>
             <li><a href="{% url 'historial_notificaciones' establecimiento_id=establecimiento_id %}">Notificaciones</a></li>
             <li>
-                <!-- Formulario para cerrar sesión -->
                 <form action="{% url 'logout' %}" method="post" style="display: inline;">
                     {% csrf_token %}
                     <button type="submit">Cerrar sesión</button>
@@ -236,7 +241,6 @@
                 </div>
                 <div id="panel-{{ alumno.id }}" class="panel-content">
                     {% if asistencias %}
-                        {% for asistencia in asistencias %}
                         <table>
                             <thead>
                                 <tr>
@@ -247,22 +251,23 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                {% for asistencia in asistencias %}
                                 <tr>
                                     <td>{{ asistencia.curso }}</td>
                                     <td>{{ asistencia.total_clases }}</td>
                                     <td>{{ asistencia.asistencia }}</td>
                                     <td>{{ asistencia.porcentaje_asistencia }}%</td>
                                 </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
-                        {% endfor %}
                     {% else %}
-                        <p class="no-data">No hay datos de asistencia para este alumno.</p>
+                        <div class="no-data">No hay datos de asistencia para este alumno.</div>
                     {% endif %}
                 </div>
             </div>
             {% empty %}
-            <p class="no-data">No hay alumnos asociados.</p>
+            <div class="no-data">No hay alumnos asociados.</div>
             {% endfor %}
         </div>
 

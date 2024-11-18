@@ -283,13 +283,28 @@ def registrar_calificaciones(request, establecimiento_id, curso_id):
             alumno = curso_alumno.alumno
             form = CalificacionForm(request.POST, prefix=str(alumno.id))
             if form.is_valid():
-                # Crear una nueva calificación en lugar de actualizar la existente
+                # Crear una nueva calificación
+                nota = form.cleaned_data['nota']
                 Calificacion.objects.create(
                     alumno=alumno,
                     curso=curso,
                     establecimiento=curso.establecimiento,
-                    nota=form.cleaned_data['nota']
+                    nota=nota
                 )
+                
+                # Verificar si la calificación es menor a 4 para crear la notificación
+                if nota < 4:
+                    apoderado = alumno.apoderado
+                    if apoderado:
+                        # Crear la notificación en la base de datos para el apoderado
+                        mensaje = f"Su representado {alumno.nombre} {alumno.apellido} ha obtenido una calificación de {nota} en {curso.nombre}."
+                        Notificacion.objects.create(
+                            establecimiento=establecimiento,
+                            apoderado=apoderado,
+                            mensaje=mensaje,
+                            tipo='calificacion_baja',
+                            prioridad=1  # Asignar prioridad alta para calificaciones bajas
+                        )
             else:
                 errores[alumno] = form.errors
 
@@ -308,6 +323,7 @@ def registrar_calificaciones(request, establecimiento_id, curso_id):
         'success_message': success_message,  # Pasar el mensaje de éxito al contexto
         'establecimiento': establecimiento,
     })
+
 
 # =================================================== REGISTRO ACADEMICO =====================================================================================
 
@@ -440,20 +456,35 @@ def alumno_detalle(request, establecimiento_id, alumno_id):
 def descargar_pdf_alumno(request, establecimiento_id, alumno_id):
     establecimiento = get_object_or_404(Establecimiento, id=establecimiento_id)
     alumno = get_object_or_404(Alumno, id=alumno_id, establecimiento=establecimiento)
-    calificaciones = Calificacion.objects.filter(alumno=alumno)
-    asistencias = Asistencia.objects.filter(alumnos_presentes=alumno)
-    ausencias = Asistencia.objects.filter(alumnos_ausentes=alumno)
-    justificaciones = Asistencia.objects.filter(alumnos_justificados=alumno)
-    promedio = calificaciones.aggregate(Avg('nota'))['nota__avg'] or 0
+
+    # Obtener el curso actual del alumno mediante el modelo CursoAlumno
+    curso_alumno = CursoAlumno.objects.filter(alumno=alumno).first()
+    curso_actual = curso_alumno.curso if curso_alumno else None
+
+    # Filtrar calificaciones del alumno por el curso actual
+    calificaciones = Calificacion.objects.filter(alumno=alumno, curso=curso_actual) if curso_actual else []
+
+    # Calcular el promedio de calificaciones
+    promedio = calificaciones.aggregate(promedio=Avg('nota'))['promedio'] or 0
+
+    # Filtrar asistencias, ausencias y justificaciones usando el curso actual
+    asistencias = Asistencia.objects.filter(curso=curso_actual, alumnos_presentes=alumno) if curso_actual else []
+    ausencias = Asistencia.objects.filter(curso=curso_actual, alumnos_ausentes=alumno) if curso_actual else []
+    justificaciones = Asistencia.objects.filter(curso=curso_actual, alumnos_justificados=alumno) if curso_actual else []
+
+    # Filtrar observaciones del alumno por el curso actual
+    observaciones = Observacion.objects.filter(alumno=alumno, curso=curso_actual) if curso_actual else []
 
     context = {
         'alumno': alumno,
+        'curso': curso_actual,
         'calificaciones': calificaciones,
         'asistencias': asistencias,
         'ausencias': ausencias,
         'justificaciones': justificaciones,
+        'observaciones': observaciones,
         'promedio': promedio,
-        'establecimiento': establecimiento,
+        'establecimiento': establecimiento
     }
 
     html_string = render_to_string('alumno_detalle.html', context)
@@ -463,7 +494,9 @@ def descargar_pdf_alumno(request, establecimiento_id, alumno_id):
     html.write_pdf(response)
 
     return response
+
 # =============================================================== OBSERVACIONES =========================================================================
+
 @login_required
 def observaciones(request, establecimiento_id, curso_id):
     establecimiento = get_object_or_404(Establecimiento, id=establecimiento_id)
@@ -508,8 +541,6 @@ def observaciones(request, establecimiento_id, curso_id):
         'form': form,
     })
 
-
-     
 # ============================================================= Dashboard de Alumno ==================================================
 
 @login_required
@@ -652,16 +683,13 @@ def apoderado_view(request, establecimiento_id):  # Recibimos 'establecimiento_i
 
 #=========================================== APODERADO NOTIFICACIONES ======================================================================
 @login_required
-def marcar_notificacion_como_leida(request, notificacion_id):
+def marcar_notificacion_como_leida(request, establecimiento_id, notificacion_id):
     # Obtener la notificación asociada al apoderado actual y al ID de la notificación
     notificacion = get_object_or_404(Notificacion, id=notificacion_id, apoderado__user=request.user)
 
     # Marcar la notificación como leída
     notificacion.leida = True
     notificacion.save()
-
-    # Obtener el establecimiento_id del apoderado
-    establecimiento_id = notificacion.apoderado.establecimiento.id
 
     # Redirigir a la vista de apoderado con el establecimiento_id como argumento
     return redirect('apoderado_view', establecimiento_id=establecimiento_id)
@@ -888,19 +916,36 @@ def informes_academicos(request):
     informes = []
 
     for curso in cursos:
-        alumnos = curso.alumnos.all()
+        # Filtra los alumnos del curso que están en el establecimiento correcto
+        alumnos = Alumno.objects.filter(curso_alumno_relacion__curso=curso, establecimiento=director.establecimiento).distinct()
         total_alumnos = alumnos.count()
-        promedio_notas = Calificacion.objects.filter(alumno__in=alumnos).aggregate(Avg('nota'))['nota__avg'] or 0
-        total_asistencias = Asistencia.objects.filter(alumnos_presentes__in=alumnos).count()
-        total_dias = Asistencia.objects.filter(curso=curso).count()
-
-        promedio_asistencia = (total_asistencias / (total_alumnos * total_dias) * 100) if total_alumnos > 0 and total_dias > 0 else 0
         
+        # Calcular el promedio de notas específico para el curso actual
+        promedio_notas = Calificacion.objects.filter(alumno__in=alumnos, curso=curso).aggregate(Avg('nota'))['nota__avg'] or 0
+        
+        # Contabiliza los registros de asistencia específicos para el curso actual
+        total_asistencias = Asistencia.objects.filter(curso=curso, alumnos_presentes__in=alumnos).count()
+        total_ausentes = Asistencia.objects.filter(curso=curso, alumnos_ausentes__in=alumnos).count()
+        total_justificados = Asistencia.objects.filter(curso=curso, alumnos_justificados__in=alumnos).count()
+        total_dias = Asistencia.objects.filter(curso=curso).count()
+        
+        # Total de registros de asistencia considerados
+        total_registros_asistencia = total_asistencias + total_ausentes + total_justificados
+
+        # Calcular el porcentaje de asistencia en base a los registros totales
+        promedio_asistencia = 0
+        if total_alumnos > 0 and total_dias > 0:
+            # Calcula el porcentaje en función de los presentes
+            promedio_asistencia = (total_asistencias / total_registros_asistencia * 100) if total_registros_asistencia > 0 else 0
+
+        # Limitar el valor máximo a 100% y redondear a un decimal
+        promedio_asistencia = min(round(promedio_asistencia, 1), 100)
+
         informes.append({
             'curso': curso,
             'total_alumnos': total_alumnos,
-            'promedio_notas': round(promedio_notas, 1),
-            'promedio_asistencia': round(promedio_asistencia, 1)
+            'promedio_notas': round(promedio_notas, 1) if promedio_notas > 0 else 'Sin notas',
+            'promedio_asistencia': promedio_asistencia
         })
 
     return render(request, 'direInfoAca.html', {'informes': informes})
@@ -944,19 +989,35 @@ def direcPdfInfoAca(request):
     # Genera los informes académicos para los cursos filtrados
     informes = []
     for curso in cursos:
-        alumnos = curso.alumnos.all()
+        # Filtra los alumnos del curso en el establecimiento del director
+        alumnos = Alumno.objects.filter(curso_alumno_relacion__curso=curso, establecimiento=director.establecimiento).distinct()
         total_alumnos = alumnos.count()
-        promedio_notas = Calificacion.objects.filter(alumno__in=alumnos).aggregate(Avg('nota'))['nota__avg'] or 0
-        total_asistencias = Asistencia.objects.filter(alumnos_presentes__in=alumnos).count()
+        
+        # Calcular el promedio de notas específico para el curso actual
+        promedio_notas = Calificacion.objects.filter(alumno__in=alumnos, curso=curso).aggregate(Avg('nota'))['nota__avg'] or 0
+        
+        # Contabiliza los registros de asistencia específicos para el curso actual
+        total_asistencias = Asistencia.objects.filter(curso=curso, alumnos_presentes__in=alumnos).count()
+        total_ausentes = Asistencia.objects.filter(curso=curso, alumnos_ausentes__in=alumnos).count()
+        total_justificados = Asistencia.objects.filter(curso=curso, alumnos_justificados__in=alumnos).count()
         total_dias = Asistencia.objects.filter(curso=curso).count()
+        
+        # Total de registros de asistencia considerados
+        total_registros_asistencia = total_asistencias + total_ausentes + total_justificados
 
-        promedio_asistencia = (total_asistencias / (total_alumnos * total_dias) * 100) if total_alumnos > 0 and total_dias > 0 else 0
+        # Calcular el porcentaje de asistencia en base a los registros totales
+        promedio_asistencia = 0
+        if total_alumnos > 0 and total_dias > 0:
+            promedio_asistencia = (total_asistencias / total_registros_asistencia * 100) if total_registros_asistencia > 0 else 0
+
+        # Limitar el valor máximo a 100% y redondear a un decimal
+        promedio_asistencia = min(round(promedio_asistencia, 1), 100)
 
         informes.append({
             'curso': curso,
             'total_alumnos': total_alumnos,
-            'promedio_notas': round(promedio_notas, 1),
-            'promedio_asistencia': round(promedio_asistencia, 1)
+            'promedio_notas': round(promedio_notas, 1) if promedio_notas > 0 else 'Sin notas',
+            'promedio_asistencia': promedio_asistencia
         })
 
     # Renderiza la plantilla con los informes académicos generados
@@ -1226,7 +1287,7 @@ def ver_gestion_pagos_admision(request, establecimiento_id):
 
 
 
-# =====================================================VISTA de ASISTENTE DE ADMISIÓN Y FINANZAS PARA AGREGAR ALUMNO ==========================================
+# ===================================================== VISTA de ASISTENTE DE ADMISIÓN Y FINANZAS PARA AGREGAR ALUMNO ==========================================
 @login_required
 def agregar_alumno_asis(request, establecimiento_id):
     # Obtener el establecimiento por su ID

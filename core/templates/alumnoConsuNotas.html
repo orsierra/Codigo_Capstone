@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Consulta de Notas</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         /* Reset básico */
         * {
@@ -15,7 +14,7 @@
 
         body {
             font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
+            background-color: #f4f6f9;
             display: flex;
             height: 100vh;
         }
@@ -23,21 +22,22 @@
         .sidebar {
             width: 250px;
             background-color: #343a40;
-            color: white;
+            color: #fff;
             padding: 20px;
             position: fixed;
             height: 100%;
+            overflow-y: auto;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
         }
 
         .sidebar h2 {
             text-align: center;
-            color: #ffc107;
             font-size: 1.5em;
             margin-bottom: 30px;
+            color: #ffc107;
         }
 
         .sidebar ul {
@@ -46,7 +46,7 @@
         }
 
         .sidebar ul li {
-            margin: 15px 0;
+            margin: 20px 0;
         }
 
         .sidebar ul li a,
@@ -54,18 +54,17 @@
             color: #ced4da;
             text-decoration: none;
             font-weight: bold;
-            display: flex;
-            align-items: center;
-            padding: 10px;
+            display: block;
+            padding: 8px;
             border-radius: 5px;
             transition: all 0.3s;
+            width: 100%;
+            text-align: left;
             background: none;
             border: none;
             cursor: pointer;
+            font-size: 1em;
             font-family: inherit;
-            font-size: inherit;
-            width: 100%;
-            text-align: left;
         }
 
         .sidebar ul li a:hover,
@@ -74,14 +73,11 @@
             color: #343a40;
         }
 
-        .sidebar ul li i {
-            margin-right: 10px;
-        }
-
         .footer {
             text-align: center;
             font-size: 14px;
             color: #ffc107;
+            margin-top: 20px;
         }
 
         .footer a {
@@ -105,18 +101,16 @@
             font-size: 2em;
             text-align: center;
             color: #343a40;
-            background-color: #007bff;
-            color: white;
-            padding: 15px;
-            border-radius: 8px;
+            margin-bottom: 20px;
         }
 
         .asignatura {
-            background-color: #e0e0e0;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             padding: 15px;
-            border-radius: 10px;
             margin-bottom: 15px;
-            font-size: 18px;
+            font-size: 1.1em;
             font-weight: bold;
             display: flex;
             justify-content: space-between;
@@ -126,27 +120,32 @@
         }
 
         .asignatura:hover {
-            background-color: #ccc;
+            background-color: #f1f1f1;
         }
 
         .notas {
             display: none;
-            background-color: #f9f9f9;
+            background-color: #f8f9fa;
             padding: 20px;
-            border-radius: 10px;
+            border-radius: 8px;
             margin-top: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         .notas table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
         .notas th, .notas td {
-            padding: 12px;
-            border: 1px solid #ddd;
+            padding: 15px;
             text-align: center;
+            border-bottom: 1px solid #dee2e6;
         }
 
         .notas th {
@@ -159,50 +158,43 @@
             color: #343a40;
         }
 
+        .no-data {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+            padding: 15px;
+            background-color: #fff;
+            border: 1px dashed #dee2e6;
+            border-radius: 5px;
+        }
+
         /* Responsividad */
         @media (max-width: 768px) {
             .sidebar {
                 width: 100%;
                 height: auto;
                 position: relative;
-                display: none; /* Ocultar la barra lateral por defecto */
             }
 
             .main-content {
                 margin-left: 0;
                 width: 100%;
             }
-
-            .sidebar.active {
-                display: block; /* Mostrar cuando la clase active esté presente */
-            }
-
-            .toggle-sidebar {
-                display: block;
-                background-color: #343a40;
-                color: white;
-                padding: 10px;
-                cursor: pointer;
-                margin: 10px;
-                border-radius: 5px;
-            }
         }
     </style>
 </head>
 <body>
 
-    <!-- Barra lateral de navegación -->
     <div class="sidebar">
         <h2>Menú</h2>
         <ul>
-            <li><a href="{% url 'alumno_dashboard' establecimiento_id  %}"><i class="fas fa-home"></i>Inicio</a></li>
-            <li><a href="{% url 'alumnoConsuAsis' establecimiento_id  %}"><i class="fas fa-calendar-check"></i>Consulta de Asistencia</a></li>
-            <li><a href="{% url 'alumnoConsuNotas' establecimiento_id  %}"><i class="fas fa-graduation-cap"></i>Consulta de Notas</a></li>
+            <li><a href="{% url 'alumno_dashboard' establecimiento_id %}">Inicio</a></li>
+            <li><a href="{% url 'alumnoConsuAsis' establecimiento_id %}">Consulta de Asistencia</a></li>
+            <li><a href="{% url 'alumnoConsuNotas' establecimiento_id %}">Consulta de Notas</a></li>
             <li>
-                <!-- Botón de Cerrar sesión estilo enlace -->
                 <form action="{% url 'logout' %}" method="post" style="display: inline;">
                     {% csrf_token %}
-                    <button type="submit"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</button>
+                    <button type="submit">Cerrar sesión</button>
                 </form>
             </li>
         </ul>
@@ -211,19 +203,13 @@
         </div>
     </div>
 
-    <!-- Botón para mostrar/ocultar la barra lateral en móviles -->
-    <div class="toggle-sidebar" onclick="document.querySelector('.sidebar').classList.toggle('active')">
-        <i class="fas fa-bars"></i> Menú
-    </div>
-
     <div class="main-content">
-        <h1>Asignaturas y Notas</h1>
+        <h1>Consulta de Notas</h1>
 
         <!-- Iteración por las asignaturas -->
         {% for item in cursos_con_promedios %}
-        <div class="asignatura" data-curso-id="{{ item.curso.id }}">
+        <div class="asignatura" onclick="document.getElementById('notas-{{ item.curso.id }}').style.display = document.getElementById('notas-{{ item.curso.id }}').style.display === 'none' ? 'block' : 'none';">
             <span>{{ item.curso.asignatura }}</span>
-            <i class="fas fa-chevron-down"></i>
         </div>
         <div class="notas" id="notas-{{ item.curso.id }}">
             <h2>Notas de {{ item.curso.asignatura }}</h2>
@@ -241,39 +227,15 @@
                         <td>{{ calificacion.nota }}</td>
                     </tr>
                     {% endfor %}
-                    <!-- Cálculo del promedio -->
                     <tr class="promedio">
                         <td>Promedio</td>
-                        <td>
-                            {% if item.promedio %}
-                                {{ item.promedio|floatformat:2 }}
-                            {% else %}
-                                No disponible
-                            {% endif %}
-                        </td>
+                        <td>{{ item.promedio|floatformat:2 }}</td>
                     </tr>
                 </tbody>
             </table>
         </div>
         {% endfor %}
     </div>
-
-    <script>
-        document.querySelectorAll('.asignatura').forEach(function (asignatura) {
-            asignatura.addEventListener('click', function () {
-                var cursoId = this.getAttribute('data-curso-id');
-                var notasDiv = document.getElementById('notas-' + cursoId);
-
-                notasDiv.style.display = notasDiv.style.display === 'none' || notasDiv.style.display === '' ? 'block' : 'none';
-                this.querySelector('i').classList.toggle('fa-chevron-down');
-                this.querySelector('i').classList.toggle('fa-chevron-up');
-            });
-
-            // Mostrar las notas por defecto (si lo prefieres)
-            var cursoId = asignatura.getAttribute('data-curso-id');
-            document.getElementById('notas-' + cursoId).style.display = 'block';
-        });
-    </script>
 
 </body>
 </html>

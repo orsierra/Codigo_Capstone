@@ -202,6 +202,9 @@
             <h1>Informe Académico</h1>
         </div>
 
+        <!-- Mostrar la cantidad de informes encontrados -->
+        <p>{{ informes|length }} informes encontrados</p>
+
         <table>
             <thead>
                 <tr>
@@ -217,7 +220,8 @@
                     <td>{{ informe.total_alumnos }}</td>
                     <td>{{ informe.promedio_notas }}</td>
                     <td>{{ informe.promedio_asistencia }}%</td>
-                    <td>{{ informe.curso.nombre }}</td>
+                    <!-- Mostrar nombre del curso o el objeto completo si el nombre no existe -->
+                    <td>{{ informe.curso.nombre|default:informe.curso }}</td>
                 </tr>
                 {% empty %}
                 <tr>
