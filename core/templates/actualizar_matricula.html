@@ -140,7 +140,7 @@
             margin-bottom: 0.5em;
         }
 
-        select, input[type="text"], input[type="password"] {
+        select, input[type="text"], input[type="email"], input[type="password"] {
             width: 100%;
             padding: 10px;
             font-size: 1em;
@@ -150,7 +150,7 @@
             transition: all 0.3s;
         }
 
-        select:hover, input[type="text"]:hover, input[type="password"]:hover {
+        select:hover, input[type="text"]:hover, input[type="email"]:hover, input[type="password"]:hover {
             border-color: #ffc107;
         }
 
@@ -199,7 +199,7 @@
         <h2>Menú</h2>
         <ul>
             <li><a href="{% url 'panel_admision' establecimiento_id=establecimiento.id %}">Inicio</a></li>
-            <li><a href="{% url 'gestionar_estudiantes' %}">Lista de Estudiantes</a></li>
+            <li><a href="{% url 'gestionar_estudiantes' establecimiento.id %}">Lista de Estudiantes</a></li>
             <li><a href="{% url 'logout' %}">Cerrar sesión</a></li>
         </ul>
         <div class="footer">
@@ -209,33 +209,46 @@
 
     <div class="main-content">
         <h1>Actualizar Matrícula: {{ alumno.nombre }} {{ alumno.apellido }}</h1>
-
+    
         {% if messages %}
             {% for message in messages %}
                 <div class="alert">{{ message }}</div>
             {% endfor %}
         {% endif %}
-
+    
         <form method="post">
             {% csrf_token %}
+            
+            <!-- Errores globales del formulario -->
             {{ form.non_field_errors }}
-        
+            
+            <!-- Campos del formulario -->
             {% for field in form %}
                 <div class="form-group">
                     <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    
+                    <!-- Mostrar el campo -->
                     {{ field }}
+    
+                    <!-- Mostrar errores específicos del campo -->
                     {% if field.errors %}
-                        <div class="error">{{ field.errors }}</div>
+                        <div class="error">
+                            {% for error in field.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
                     {% endif %}
                 </div>
             {% endfor %}
-        
+            
             <div class="button-container">
                 <button type="submit">Actualizar Matrícula</button>
-                <a class="btn-back" href="{% url 'gestionar_estudiantes' %}">Volver</a>
+                <a class="btn-back" href="{% url 'gestionar_estudiantes' establecimiento.id %}">Volver</a>
+
             </div>
         </form>
     </div>
+    
 
     <script>
         $(document).ready(function() {

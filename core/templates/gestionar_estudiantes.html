@@ -216,7 +216,7 @@
         <h2>Menú</h2>
         <ul>
             <li><a href="{% url 'panel_admision' establecimiento_id=establecimiento.id %}">Inicio</a></li>
-            <li><a href="{% url 'agregar_alumno' %}">Agregar Alumno</a></li>
+            <li><a href="{% url 'agregar_alumno' establecimiento.id %}">Agregar Alumno</a></li>
             <li>
                 <!-- Botón de Cerrar sesión estilo enlace -->
                 <form action="{% url 'logout' %}" method="post" style="display: inline;">

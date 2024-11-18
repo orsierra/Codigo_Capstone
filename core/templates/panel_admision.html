@@ -56,8 +56,8 @@
 <body>
     <div class="dashboard-container">
         <h1>Panel de Admisión y Matrícula</h1>
-        <a href="{% url 'gestionar_estudiantes' %}" class="btn">Gestionar Estudiantes</a>
-        <a href="{% url 'agregar_alumno' %}" class="btn">Ingresar Nuevo Estudiante</a>
+        <a href="{% url 'gestionar_estudiantes' establecimiento.id %}" class="btn">Gestionar Estudiantes</a>
+        <a href="{% url 'agregar_alumno' establecimiento.id %}" class="btn">Ingresar Nuevo Estudiante</a>
 
 
         <footer>

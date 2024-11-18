@@ -110,7 +110,7 @@ class AlumnoForm(forms.ModelForm):
     establecimiento_nombre = forms.CharField(
         label='Establecimiento',
         widget=forms.TextInput(attrs={'readonly': 'readonly'}),
-        required=False
+        required=True
     )
 
     class Meta:
@@ -129,19 +129,19 @@ class AlumnoForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         # Obtener el establecimiento desde kwargs
-        establecimiento_instance = kwargs.pop('establecimiento_instance', None)
+        self.establecimiento_instance = kwargs.pop('establecimiento_instance', None)
         alumno_instance = kwargs.get('instance')
 
         super().__init__(*args, **kwargs)
 
         # Filtrar los cursos asociados con el establecimiento relacionado
-        if establecimiento_instance:
-            self.fields['cursos'].queryset = Curso.objects.filter(establecimiento=establecimiento_instance)
-            self.fields['apoderado'].queryset = Apoderado.objects.filter(establecimiento=establecimiento_instance)
+        if self.establecimiento_instance:
+            self.fields['cursos'].queryset = Curso.objects.filter(establecimiento=self.establecimiento_instance)
+            self.fields['apoderado'].queryset = Apoderado.objects.filter(establecimiento=self.establecimiento_instance)
 
         # Si se proporciona un establecimiento, mostrar su nombre como solo lectura
-        if establecimiento_instance:
-            self.fields['establecimiento_nombre'].initial = establecimiento_instance.nombre
+        if self.establecimiento_instance:
+            self.fields['establecimiento_nombre'].initial = self.establecimiento_instance.nombre
 
         if alumno_instance:
             # Asignar cursos en los que el alumno está inscrito si ya existe una instancia de alumno
@@ -160,7 +160,7 @@ class AlumnoForm(forms.ModelForm):
         alumno.user = user  # Asociar el usuario con el alumno
 
         # Asignar el establecimiento al alumno si se pasó como argumento
-        if hasattr(self, 'establecimiento_instance'):
+        if self.establecimiento_instance:
             alumno.establecimiento = self.establecimiento_instance
 
         if commit:
@@ -173,6 +173,7 @@ class AlumnoForm(forms.ModelForm):
             CursoAlumno.objects.get_or_create(alumno=alumno, curso=curso)
 
         return alumno
+
 
     
 class InformeFinancieroForm(forms.ModelForm):
