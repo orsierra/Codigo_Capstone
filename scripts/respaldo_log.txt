@@ -88,3 +88,140 @@
 2024-11-18 16:00:14,493 - INFO - Tablas obtenidas: [('core_establecimiento',), ('core_apoderado',), ('core_alumno',), ('core_curso_alumnos',), ('core_director',), ('core_contrato',), ('core_calificacion',), ('core_asistencia',), ('core_asistencia_alumnos_ausentes',), ('core_asistencia_alumnos_justificados',), ('core_asistencia_alumnos_presentes',), ('core_asismatricula',), ('core_asisfinanza',), ('core_informe',), ('core_informeacademico',), ('core_informefinanciero',), ('core_notificacion',), ('core_observacion',), ('core_profesor',), ('core_curso',), ('core_bitacoraclase',), ('core_registroacademico',), ('core_sostenedor',), ('core_subdirector',), ('core_cursoalumno',)]
 2024-11-18 16:00:14,889 - INFO - Respaldo diario guardado en C:\Users\GOLDEN GAMERS\Desktop\Capstone\Codigo_Capstone\scripts\backups\respaldo_2024-11-18.xlsx
 2024-11-18 16:00:14,890 - INFO - Conexión cerrada.
+2024-11-18 19:55:59,842 - INFO - Iniciando el script de respaldo diario.
+2024-11-18 19:55:59,843 - INFO - Conectado a la base de datos.
+2024-11-18 19:55:59,843 - INFO - Tablas obtenidas: ['core_establecimiento', 'core_apoderado', 'core_alumno', 'core_curso_alumnos', 'core_director', 'core_contrato', 'core_calificacion', 'core_asistencia', 'core_asistencia_alumnos_ausentes', 'core_asistencia_alumnos_justificados', 'core_asistencia_alumnos_presentes', 'core_asismatricula', 'core_asisfinanza', 'core_informe', 'core_informeacademico', 'core_informefinanciero', 'core_notificacion', 'core_observacion', 'core_profesor', 'core_curso', 'core_bitacoraclase', 'core_registroacademico', 'core_sostenedor', 'core_subdirector', 'core_cursoalumno']
+2024-11-18 19:56:00,084 - INFO - Datos de la tabla core_establecimiento:    id                       nombre               direccion   telefono                           email
+0   1    Colegio Nuevos Horizontes     Calle Principal 123  123456789       info@nuevoshorizontes.com
+1   2  Colegio Nuevos Horizontes 2  Avenida Secundaria 456  987654321  contacto@nuevoshorizontes2.com
+2   3  Colegio Nuevos Horizontes 3      Camino Tercero 789  111222333      info@nuevoshorizontes3.com
+2024-11-18 19:56:00,085 - WARNING - Tabla core_establecimiento no contiene la columna 'calificacion'
+2024-11-18 19:56:00,092 - INFO - Datos de la tabla core_apoderado:    id  nombre   apellido                      email   telefono  user_id  establecimiento_id
+0   1  Carlos    Ramírez   carlos.ramirez@cole1.com  123456789       28                   1
+1   2     Ana   González     ana.gonzalez@cole1.com  987654321       29                   1
+2   3    Luis      Pérez       luis.perez@cole1.com  456123789       30                   1
+3   4   Marta      López      marta.lopez@cole1.com  321654987       31                   1
+4   5   Sofía  Fernández  sofia.fernandez@cole1.com  147258369       32                   1
+2024-11-18 19:56:00,092 - WARNING - Tabla core_apoderado no contiene la columna 'calificacion'
+2024-11-18 19:56:00,097 - INFO - Datos de la tabla core_alumno:    id   nombre   apellido                          email estado_admision  user_id  apoderado_id  establecimiento_id
+0   1   Andrea    Ramírez  andrea.ramírez@colealumno.com        Aprobado       64             1                   1
+1   2   Miguel     García   miguel.garcía@colealumno.com        Aprobado       65             2                   1
+2   3     Sara  Fernández  sara.fernández@colealumno.com        Aprobado       66             3                   1
+3   4    Diego   Martínez  diego.martínez@colealumno.com        Aprobado       67             4                   1
+4   5  Luciana      López   luciana.lópez@colealumno.com        Aprobado       68             5                   1
+2024-11-18 19:56:00,097 - WARNING - Tabla core_alumno no contiene la columna 'calificacion'
+2024-11-18 19:56:00,101 - INFO - Datos de la tabla core_curso_alumnos: Empty DataFrame
+Columns: [id, curso_id, alumno_id]
+Index: []
+2024-11-18 19:56:00,101 - WARNING - Tabla core_curso_alumnos no contiene la columna 'calificacion'
+2024-11-18 19:56:00,106 - INFO - Datos de la tabla core_director:    id  nombre apellido                       email  user_id  establecimiento_id
+0   1    Juan    Pérez      juan_perez@example.com      140                   1
+1   2  Carlos  Sánchez  carlos_sanchez@example.com      141                   2
+2   3  Mónica    Gómez    monica_gomez@example.com      142                   3
+2024-11-18 19:56:00,106 - WARNING - Tabla core_director no contiene la columna 'calificacion'
+2024-11-18 19:56:00,107 - INFO - Datos de la tabla core_contrato: Empty DataFrame
+Columns: [id, fecha, valor_total, forma_pago, observaciones, alumno_id, apoderado_id, establecimiento_id]
+Index: []
+2024-11-18 19:56:00,108 - WARNING - Tabla core_contrato no contiene la columna 'calificacion'
+2024-11-18 19:56:00,112 - INFO - Datos de la tabla core_calificacion:    id       fecha  nota  alumno_id  curso_id  establecimiento_id
+0  13  2024-11-18   7.0          1         1                   1
+1  14  2024-11-18   3.5          2         1                   1
+2  15  2024-11-18   4.0          3         1                   1
+3  16  2024-11-18   5.5          4         1                   1
+4  17  2024-11-18   6.5         13         1                   1
+2024-11-18 19:56:00,112 - WARNING - Tabla core_calificacion no contiene la columna 'calificacion'
+2024-11-18 19:56:00,116 - INFO - Datos de la tabla core_asistencia:    id       fecha  curso_id  establecimiento_id
+0  14  2024-11-18         1                   1
+1  15  2024-11-18         2                   1
+2024-11-18 19:56:00,116 - WARNING - Tabla core_asistencia no contiene la columna 'calificacion'
+2024-11-18 19:56:00,118 - INFO - Datos de la tabla core_asistencia_alumnos_ausentes:    id  asistencia_id  alumno_id
+0   1             14          1
+1   2             14          4
+2   3             15          3
+2024-11-18 19:56:00,118 - WARNING - Tabla core_asistencia_alumnos_ausentes no contiene la columna 'calificacion'
+2024-11-18 19:56:00,121 - INFO - Datos de la tabla core_asistencia_alumnos_justificados:    id  asistencia_id  alumno_id
+0   1             14          3
+1   2             15          1
+2024-11-18 19:56:00,121 - WARNING - Tabla core_asistencia_alumnos_justificados no contiene la columna 'calificacion'
+2024-11-18 19:56:00,123 - INFO - Datos de la tabla core_asistencia_alumnos_presentes:    id  asistencia_id  alumno_id
+0  43             14          2
+1  44             14         13
+2  45             14         22
+3  46             15          2
+4  47             15          4
+2024-11-18 19:56:00,123 - WARNING - Tabla core_asistencia_alumnos_presentes no contiene la columna 'calificacion'
+2024-11-18 19:56:00,127 - INFO - Datos de la tabla core_asismatricula:    id nombre apellido                      email  user_id  establecimiento_id
+0   1  Laura     Díaz     laura_diaz@example.com      134                   1
+1   2  Marta  Ramírez  marta_ramirez@example.com      135                   2
+2   3  Sofía    López    sofia_lopez@example.com      136                   3
+2024-11-18 19:56:00,127 - WARNING - Tabla core_asismatricula no contiene la columna 'calificacion'
+2024-11-18 19:56:00,131 - INFO - Datos de la tabla core_asisfinanza:    id   nombre  apellido                         email  user_id  establecimiento_id
+0   1      Ana     Pérez         ana_perez@example.com      137                   1
+1   2  Beatriz  González  beatriz_gonzalez@example.com      138                   2
+2   3  Claudia  Martínez  claudia_martinez@example.com      139                   3
+2024-11-18 19:56:00,131 - WARNING - Tabla core_asisfinanza no contiene la columna 'calificacion'
+2024-11-18 19:56:00,133 - INFO - Datos de la tabla core_informe: Empty DataFrame
+Columns: [id, fecha, contenido, curso_id, establecimiento_id]
+Index: []
+2024-11-18 19:56:00,133 - WARNING - Tabla core_informe no contiene la columna 'calificacion'
+2024-11-18 19:56:00,134 - INFO - Datos de la tabla core_informeacademico: Empty DataFrame
+Columns: [id, total_alumnos, promedio_notas, promedio_asistencia, curso_id, establecimiento_id]
+Index: []
+2024-11-18 19:56:00,134 - WARNING - Tabla core_informeacademico no contiene la columna 'calificacion'
+2024-11-18 19:56:00,135 - INFO - Datos de la tabla core_informefinanciero: Empty DataFrame
+Columns: [id, concepto, monto, observaciones, establecimiento_id]
+Index: []
+2024-11-18 19:56:00,135 - WARNING - Tabla core_informefinanciero no contiene la columna 'calificacion'
+2024-11-18 19:56:00,139 - INFO - Datos de la tabla core_notificacion:    id                                            mensaje  leida              fecha_creacion               tipo  prioridad  apoderado_id establecimiento_id
+0   1  Su representado Miguel García ha obtenido una ...      1  2024-11-18 19:22:08.754834  calificacion_baja          1             2               None
+1   2  Su representado Sara Fernández ha obtenido una...      0  2024-11-18 19:22:08.778557  calificacion_baja          1             3               None
+2   3  Su representado Diego Martínez ha obtenido una...      0  2024-11-18 19:22:08.803438  calificacion_baja          1             4               None
+3   4  Su representado Daniela Suárez ha obtenido una...      0  2024-11-18 19:22:08.833999  calificacion_baja          1             4               None
+4   5  Su representado Tomás Jiménez ha obtenido una ...      0  2024-11-18 19:22:08.861353  calificacion_baja          1             4               None
+2024-11-18 19:56:00,139 - WARNING - Tabla core_notificacion no contiene la columna 'calificacion'
+2024-11-18 19:56:00,143 - INFO - Datos de la tabla core_observacion:    id       fecha                     contenido  alumno_id  curso_id establecimiento_id
+0   1  2024-11-17          alumno se porta bien          1         1               None
+1   2  2024-11-17                falta a clases          2         1               None
+2   3  2024-11-17      justifica sus asistencia          3         1               None
+3   4  2024-11-17                  se porta mal         13         1               None
+4   6  2024-11-18  miguel se saco una mala nota          2         1               None
+2024-11-18 19:56:00,143 - WARNING - Tabla core_observacion no contiene la columna 'calificacion'
+2024-11-18 19:56:00,149 - INFO - Datos de la tabla core_profesor:    id  nombre  apellido              email   asignatura  establecimiento_id  user_id
+0   1    Juan     Pérez  prof.len@cole.com     Lenguaje                   1        1
+1   2     Ana     Gómez  prof.bio@cole.com     Biología                   1        2
+2   3  Carlos   Sánchez  prof.qui@cole.com      Química                   1        3
+3   4   María  Martínez  prof.fis@cole.com       Física                   1        4
+4   5    Luis   Ramírez  prof.mat@cole.com  Matemáticas                   1        5
+2024-11-18 19:56:00,149 - WARNING - Tabla core_profesor no contiene la columna 'calificacion'
+2024-11-18 19:56:00,154 - INFO - Datos de la tabla core_curso:    id                    nombre   asignatura             dias      hora             sala  establecimiento_id  profesor_id
+0   1     1ero medio - Lenguaje     Lenguaje  Lunes a Viernes  09:00:00  Sala 1ero medio                   1            1
+1   2     1ero medio - Biología     Biología  Lunes a Viernes  08:00:00  Sala 1ero medio                   1            2
+2   3      1ero medio - Química      Química  Lunes a Viernes  08:00:00  Sala 1ero medio                   1            3
+3   4       1ero medio - Física       Física  Lunes a Viernes  08:00:00  Sala 1ero medio                   1            4
+4   5  1ero medio - Matemáticas  Matemáticas  Lunes a Viernes  08:00:00  Sala 1ero medio                   1            5
+2024-11-18 19:56:00,154 - WARNING - Tabla core_curso no contiene la columna 'calificacion'
+2024-11-18 19:56:00,161 - INFO - Datos de la tabla core_bitacoraclase:    id       fecha                             actividades_realizadas                                      observaciones  curso_id  profesor_id
+0  26  2024-11-18                          se realizo la actividad 1                                   todos trabajaron         1            1
+1  27  2024-11-18  se realizo una actividad complementaria y prue...  a la mayoria le fue mal por lo que se necesita...         2            2
+2024-11-18 19:56:00,161 - WARNING - Tabla core_bitacoraclase no contiene la columna 'calificacion'
+2024-11-18 19:56:00,163 - INFO - Datos de la tabla core_registroacademico: Empty DataFrame
+Columns: [id, fecha, observaciones, alumno_id, curso_id, establecimiento_id]
+Index: []
+2024-11-18 19:56:00,163 - WARNING - Tabla core_registroacademico no contiene la columna 'calificacion'
+2024-11-18 19:56:00,167 - INFO - Datos de la tabla core_sostenedor:    id  nombre apellido                     email   telefono  user_id
+0   1  Carlos    Gómez  carlos_gomez@example.com  123456789      146
+2024-11-18 19:56:00,167 - WARNING - Tabla core_sostenedor no contiene la columna 'calificacion'
+2024-11-18 19:56:00,171 - INFO - Datos de la tabla core_subdirector:    id  nombre   apellido                         email  establecimiento_id  user_id
+0   1   Pedro   Martínez    pedro_martinez@example.com                   1      143
+1   2    Luis  Fernández    luis_fernandez@example.com                   2      144
+2   3  Raquel  Hernández  raquel_hernandez@example.com                   3      145
+2024-11-18 19:56:00,172 - WARNING - Tabla core_subdirector no contiene la columna 'calificacion'
+2024-11-18 19:56:00,176 - INFO - Datos de la tabla core_cursoalumno:    id  alumno_id  curso_id
+0   1          1         1
+1   2          1         2
+2   3          1         3
+3   4          1         4
+4   5          1         5
+2024-11-18 19:56:00,176 - WARNING - Tabla core_cursoalumno no contiene la columna 'calificacion'
+2024-11-18 19:56:00,271 - INFO - Respaldo diario guardado en C:\Users\GOLDEN GAMERS\Desktop\Capstone\Codigo_Capstone\scripts\backups\respaldo_2024-11-18.xlsx
+2024-11-18 19:56:00,271 - INFO - Conexión cerrada.
