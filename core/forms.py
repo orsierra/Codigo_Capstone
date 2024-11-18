@@ -1,5 +1,5 @@
 from django import forms
-from .models import Asistencia, Alumno, Calificacion, Observacion, Apoderado, Curso, InformeFinanciero, Contrato, CursoAlumno, Establecimiento
+from .models import Asistencia, Alumno, Calificacion, Observacion, Apoderado, Curso, InformeFinanciero, Contrato, CursoAlumno, Establecimiento, Profesor
 from django.core.exceptions import ValidationError
 from django_select2.forms import Select2MultipleWidget
 from django.contrib.auth.models import User
@@ -264,4 +264,23 @@ class ContratoForm(forms.ModelForm):
         if establecimiento_instance:
             self.fields['establecimiento_id'].initial = establecimiento_instance.id  # Guardar el ID del establecimiento
             self.fields['establecimiento_nombre'].initial = establecimiento_instance.nombre  # Mostrar nombre del establecimiento
+
+class CursoForm(forms.ModelForm):
+    class Meta:
+        model = Curso
+        fields = ['sala', 'hora', 'profesor', 'asignatura']  # Solo los campos que deseas que se puedan editar
+
+    def __init__(self, *args, **kwargs):
+        # Obtener el subdirector relacionado con el usuario autenticado
+        self.subdirector = kwargs.pop('subdirector', None)
+        super().__init__(*args, **kwargs)
+
+        # Filtrar los profesores por establecimiento (aunque no se modifique el profesor)
+        if self.subdirector:
+            self.fields['profesor'].queryset = Profesor.objects.filter(establecimiento=self.subdirector.establecimiento)
+        
+        # Hacer los campos de profesor y asignatura de solo lectura si deseas que no se modifiquen
+        self.fields['profesor'].disabled = True
+        self.fields['asignatura'].disabled = True
+
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consulta de Informes Académicos</title>
+    <title>Modificar Información de Profesor</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -41,61 +41,76 @@
             font-size: 36px;
             margin-bottom: 20px;
         }
-        .table-container {
+        .form-container {
             width: 80%;
             max-width: 600px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
             margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
         }
-        table, th, td {
-            border: 1px solid black;
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
         }
-        th, td {
-            padding: 12px;
-            text-align: center;
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
         }
-        th {
+        button {
+            padding: 10px 20px;
             background-color: #333;
             color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
         }
-        a {
-            color: black;
+        button:hover {
+            background-color: #575757;
+        }
+        .btn-back {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007bff; /* Azul */
+            color: white;
             text-decoration: none;
+            font-size: 16px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .btn-back:hover {
+            background-color: #0056b3; /* Azul oscuro */
         }
     </style>
 </head>
 <body>
     <div class="sidebar">
         <h2>Menú</h2>
-        <a href="{% url 'subdirector_home' %}">Subdirector</a>
+        <a href="#">Página de la Institución</a>
         <a href="{% url 'gestion_recursos_academicos' %}">Editar cursos</a>
         <form action="{% url 'logout' %}" method="post" style="display: inline;">
             {% csrf_token %}
             <button type="submit">Cerrar sesión</button>
         </form>
-        
     </div>
     <div class="main-content">
-        <h1>Consulta de Informes Académicos</h1>
-        <div class="table-container">
-            <table>
-                <tr>
-                    <th>CURSOS</th>
-                </tr>
-                {% for curso in cursos %}
-                <tr>
-                    <td><a href="{% url 'detalle_curso' curso.id %}">{{ curso.nombre }}</a></td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td>No hay cursos disponibles</td>
-                </tr>
-                {% endfor %}
-            </table>
+        <h1>Modificar Información de Profesor</h1>
+        <div class="form-container">
+            <h1>Editar Recurso Académico</h1>
+            <form method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit">Guardar cambios</button>
+            </form>
+            <a href="{% url 'gestion_recursos_academicos' %}" class="btn-back">Volver</a>
         </div>
     </div>
 </body>

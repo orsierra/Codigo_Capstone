@@ -127,13 +127,13 @@
 <body>
     <div class="sidebar">
         <h2>Menú</h2>
-        <a href="#">Página de la Institución</a>
-        <a href="#">Perfil</a>
-        <a href="#">Salir</a>
-        <div style="margin-top: auto;">
-            <p>Privacidad</p>
-            <p>Accesibilidad</p>
-        </div>
+        
+        <a href="{% url 'subdirector_home' %}">Subdirector</a>
+        <a href="{% url 'consulta_informes_academicos' %}">Informes académicos</a>
+        <form action="{% url 'logout' %}" method="post" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit">Cerrar sesión</button>
+        </form>
     </div>
     <div class="main-content">
         <h1>Recursos</h1>
@@ -152,7 +152,7 @@
                         <td>{{ curso.asignatura }}</td>
                         <td>{{ curso.sala }}</td>
                         <td>{{ curso.hora }}</td>
-                        <td><a href="#" class="btn">✏️</a></td>
+                        <td><a href="{% url 'editar_recurso' curso.id %}" class="btn">✏️ Editar</a></td>
                     </tr>
                 {% empty %}
                     <tr>

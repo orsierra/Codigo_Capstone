@@ -67,9 +67,10 @@ urlpatterns = [
     #SUBDIRECTOR
     path('subdirector/', views.subdirector_home, name='subdirector_home'),
     path('subdirector/informes/', views.consulta_informes_academicos, name='consulta_informes_academicos'),
-    path('subdirector/recursos/', views.gestion_recursos_academicos, name='gestion_recursos_academicos'),
     path('subdirector/curso/<int:curso_id>/', views.detalle_curso, name='detalle_curso'),
     path('curso/<int:curso_id>/pdf/', views.detalle_curso_pdf, name='detalle_curso_pdf'),
+    path('subdirector/recursos/', views.gestion_recursos_academicos, name='gestion_recursos_academicos'),   
+    path('editar_recurso/<int:curso_id>/', views.editar_recurso, name='editar_recurso'),
     
     #SOSTENEDOR
     path('sostenedor/', views.sostenedor, name='sostenedor'),
