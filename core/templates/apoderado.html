@@ -62,20 +62,29 @@
             align-items: center;
             gap: 15px; /* Espacio entre botones */
             margin-top: 20px;
+            width: 100%;
         }
         .btn {
             display: inline-block;
-            padding: 15px 30px;
+            padding: 15px 0; /* Ajuste de altura uniforme */
             font-size: 18px;
             background-color: black;
             color: white;
             text-decoration: none;
             border-radius: 5px;
             width: 100%; /* Hace que los botones ocupen todo el ancho dentro de la columna */
+            max-width: 300px; /* Limitar el ancho del botón */
             text-align: center;
+            transition: background-color 0.3s;
         }
         .btn:hover {
             background-color: #333;
+        }
+        .divider {
+            width: 100%;
+            max-width: 300px;
+            border-top: 1px solid #555;
+            margin: 10px 0;
         }
         footer {
             margin-top: 50px;
@@ -103,6 +112,14 @@
             <a href="{% url 'apoderadoConsuAsis' establecimiento_id=establecimiento_id %}" class="btn">Consulta de Asistencia</a>
             <a href="{% url 'apoderadoConsuNotas' establecimiento_id=establecimiento_id %}" class="btn">Consulta de Notas</a>
             <a href="{% url 'apoderadoObservaciones' establecimiento_id=establecimiento_id %}" class="btn">Observaciones</a>
+            
+            <div class="divider"></div> <!-- Línea divisora para separar "Cerrar Sesión" -->
+
+            <!-- Botón de Cerrar Sesión -->
+            <form action="{% url 'logout' %}" method="post" style="width: 100%; max-width: 300px;">
+                {% csrf_token %}
+                <button type="submit" class="btn">Cerrar Sesión</button>
+            </form>
         </div>
 
         <footer>

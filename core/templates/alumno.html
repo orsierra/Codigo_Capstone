@@ -53,12 +53,20 @@
             max-width: 300px; /* Limitar el ancho del botón */
             text-align: center;
             transition: background-color 0.3s;
+            border: none; /* Eliminar borde para consistencia */
+            box-sizing: border-box; /* Asegura que el padding no aumente el ancho */
         }
         .btn:hover {
             background-color: #333;
         }
+        .divider {
+            width: 100%;
+            max-width: 300px;
+            border-top: 1px solid #555;
+            margin: 10px 0;
+        }
         footer {
-            margin-top: 50px;
+            margin-top: 30px;
             font-size: 14px;
         }
     </style>
@@ -71,6 +79,14 @@
         <div class="btn-container">
             <a href="{% url 'alumnoConsuAsis' establecimiento_id=establecimiento.id %}" class="btn">Ver asistencia</a>
             <a href="{% url 'alumnoConsuNotas' establecimiento_id=establecimiento.id %}" class="btn">Consulta de notas</a>
+            
+            <div class="divider"></div> <!-- Línea divisora para separar "Cerrar Sesión" -->
+
+            <!-- Botón de Cerrar Sesión -->
+            <form action="{% url 'logout' %}" method="post" style="width: 100%; max-width: 300px;">
+                {% csrf_token %}
+                <button type="submit" class="btn">Cerrar Sesión</button>
+            </form>
         </div>
 
         <footer>

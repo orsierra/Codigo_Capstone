@@ -15,8 +15,8 @@
             align-items: center;
             height: 100vh;
             background-image: url("{% static 'img/fondo.jpg' %}");
-            background-size: cover; /* Cubrir toda la pantalla */
-            background-position: center; /* Centrar la imagen */
+            background-size: cover;
+            background-position: center;
         }
         .dashboard-container {
             display: flex;
@@ -24,11 +24,11 @@
             align-items: center;
             text-align: center;
             background-color: white;
-            padding: 80px; /* Aumentar el padding para hacer el cuadro más grande */
+            padding: 80px;
             border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Sombra más prominente */
-            max-width: 600px; /* Establecer un ancho máximo */
-            width: 100%; /* Hacer que ocupe el 100% del contenedor */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            max-width: 600px;
+            width: 100%;
         }
         h1 {
             font-size: 36px;
@@ -42,13 +42,23 @@
             color: white;
             text-decoration: none;
             border-radius: 5px;
-            margin-top: 20px; /* Añadir un margen superior al botón */
+            margin-top: 15px;
+            width: 100%;
+            max-width: 300px;
+            box-sizing: border-box;
+            transition: background-color 0.3s;
         }
         .btn:hover {
             background-color: #333;
         }
+        .divider {
+            width: 100%;
+            max-width: 300px;
+            border-top: 1px solid #555;
+            margin: 10px 0;
+        }
         footer {
-            margin-top: 50px;
+            margin-top: 30px;
             font-size: 14px;
         }
     </style>
@@ -56,8 +66,18 @@
 <body>
     <div class="dashboard-container">
         <h1>Profesor</h1>
-        <!-- Botón que dirige a los cursos del profe -->
-        <a href="{% url 'profesor_cursos'  establecimiento_id=establecimiento.id %}" class="btn">Mis cursos</a>
+        
+        <!-- Botón que dirige a los cursos del profesor -->
+        <a href="{% url 'profesor_cursos' establecimiento_id=establecimiento.id %}" class="btn">Mis cursos</a>
+        
+        <div class="divider"></div> <!-- Línea divisora más delgada y con menos margen -->
+
+        <!-- Botón de Cerrar Sesión -->
+        <form action="{% url 'logout' %}" method="post" style="width: 100%; max-width: 300px;">
+            {% csrf_token %}
+            <button type="submit" class="btn">Cerrar Sesión</button>
+        </form>
+
         <footer>
             <p>Colegio Nuevos Horizontes</p>
             <div>

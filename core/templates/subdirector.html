@@ -34,18 +34,35 @@
             font-size: 36px;
             margin-bottom: 30px;
         }
+        .btn-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+        }
         .btn {
-            display: inline-block;
-            padding: 15px 30px;
+            display: block;
+            padding: 15px 0;
             font-size: 18px;
             background-color: black;
             color: white;
             text-decoration: none;
             border-radius: 5px;
-            margin-top: 20px;
+            width: 100%;
+            max-width: 300px;
+            text-align: center;
+            transition: background-color 0.3s;
+            box-sizing: border-box;
         }
         .btn:hover {
             background-color: #333;
+        }
+        .divider {
+            width: 100%;
+            max-width: 300px;
+            border-top: 1px solid #555;
+            margin: 10px 0;
         }
         footer {
             margin-top: 50px;
@@ -54,13 +71,41 @@
         .footer-icons span {
             margin: 0 5px;
         }
+        .btn-logout {
+            padding: 15px 0;
+            font-size: 18px; /* Asegurar que sea el mismo tamaño de fuente */
+            background-color: black;
+            color: white;
+            text-align: center;
+            border-radius: 5px;
+            width: 100%;
+            max-width: 300px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            box-sizing: border-box;
+            border: none;
+        }
+        .btn-logout:hover {
+            background-color: #333;
+        }
     </style>
 </head>
 <body>
     <div class="dashboard-container">
         <h1>Subdirector</h1>
-        <a href="{% url 'consulta_informes_academicos' %}" class="btn">Consulta de Informes Académicos</a>
-        <a href="{% url 'gestion_recursos_academicos' %}" class="btn">Gestión de Recursos Académicos</a>
+        
+        <div class="btn-container">
+            <a href="{% url 'consulta_informes_academicos' %}" class="btn">Consulta de Informes Académicos</a>
+            <a href="{% url 'gestion_recursos_academicos' %}" class="btn">Gestión de Recursos Académicos</a>
+
+            <div class="divider"></div>
+
+            <form action="{% url 'logout' %}" method="post" style="width: 100%; max-width: 300px; margin: 0;">
+                {% csrf_token %}
+                <button type="submit" class="btn-logout">Cerrar Sesión</button>
+            </form>
+        </div>
+
         <footer>
             <p>INSTITUCIÓN NUEVOS HORIZONTES</p>
             <div class="footer-icons">
