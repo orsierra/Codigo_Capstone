@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modificar Información de Profesor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            background-color: #f4f4f4;
+        }
+        .sidebar {
+            width: 200px;
+            background-color: #111;
+            color: white;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 0;
+            display: block;
+        }
+        .sidebar a:hover {
+            background-color: #575757;
+        }
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+        .form-container {
+            width: 80%;
+            max-width: 600px;
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #575757;
+        }
+        .btn-back {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007bff; /* Azul */
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .btn-back:hover {
+            background-color: #0056b3; /* Azul oscuro */
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Menú</h2>
+        <a href="#">Página de la Institución</a>
+        <a href="{% url 'gestion_recursos_academicos' %}">Editar cursos</a>
+        <form action="{% url 'logout' %}" method="post" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit">Cerrar sesión</button>
+        </form>
+    </div>
+    <div class="main-content">
+        <h1>Modificar Información de Profesor</h1>
+        <div class="form-container">
+            <h1>Editar Recurso Académico</h1>
+            <form method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit">Guardar cambios</button>
+            </form>
+            <a href="{% url 'gestion_recursos_academicos' %}" class="btn-back">Volver</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -157,43 +157,49 @@
 <body>
     <div class="sidebar">
         <h2>Menú</h2>
-        <ul>
-            <li><a href="#">Página de la Institución</a></li>
-            <li><a href="#">Perfil</a></li>
-            <li><a href="#">Salir</a></li>
-        </ul>
-        <div class="footer">
-            <a href="#">Privacidad</a><br>
-            <a href="#">Accesibilidad</a>
-        </div>
+        <a href="{% url 'subdirector_home' %}">Subdirector</a>
+        <a href="{% url 'gestion_recursos_academicos' %}">Editar cursos</a>
+        <a href="{% url 'consulta_informes_academicos' %}">Informes académicos</a>
+        <form action="{% url 'logout' %}" method="post" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit">Cerrar sesión</button>
+        </form>
     </div>
 
     <div class="main-content">
-        <div class="container">
-            <h1>Consulta de Informes Académicos - {{ curso.nombre }}</h1>
+        <h1>Consulta de Informes Académicos - {{ curso.nombre }}</h1>
+        <div class="table-container">
             <table>
                 <thead>
                     <tr>
-                        <th>ESTUDIANTES</th>
-                        <th>PROMEDIO NOTAS</th>
-                        <th>ACCIÓN</th>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th>Calificaciones</th>
+                        <th>Promedio</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for estudiante in estudiantes %}
                     <tr>
-                        <td>{{ estudiante.nombre }} {{ estudiante.apellido }}</td>
+                        <td>{{ estudiante.nombre }}</td>
+                        <td>{{ estudiante.apellido }}</td>
+                        <td>
+                            {% for calificacion in estudiante.calificaciones %}
+                                {{ calificacion }}{% if not forloop.last %} - {% endif %}
+                            {% endfor %}
+                        </td>
                         <td>{{ estudiante.promedio_notas }}</td>
-                        <td><a href="{% url 'detalle_curso_pdf' curso.id %}" class="btn">IMPRIMIR EN PDF 🖨️</a></td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="3">No hay estudiantes en este curso</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
+            
+            <a href="{% url 'detalle_curso_pdf' curso.id %}" class="btn">IMPRIMIR EN PDF 🖨️</a>
         </div>
     </div>
+    
+    </div>
+    
+    
 </body>
 </html>

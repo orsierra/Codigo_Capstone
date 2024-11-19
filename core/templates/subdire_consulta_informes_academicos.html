@@ -144,15 +144,13 @@
 <body>
     <div class="sidebar">
         <h2>Menú</h2>
-        <ul>
-            <li><a href="#">Página de la Institución</a></li>
-            <li><a href="#">Perfil</a></li>
-            <li><a href="#">Salir</a></li>
-        </ul>
-        <div class="footer">
-            <a href="#">Privacidad</a><br>
-            <a href="#">Accesibilidad</a>
-        </div>
+        <a href="{% url 'subdirector_home' %}">Subdirector</a>
+        <a href="{% url 'gestion_recursos_academicos' %}">Editar cursos</a>
+        <form action="{% url 'logout' %}" method="post" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit">Cerrar sesión</button>
+        </form>
+        
     </div>
 
     <div class="main-content">

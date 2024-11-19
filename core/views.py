@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404
 from datetime import date
 from django.utils import timezone
-from .forms import CalificacionForm, ObservacionForm, AlumnoForm, InformeFinancieroForm, ApoderadoForm, ContratoForm, AsistenciaForm
+from .forms import CalificacionForm, ObservacionForm, AlumnoForm, InformeFinancieroForm, ApoderadoForm, ContratoForm, AsistenciaForm, CursoForm
 from django.contrib import messages
 from django.db.models import Avg
 from django.http import HttpResponse
@@ -1407,6 +1407,29 @@ def gestion_recursos_academicos(request):
 
     return render(request, 'gestion_recursos_academicos.html', {'cursos': cursos})
 
+ # =================================================== Subdirector - editar Curso ===============================================
+@login_required
+def editar_recurso(request, curso_id):
+    # Obtener el subdirector relacionado con el usuario autenticado
+    subdirector = Subdirector.objects.get(user=request.user)
+    
+    # Obtener el curso a editar
+    curso = get_object_or_404(Curso, id=curso_id)
+
+    # Si el formulario ha sido enviado y es válido, actualizamos el curso
+    if request.method == 'POST':
+        form = CursoForm(request.POST, instance=curso, subdirector=subdirector)
+        if form.is_valid():
+            # Asignar el establecimiento_id del subdirector al curso antes de guardar
+            curso.establecimiento = subdirector.establecimiento
+            form.save()  # Guardamos los cambios
+            return redirect('gestion_recursos_academicos')  # Redirige a la lista de recursos académicos
+    else:
+        form = CursoForm(instance=curso, subdirector=subdirector)
+
+    return render(request, 'subdire_recursos.html', {'form': form})
+
+
 # =================================================== Subdirector - Detalle de Curso ===================================================
 @login_required
 def detalle_curso(request, curso_id):
@@ -1416,20 +1439,34 @@ def detalle_curso(request, curso_id):
     # Obtener el curso solo si pertenece al establecimiento del subdirector
     curso = get_object_or_404(Curso, id=curso_id, establecimiento=subdirector.establecimiento)
     
-    # Filtrar los estudiantes que pertenecen al mismo establecimiento que el subdirector
-    estudiantes = curso.alumnos.filter(establecimiento=subdirector.establecimiento)
+    # Filtrar los estudiantes relacionados con el curso y establecimiento del subdirector
+    estudiantes = Alumno.objects.filter(
+        curso_alumno_relacion__curso=curso,
+        establecimiento=subdirector.establecimiento
+    ).distinct()
 
-    # Calcular el promedio de notas de cada estudiante
-    estudiantes_con_promedio = [
-        {
+    # Calcular las calificaciones y el promedio de cada estudiante
+    estudiantes_con_calificaciones_y_promedio = []
+    for estudiante in estudiantes:
+        # Obtener todas las calificaciones de un estudiante en ese curso
+        calificaciones = Calificacion.objects.filter(alumno=estudiante, curso=curso)
+        
+        # Obtener el promedio de las calificaciones
+        promedio = calificaciones.aggregate(promedio=Avg('nota'))['promedio']
+        
+        # Crear una lista de calificaciones
+        lista_calificaciones = [calificacion.nota for calificacion in calificaciones]
+        
+        estudiantes_con_calificaciones_y_promedio.append({
+            'id': estudiante.id,
             'nombre': estudiante.nombre,
             'apellido': estudiante.apellido,
-            'promedio_notas': round(Calificacion.objects.filter(alumno=estudiante, curso=curso).aggregate(promedio=Avg('nota'))['promedio'], 2) or "-"
-        }
-        for estudiante in estudiantes
-    ]
+            'calificaciones': lista_calificaciones,
+            'promedio_notas': round(promedio, 2) if promedio is not None else "-"  # Verifica si el promedio es None
+        })
 
-    return render(request, 'detalle_curso.html', {'curso': curso, 'estudiantes': estudiantes_con_promedio})
+    return render(request, 'detalle_curso.html', {'curso': curso, 'estudiantes': estudiantes_con_calificaciones_y_promedio})
+
 
 
 # =================================================== Subdirector - Detalle de Curso en PDF ===================================================
@@ -1441,27 +1478,40 @@ def detalle_curso_pdf(request, curso_id):
     # Obtener el curso solo si pertenece al establecimiento del subdirector
     curso = get_object_or_404(Curso, id=curso_id, establecimiento=subdirector.establecimiento)
     
-    # Filtrar los estudiantes que pertenecen al establecimiento del subdirector
-    estudiantes = curso.alumnos.filter(establecimiento=subdirector.establecimiento)
-    
-    # Calcular el promedio de notas de cada estudiante
-    estudiantes_con_promedio = [
-        {
+    # Filtrar los estudiantes que pertenecen al establecimiento del subdirector y están en el curso
+    estudiantes = Alumno.objects.filter(curso_alumno_relacion__curso=curso, establecimiento=subdirector.establecimiento).distinct()
+
+    # Calcular el promedio de notas de cada estudiante y obtener las calificaciones
+    estudiantes_con_notas = []
+    for estudiante in estudiantes:
+        # Obtener todas las calificaciones del estudiante para este curso
+        calificaciones = Calificacion.objects.filter(alumno=estudiante, curso=curso)
+        
+        # Obtener las notas en una lista y calcular el promedio
+        notas = [calificacion.nota for calificacion in calificaciones]
+        promedio = sum(notas) / len(notas) if len(notas) > 0 else None
+        
+        # Manejar el caso cuando no haya calificaciones
+        promedio_notas = round(promedio, 2) if promedio is not None else "-"
+        
+        estudiantes_con_notas.append({
             'nombre': estudiante.nombre,
             'apellido': estudiante.apellido,
-            'promedio_notas': round(Calificacion.objects.filter(alumno=estudiante, curso=curso).aggregate(promedio=Avg('nota'))['promedio'], 2) or "-"
-        }
-        for estudiante in estudiantes
-    ]
+            'notas': ' - '.join(map(str, notas)),  # Unir las notas con un guion
+            'promedio_notas': promedio_notas
+        })
     
-    # Renderizar el HTML y generar el PDF
-    html_string = render_to_string('detalle_curso_pdf.html', {'curso': curso, 'estudiantes': estudiantes_con_promedio})
+    # Renderizar el HTML para el PDF
+    html_string = render_to_string('detalle_curso_pdf.html', {'curso': curso, 'estudiantes': estudiantes_con_notas})
+    
+    # Generar el PDF con WeasyPrint
     pdf = HTML(string=html_string).write_pdf()
 
     # Devolver el archivo PDF como respuesta
     response = HttpResponse(pdf, content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="{curso.nombre}_reporte.pdf"'
     return response
+
 # =================================================== Sostenedor - Información del Establecimiento ===================================================
 @login_required
 def sostenedor(request):

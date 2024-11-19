@@ -13,21 +13,28 @@
 </head>
 <body>
     <h1>Informe Académico - {{ curso.nombre }}</h1>
+    <p>Estudiantes: {{ estudiantes|length }}</p>
     <table>
         <thead>
             <tr>
-                <th>Estudiante</th>
-                <th>Promedio de Notas</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Calificaciones</th>
+                <th>Promedio</th>
             </tr>
         </thead>
         <tbody>
             {% for estudiante in estudiantes %}
             <tr>
-                <td>{{ estudiante.nombre }} {{ estudiante.apellido }}</td>
-                <td>{{ estudiante.promedio_notas }}</td>
+                <td>{{ estudiante.nombre }}</td>
+                <td>{{ estudiante.apellido }}</td>
+                <td>{{ estudiante.notas }}</td> <!-- Mostrar las calificaciones separadas por guion -->
+                <td>{{ estudiante.promedio_notas }}</td> <!-- Mostrar el promedio -->
             </tr>
             {% endfor %}
         </tbody>
     </table>
+    
 </body>
+
 </html>
