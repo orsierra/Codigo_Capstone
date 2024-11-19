@@ -220,7 +220,7 @@ def registrar_asistencia(request, establecimiento_id, curso_id):
         'success_message': success_message,  # Enviar mensaje de éxito al template
     })
 
-#========================================================== HISTORIAL BITACORA =============================================================
+#========================================================== HISTORIAL BITÁCORA =============================================================
 
 
 @login_required
