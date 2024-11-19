@@ -66,7 +66,6 @@ urlpatterns = [
     path('curso/<int:curso_id>/pdf/', views.detalle_curso_pdf, name='detalle_curso_pdf'),
     path('subdirector/recursos/', views.gestion_recursos_academicos, name='gestion_recursos_academicos'),   
     path('editar_recurso/<int:curso_id>/', views.editar_recurso, name='editar_recurso'),
-    
     #SOSTENEDOR
     path('sostenedor/', views.sostenedor, name='sostenedor'),
     path('establecimientos/<int:establecimiento_id>/', views.establecimientos, name='establecimientos'),
