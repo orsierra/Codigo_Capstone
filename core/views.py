@@ -555,7 +555,6 @@ def alumno_dashboard(request, establecimiento_id):
 
 
 # ===================================================== Consulta de Asistencia del Alumno ============================================
-
 @login_required
 def alumno_consulta_asistencia(request, establecimiento_id):
     # Obtener el objeto Alumno asociado al usuario actual
@@ -580,26 +579,22 @@ def alumno_consulta_asistencia(request, establecimiento_id):
     for curso_alumno in cursos_alumno:
         curso = curso_alumno.curso  # Acceder al curso
 
-        # Obtener las fechas de asistencia para el alumno en el curso específico
-        fechas_presentes = set(Asistencia.objects.filter(
-            curso=curso,
-            alumnos_presentes=alumno
-        ).values_list('fecha', flat=True))
+        # Obtener todos los IDs únicos de asistencias para el curso
+        total_clases_ids = Asistencia.objects.filter(curso=curso).values_list('id', flat=True)
+        total_clases = len(set(total_clases_ids))  # Contar IDs únicos
 
-        fechas_ausentes = set(Asistencia.objects.filter(
-            curso=curso,
-            alumnos_ausentes=alumno
-        ).values_list('fecha', flat=True))
+        # Obtener los IDs únicos de asistencias presentes
+        asistencias_presentes_ids = Asistencia.objects.filter(curso=curso, alumnos_presentes=alumno).values_list('id', flat=True)
+        asistencias_presentes = len(set(asistencias_presentes_ids))
 
-        fechas_justificados = set(Asistencia.objects.filter(
-            curso=curso,
-            alumnos_justificados=alumno
-        ).values_list('fecha', flat=True))
+        # Obtener los IDs únicos de asistencias justificadas
+        asistencias_justificadas_ids = Asistencia.objects.filter(curso=curso, alumnos_justificados=alumno).values_list('id', flat=True)
+        asistencias_justificadas = len(set(asistencias_justificadas_ids))
 
-        # Calcular el total de clases y el porcentaje de asistencia
-        fechas_totales = fechas_presentes | fechas_ausentes | fechas_justificados
-        total_clases = len(fechas_totales)
-        total_asistencia = len(fechas_presentes) + len(fechas_justificados)
+        # Calcular el total de asistencias (presente + justificado)
+        total_asistencia = asistencias_presentes + asistencias_justificadas
+
+        # Calcular el porcentaje de asistencia
         porcentaje_asistencia = (total_asistencia / total_clases * 100) if total_clases > 0 else 0
 
         # Agregar los datos al diccionario
@@ -721,7 +716,6 @@ def historial_notificaciones(request, establecimiento_id):
 
 
 #============================================================================= Consulta de Asistencia del Apoderado =========================================================================================
-
 @login_required
 def apoderadoConsuAsis(request, establecimiento_id):
     # Obtener el apoderado y el establecimiento
@@ -737,25 +731,29 @@ def apoderadoConsuAsis(request, establecimiento_id):
     asistencias_data = {}
 
     for alumno in alumnos:
-        # Obtener cursos únicos en el establecimiento actual asignados al alumno usando la relación correcta
+        # Obtener cursos únicos en el establecimiento actual asignados al alumno
         cursos_asignados = Curso.objects.filter(curso_alumno_relacion__alumno=alumno, establecimiento=establecimiento).distinct()
 
         asistencias_data[alumno] = []
 
         for curso in cursos_asignados:
-            # Obtener todas las fechas de asistencia relacionadas con el alumno y el curso
-            fechas_presentes = set(Asistencia.objects.filter(curso=curso, alumnos_presentes=alumno).values_list('fecha', flat=True))
-            fechas_ausentes = set(Asistencia.objects.filter(curso=curso, alumnos_ausentes=alumno).values_list('fecha', flat=True))
-            fechas_justificados = set(Asistencia.objects.filter(curso=curso, alumnos_justificados=alumno).values_list('fecha', flat=True))
+            # Obtener IDs únicos de asistencias por estado
+            total_clases_ids = Asistencia.objects.filter(curso=curso).values_list('id', flat=True)
+            total_clases = len(set(total_clases_ids))  # Total de clases (IDs únicos)
 
-            # Calcular totales de clases y asistencia
-            fechas_totales = fechas_presentes | fechas_ausentes | fechas_justificados
-            total_clases = len(fechas_totales)
+            asistencias_presentes_ids = Asistencia.objects.filter(curso=curso, alumnos_presentes=alumno).values_list('id', flat=True)
+            asistencias_presentes = len(set(asistencias_presentes_ids))  # IDs únicos de asistencias presentes
 
-            total_asistencia = len(fechas_presentes) + len(fechas_justificados)
+            asistencias_justificadas_ids = Asistencia.objects.filter(curso=curso, alumnos_justificados=alumno).values_list('id', flat=True)
+            asistencias_justificadas = len(set(asistencias_justificadas_ids))  # IDs únicos de asistencias justificadas
+
+            # Calcular el total de asistencias (presente + justificado)
+            total_asistencia = asistencias_presentes + asistencias_justificadas
+
+            # Calcular el porcentaje de asistencia
             porcentaje_asistencia = (total_asistencia / total_clases * 100) if total_clases > 0 else 0
 
-            # Añadir la información del curso y asistencia al contexto de cada alumno
+            # Agregar los datos al diccionario
             asistencias_data[alumno].append({
                 'curso': curso.nombre,
                 'total_clases': total_clases,
