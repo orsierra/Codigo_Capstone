@@ -1,60 +1,124 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Modificar Información de Profesor</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
     <style>
+        /* Reset básico */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: Arial, sans-serif;
-            margin: 0;
             display: flex;
-            background-color: #f4f4f4;
-        }
-        .sidebar {
-            width: 200px;
-            background-color: #111;
-            color: white;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
             height: 100vh;
+            background-color: #f0f2f5;
         }
-        .sidebar a {
+
+        .sidebar {
+            width: 250px;
+            background-color: #343a40;
             color: white;
-            text-decoration: none;
-            padding: 10px 0;
-            display: block;
-        }
-        .sidebar a:hover {
-            background-color: #575757;
-        }
-        .main-content {
-            flex: 1;
             padding: 20px;
-            background-color: white;
             display: flex;
             flex-direction: column;
-            align-items: center;
+            justify-content: space-between;
+            position: fixed;
+            height: 100%;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
         }
-        h1 {
-            font-size: 36px;
+
+        .sidebar h2 {
+            text-align: center;
+            font-size: 1.5em;
+            color: #ffc107;
             margin-bottom: 20px;
+            font-weight: bold;
         }
-        .form-container {
-            width: 80%;
-            max-width: 600px;
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            flex-grow: 1;
+        }
+
+        .sidebar ul li {
+            margin: 15px 0;
+        }
+
+        .sidebar ul li a,
+        .sidebar ul li form button {
+            color: #ced4da;
+            text-decoration: none;
+            font-size: 1em;
+            display: block;
+            padding: 10px 0;
+            text-align: left;
+            transition: color 0.3s;
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .sidebar ul li a:hover,
+        .sidebar ul li form button:hover {
+            color: #ffc107;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 14px;
             margin-top: 20px;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            background-color: #fff;
         }
+
+        .footer a {
+            color: #ffc107;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 40px;
+            margin-left: 250px;
+            background-color: #f0f2f5;
+            overflow-y: auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 2em;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
         label {
             display: block;
             margin-bottom: 8px;
             font-weight: bold;
+            color: #333;
         }
+
         input, select {
             width: 100%;
             padding: 10px;
@@ -63,6 +127,7 @@
             border-radius: 5px;
             font-size: 16px;
         }
+
         button {
             padding: 10px 20px;
             background-color: #333;
@@ -71,36 +136,51 @@
             cursor: pointer;
             font-size: 16px;
             border-radius: 5px;
+            transition: background-color 0.3s;
+            width: 100%;
         }
+
         button:hover {
             background-color: #575757;
         }
+
         .btn-back {
             display: inline-block;
             margin-top: 20px;
             padding: 10px 20px;
-            background-color: #007bff; /* Azul */
+            background-color: #007bff;
             color: white;
             text-decoration: none;
             font-size: 16px;
             border-radius: 5px;
             text-align: center;
+            transition: background-color 0.3s;
+            width: 100%;
         }
+
         .btn-back:hover {
-            background-color: #0056b3; /* Azul oscuro */
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
     <div class="sidebar">
         <h2>Menú</h2>
-        <a href="#">Página de la Institución</a>
-        <a href="{% url 'gestion_recursos_academicos' %}">Editar cursos</a>
-        <form action="{% url 'logout' %}" method="post" style="display: inline;">
-            {% csrf_token %}
-            <button type="submit">Cerrar sesión</button>
-        </form>
+        <ul>
+            <li><a href="{% url 'subdirector_home' %}">Inicio</a></li>
+            <li><a href="{% url 'gestion_recursos_academicos' %}">Editar cursos</a></li>
+            <li>
+                <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit">Cerrar sesión</button>
+                </form>
+            </li>
+        </ul>
+        <div class="footer">
+            <a href="#">Nuevos horizontes</a>
+        </div>
     </div>
+
     <div class="main-content">
         <h1>Modificar Información de Profesor</h1>
         <div class="form-container">

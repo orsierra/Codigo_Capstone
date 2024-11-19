@@ -1,142 +1,186 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recursos Académicos</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
     <style>
-        /* General styles */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+        /* Reset básico */
+        * {
             margin: 0;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        /* Sidebar styles */
-        .sidebar {
-            width: 200px;
-            background-color: #111;
-            color: white;
-            padding: 20px;
-            height: 100vh;
-            position: fixed;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        .sidebar a {
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            height: 100vh;
+            background-color: #f0f2f5;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #343a40;
             color: white;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: fixed;
+            height: 100%;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            font-size: 1.5em;
+            color: #ffc107;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            flex-grow: 1;
+        }
+
+        .sidebar ul li {
+            margin: 15px 0;
+        }
+
+        .sidebar ul li a,
+        .sidebar ul li form button {
+            color: #ced4da;
             text-decoration: none;
-            padding: 10px 0;
+            font-size: 1em;
             display: block;
+            padding: 10px 0;
+            text-align: left;
+            transition: color 0.3s;
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .sidebar ul li a:hover,
+        .sidebar ul li form button:hover {
+            color: #ffc107;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+
+        .footer a {
+            color: #ffc107;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
         }
 
         .main-content {
-            margin-left: 220px;
-            padding: 20px;
-            background-color: white;
-            flex: 1;
+            flex-grow: 1;
+            padding: 40px;
+            margin-left: 250px;
+            background-color: #f0f2f5;
+            overflow-y: auto;
         }
 
-        /* Table styles */
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 2em;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
         .table-container {
-            width: 100%;
-            overflow-x: auto; /* Makes table scrollable on small screens */
+            max-width: 100%;
+            overflow-x: auto;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
-            min-width: 600px; /* Sets a minimum width for the table */
-        }
-
-        table, th, td {
-            border: 1px solid black;
-            padding: 12px;
-            text-align: center;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            min-width: 600px;
         }
 
         th {
-            background-color: #333;
+            background-color: #007bff;
             color: white;
+            font-weight: bold;
+            padding: 15px;
+            text-transform: uppercase;
+            font-size: 1.1em;
         }
 
-        /* Button styles */
+        td {
+            border-bottom: 1px solid #e0e0e0;
+            padding: 15px;
+            text-align: center;
+            font-size: 1em;
+            color: #333;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover td {
+            background-color: #f1f1f1;
+            color: #007bff;
+        }
+
         .btn {
             text-decoration: none;
-            color: black;
-            font-size: 1.2em;
+            color: #007bff;
+            font-size: 1.1em;
         }
 
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .sidebar {
-                position: static;
-                width: 100%;
-                height: auto;
-                display: flex;
-                flex-direction: row;
-                overflow-x: auto;
-            }
-
-            .sidebar a {
-                padding: 10px;
-                flex: 1;
-                text-align: center;
-            }
-
-            .main-content {
-                margin-left: 0;
-                padding: 10px;
-            }
-
-            h1 {
-                font-size: 24px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            table, th, td {
-                font-size: 0.8em; /* Smaller text for smaller screens */
-                padding: 8px;
-            }
-
-            th, td {
-                padding: 6px;
-            }
-
-            h1 {
-                font-size: 20px;
-                text-align: center;
-            }
-
-            /* Stack sidebar items vertically */
-            .sidebar {
-                flex-direction: column;
-                padding: 10px;
-            }
-
-            /* Adjust table for mobile */
-            .table-container {
-                overflow-x: auto; /* Allows horizontal scrolling */
-            }
+        .btn:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
     <div class="sidebar">
         <h2>Menú</h2>
-        
-        <a href="{% url 'subdirector_home' %}">Subdirector</a>
-        <a href="{% url 'consulta_informes_academicos' %}">Informes académicos</a>
-        <form action="{% url 'logout' %}" method="post" style="display: inline;">
-            {% csrf_token %}
-            <button type="submit">Cerrar sesión</button>
-        </form>
+        <ul>
+            <li><a href="{% url 'subdirector_home' %}">Inicio</a></li>
+            <li><a href="{% url 'consulta_informes_academicos' %}">Consulta de Informes Académicos</a></li>
+            <li><a href="{% url 'gestion_recursos_academicos' %}">Gestión de Recursos Académicos</a></li>
+            <li>
+                <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit">Cerrar sesión</button>
+                </form>
+            </li>
+        </ul>
+        <div class="footer">
+            <a href="#">Nuevos horizontes</a>
+        </div>
     </div>
+
     <div class="main-content">
-        <h1>Recursos</h1>
+        <h1>Recursos Académicos</h1>
         <div class="table-container">
             <table>
                 <tr>
