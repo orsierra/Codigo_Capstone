@@ -104,7 +104,7 @@
             {% else %}
                 <a href="#" class="btn btn-secondary disabled">Libro de clases no disponible</a>
             {% endif %}
-            <a href="{% url 'descargar_pdf_alumno' establecimiento.id alumno.id %}" class="btn btn-success">Descargar PDF</a>
+            <a href="{% url 'descargar_pdf_alumno' establecimiento.id curso.id alumno.id %}" class="btn btn-success">Descargar PDF</a>
         </div>
     </div>
 

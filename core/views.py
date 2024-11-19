@@ -25,7 +25,7 @@ from django.db.models import Count
 from django.core.mail import send_mail
 from django.conf import settings
 from django.urls import reverse
-from django.http import Http404
+from django.http import Http404, HttpResponseForbidden
 
 # ============================================================ MODULO INICIO ==============================================================================
 
@@ -136,7 +136,7 @@ def profesor_cursos(request, establecimiento_id):
     return render(request, 'profesorCursos.html', context)
 
 
-# Libro de clases del profesor
+# ====================================== LIBRO DE CLASES ===========================================================================
 @login_required
 def libro_clases(request, establecimiento_id, curso_id):
     establecimiento = get_object_or_404(Establecimiento, id=establecimiento_id)
@@ -375,116 +375,116 @@ def registro_academico(request, establecimiento_id, curso_id):
 
 @login_required
 def generar_informes(request, establecimiento_id, curso_id):
+    # Obtiene el establecimiento y el curso
     establecimiento = get_object_or_404(Establecimiento, id=establecimiento_id)
     curso = get_object_or_404(Curso, id=curso_id, establecimiento=establecimiento)
 
-    # Filtra los CursoAlumno que correspondan al curso y establecimiento, y por estado de admisión 'Aprobado'
+    # Obtener el profesor asociado al curso
+    profesor = curso.profesor
+
+    # Verifica que el profesor esté asociado al curso
+    if not profesor:
+        return HttpResponseForbidden("No se encontró un profesor asociado a este curso.")
+
+    # Filtra los CursoAlumno que correspondan al curso y por estado de admisión 'Aprobado'
     curso_alumnos = CursoAlumno.objects.filter(curso=curso)
-    print("Curso Alumnos:", curso_alumnos)  # Agrega esto para verificar los alumnos del curso
-    
     alumnos_aprobados = Alumno.objects.filter(
         curso_alumno_relacion__in=curso_alumnos,
         estado_admision='Aprobado',
         establecimiento=establecimiento
     )
-    print("Alumnos Aprobados:", alumnos_aprobados)  # Agrega esto para verificar los alumnos aprobados
 
     return render(request, 'Profe_generar_informes.html', {
         'curso': curso,
         'alumnos_aprobados': alumnos_aprobados,
-        'establecimiento': establecimiento
+        'establecimiento': establecimiento,
+        'profesor': profesor,  # Incluye el profesor en el contexto
     })
 
 
 
-# Alumno detalle para generar informe en PDF
+# ======================================================= Detalle de cada alumno del profesor ==================================================
 @login_required
-def alumno_detalle(request, establecimiento_id, alumno_id):
+def alumno_detalle(request, establecimiento_id, curso_id, alumno_id):
+    # Obtener el establecimiento usando el id de la URL
     establecimiento = get_object_or_404(Establecimiento, id=establecimiento_id)
+    
+    # Obtener el alumno usando su id y el establecimiento
     alumno = get_object_or_404(Alumno, id=alumno_id, establecimiento=establecimiento)
+    
+    # Obtener el curso usando el id de la URL
+    curso = get_object_or_404(Curso, id=curso_id)
 
-    # Obtener el curso actual del alumno mediante el modelo CursoAlumno
-    curso_alumno = CursoAlumno.objects.filter(alumno=alumno).first()
-    curso_actual = curso_alumno.curso if curso_alumno else None
+    # Verificar si el alumno está matriculado en el curso
+    curso_alumno = CursoAlumno.objects.filter(alumno=alumno, curso=curso).first()
+    if not curso_alumno:
+        return HttpResponseForbidden("El alumno no está matriculado en este curso.")
 
-    # Si no se encuentra el curso, manejar el caso
-    if not curso_actual:
-        return render(request, 'alumno_detalle.html', {
-            'alumno': alumno,
-            'curso': None,
-            'calificaciones': [],
-            'asistencias': [],
-            'ausencias': [],
-            'justificaciones': [],
-            'observaciones': [],  # Agregar observaciones vacías en el contexto
-            'promedio': 0,
-            'establecimiento': establecimiento,  # Agregar establecimiento al contexto
-        })
-
-    # Filtrar calificaciones del alumno por el curso actual
-    calificaciones = Calificacion.objects.filter(alumno=alumno, curso=curso_actual)
-
-    # Calcular el promedio de calificaciones
+    # Aquí puedes agregar lógica para obtener calificaciones, asistencias, etc.
+    # Ejemplo:
+    calificaciones = Calificacion.objects.filter(alumno=alumno, curso=curso)
     promedio = calificaciones.aggregate(promedio=Avg('nota'))['promedio'] or 0
+        
+    asistencias = Asistencia.objects.filter(curso=curso, alumnos_presentes=alumno)
+    ausencias = Asistencia.objects.filter(curso=curso, alumnos_ausentes=alumno)
+    justificaciones = Asistencia.objects.filter(curso=curso, alumnos_justificados=alumno)
 
-    # Filtrar asistencias, ausencias y justificaciones usando el curso actual
-    asistencias = Asistencia.objects.filter(curso=curso_actual, alumnos_presentes=alumno)
-    ausencias = Asistencia.objects.filter(curso=curso_actual, alumnos_ausentes=alumno)
-    justificaciones = Asistencia.objects.filter(curso=curso_actual, alumnos_justificados=alumno)
-
-    # Filtrar observaciones del alumno por el curso actual
-    observaciones = Observacion.objects.filter(alumno=alumno, curso=curso_actual)
-
+    
+    observaciones = Observacion.objects.filter(alumno=alumno, curso=curso) if curso else []
+    # Otros datos para la plantilla
     context = {
+        'establecimiento': establecimiento,
+        'curso': curso,
         'alumno': alumno,
-        'curso': curso_actual,
         'calificaciones': calificaciones,
+        'promedio': promedio,
         'asistencias': asistencias,
         'ausencias': ausencias,
         'justificaciones': justificaciones,
-        'observaciones': observaciones,  # Incluir observaciones en el contexto
-        'promedio': promedio,
-        'establecimiento': establecimiento  # Incluir establecimiento en el contexto
+        'observaciones': observaciones,
     }
     return render(request, 'alumno_detalle.html', context)
+
 
 ##============================================ generar pdf por alumno: asistencia y calificaciones================================
 
 
 # Descargar PDF de alumno
 @login_required
-def descargar_pdf_alumno(request, establecimiento_id, alumno_id):
+def descargar_pdf_alumno(request, establecimiento_id,curso_id, alumno_id):
+    # Obtener el establecimiento usando el id de la URL
     establecimiento = get_object_or_404(Establecimiento, id=establecimiento_id)
+    
+    # Obtener el alumno usando su id y el establecimiento
     alumno = get_object_or_404(Alumno, id=alumno_id, establecimiento=establecimiento)
+    
+    # Obtener el curso usando el id de la URL
+    curso = get_object_or_404(Curso, id=curso_id)
 
-    # Obtener el curso actual del alumno mediante el modelo CursoAlumno
-    curso_alumno = CursoAlumno.objects.filter(alumno=alumno).first()
-    curso_actual = curso_alumno.curso if curso_alumno else None
+    # Verificar si el alumno está matriculado en el curso
+    curso_alumno = CursoAlumno.objects.filter(alumno=alumno, curso=curso).first()
+    if not curso_alumno:
+        return HttpResponseForbidden("El alumno no está matriculado en este curso.")
 
-    # Filtrar calificaciones del alumno por el curso actual
-    calificaciones = Calificacion.objects.filter(alumno=alumno, curso=curso_actual) if curso_actual else []
-
-    # Calcular el promedio de calificaciones
+    # Aquí puedes agregar lógica para obtener calificaciones, asistencias, etc.
+    # Ejemplo:
+    calificaciones = Calificacion.objects.filter(alumno=alumno, curso=curso)
     promedio = calificaciones.aggregate(promedio=Avg('nota'))['promedio'] or 0
-
-    # Filtrar asistencias, ausencias y justificaciones usando el curso actual
-    asistencias = Asistencia.objects.filter(curso=curso_actual, alumnos_presentes=alumno) if curso_actual else []
-    ausencias = Asistencia.objects.filter(curso=curso_actual, alumnos_ausentes=alumno) if curso_actual else []
-    justificaciones = Asistencia.objects.filter(curso=curso_actual, alumnos_justificados=alumno) if curso_actual else []
-
-    # Filtrar observaciones del alumno por el curso actual
-    observaciones = Observacion.objects.filter(alumno=alumno, curso=curso_actual) if curso_actual else []
-
+    asistencias = Asistencia.objects.filter(curso=curso, alumnos_presentes=alumno)
+    ausencias = Asistencia.objects.filter(curso=curso, alumnos_ausentes=alumno)
+    justificaciones = Asistencia.objects.filter(curso=curso, alumnos_justificados=alumno)    
+    observaciones = Observacion.objects.filter(alumno=alumno, curso=curso) if curso else []
+    # Otros datos para la plantilla
     context = {
+        'establecimiento': establecimiento,
+        'curso': curso,
         'alumno': alumno,
-        'curso': curso_actual,
         'calificaciones': calificaciones,
+        'promedio': promedio,
         'asistencias': asistencias,
         'ausencias': ausencias,
         'justificaciones': justificaciones,
         'observaciones': observaciones,
-        'promedio': promedio,
-        'establecimiento': establecimiento
     }
 
     html_string = render_to_string('alumno_detalle.html', context)
