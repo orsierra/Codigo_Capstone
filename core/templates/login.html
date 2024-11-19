@@ -9,51 +9,115 @@
         body {
             font-family: Arial, sans-serif;
             background-image: linear-gradient(to bottom right, rgba(0, 102, 204, 0.8), rgba(0, 204, 255, 0.8)), 
-                              url('{% static "img/horizontes.jpg" %}'); /* Imagen de fondo */
-            background-size: cover; /* Cubrir toda la pantalla */
-            background-repeat: no-repeat; /* Evitar repetir la imagen */
-            background-position: center; /* Centrar la imagen */
+                              url('{% static "img/inicioLogin.jpg" %}');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
             margin: 0;
             padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            overflow: hidden;
+            position: relative;
         }
+
+        /* Elementos decorativos de fondo */
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.15);
+            opacity: 0.7;
+        }
+        .circle:nth-child(1) {
+            width: 400px;
+            height: 400px;
+            top: 5%;
+            left: 15%;
+            filter: blur(20px);
+        }
+        .circle:nth-child(2) {
+            width: 300px;
+            height: 300px;
+            bottom: 10%;
+            right: 20%;
+            filter: blur(30px);
+        }
+        .circle:nth-child(3) {
+            width: 500px;
+            height: 500px;
+            top: 40%;
+            left: 60%;
+            filter: blur(40px);
+        }
+
+        .diagonal-line {
+            position: absolute;
+            width: 2px;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: rotate(30deg);
+        }
+        .diagonal-line:nth-child(4) {
+            left: 20%;
+        }
+        .diagonal-line:nth-child(5) {
+            left: 40%;
+        }
+        .diagonal-line:nth-child(6) {
+            left: 60%;
+        }
+
         .login-container {
             width: 100%;
             max-width: 400px;
             padding: 40px;
-            background-color: rgba(255, 255, 255, 0.9); /* Color de fondo más claro para el contenedor */
+            background-color: rgba(255, 255, 255, 0.95);
             border-radius: 10px;
             text-align: center;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            z-index: 10; /* Asegura que esté encima de los elementos decorativos */
         }
+
         .login-container h2 {
-            color: #003366; /* Color de texto más oscuro para un mejor contraste */
+            color: #003366;
             font-weight: bold;
             margin-bottom: 20px;
         }
+
         .login-container input {
             width: 90%;
             padding: 10px;
             margin: 10px 0;
             border-radius: 5px;
-            border: 1px solid #ccc; /* Borde más definido */
+            border: 1px solid #ccc;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
-        .login-container button {
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .button-container button,
+        .button-container a {
             padding: 10px 20px;
             background-color: #007bff;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.3s ease; /* Transición suave para el hover */
+            text-decoration: none;
+            transition: background-color 0.3s ease;
         }
-        .login-container button:hover {
+
+        .button-container button:hover,
+        .button-container a:hover {
             background-color: #0056b3;
         }
+
         .error-message {
             color: red;
             margin-top: 10px;
@@ -62,6 +126,14 @@
     </style>
 </head>
 <body>
+    <!-- Elementos decorativos en el fondo -->
+    <div class="circle"></div>
+    <div class="circle"></div>
+    <div class="circle"></div>
+    <div class="diagonal-line"></div>
+    <div class="diagonal-line"></div>
+    <div class="diagonal-line"></div>
+
     <div class="login-container">
         <h2>INICIA SESIÓN EN TU CUENTA</h2>
         <form method="POST">
@@ -72,7 +144,10 @@
             <label for="password">Contraseña:</label>
             <input type="password" id="password" name="password" required><br>
 
-            <button type="submit">INICIAR SESIÓN</button>
+            <div class="button-container">
+                <button type="submit">INICIAR SESIÓN</button>
+                <a href="{% url 'inicio' %}">VOLVER</a>
+            </div>
         </form>
         {% if messages %}
             <div class="error-message">
