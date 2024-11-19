@@ -32,6 +32,17 @@
             margin-bottom: 15px;
         }
 
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.1em;
+        }
+
         p.description {
             text-align: center;
             color: #666;
@@ -135,6 +146,14 @@
 <body>
     <div class="container">
         <h1>Historial de Bitácoras de Clase</h1>
+
+        <!-- Success message display -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="success-message">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
         <p class="description">
             En esta sección, puedes revisar el historial de bitácoras de clase. Cada registro incluye detalles sobre las actividades realizadas, el curso, y la fecha en que se llevó a cabo la clase.
         </p>
