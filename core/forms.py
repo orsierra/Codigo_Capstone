@@ -95,23 +95,55 @@ class ApoderadoForm(forms.ModelForm):
         fields = ['nombre', 'apellido', 'email', 'telefono']
 
 class AlumnoForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput)
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'placeholder': 'Ingrese una contraseña'}),
+        required=True,
+        label="Contraseña"
+    )
     cursos = forms.ModelMultipleChoiceField(
-        queryset=Curso.objects.none(),  # Inicialmente no hay cursos
+        queryset=Curso.objects.none(),  # Inicialmente vacío
         widget=Select2MultipleWidget(attrs={'class': 'CursoAlumno'}),  # Usando el widget Select2
         required=True,
         label="Cursos"
     )
     apoderado = forms.ModelChoiceField(
-        queryset=Apoderado.objects.none(),  # Inicialmente no hay apoderados
+        queryset=Apoderado.objects.none(),  # Inicialmente vacío
+        widget=forms.Select(attrs={'class': 'form-select'}),
         required=True,
         label="Apoderado"
     )
     establecimiento_nombre = forms.CharField(
         label='Establecimiento',
-        widget=forms.TextInput(attrs={'readonly': 'readonly'}),
-        required=True
+        widget=forms.TextInput(attrs={'readonly': 'readonly', 'class': 'form-control'}),
+        required=False  # No es un campo del modelo, solo para mostrar
     )
+
+    class Meta:
+        model = Alumno
+        fields = ['nombre', 'apellido', 'email', 'apoderado', 'cursos', 'estado_admision', 'password']
+
+    def __init__(self, *args, establecimiento_instance=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Guardar el establecimiento para su uso posterior
+        self.establecimiento_instance = establecimiento_instance
+
+        # Filtrar los cursos y apoderados basados en el establecimiento
+        if establecimiento_instance:
+            self.fields['cursos'].queryset = Curso.objects.filter(establecimiento=establecimiento_instance)
+            self.fields['apoderado'].queryset = Apoderado.objects.filter(establecimiento=establecimiento_instance)
+            self.fields['establecimiento_nombre'].initial = establecimiento_instance.nombre
+
+    def save(self, commit=True):
+        alumno = super().save(commit=False)
+        if self.establecimiento_instance:
+            alumno.establecimiento = self.establecimiento_instance
+        # Cifrar la contraseña antes de guardar
+        alumno.set_password(self.cleaned_data['password'])
+        if commit:
+            alumno.save()
+            self.save_m2m()  # Guardar relaciones ManyToMany
+        return alumno
+
 
     class Meta:
         model = Alumno

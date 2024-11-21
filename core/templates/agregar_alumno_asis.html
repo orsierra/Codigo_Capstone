@@ -7,44 +7,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agregar Alumno</title>
     <link href="{% static 'django_select2/css/select2.min.css' %}" rel="stylesheet" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        /* Reset básico */
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
             background-color: #f4f4f4;
             display: flex;
-            flex-direction: column;
-            height: auto;  /* Ajusta el height al contenido */
+            height: 100vh;
         }
-        
 
         /* Barra lateral */
         .sidebar {
             width: 250px;
             background-color: #343a40;
-            color: #fff;
+            color: white;
+            padding: 20px;
             position: fixed;
             height: 100%;
-            padding: 20px;
-            top: 0;
-            left: 0;
             display: flex;
             flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
         }
+
         .sidebar h2 {
-            text-align: center;
             color: #ffc107;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: bold;
+            font-size: 1.5em;
         }
+
         .sidebar ul {
             list-style: none;
             padding: 0;
             flex-grow: 1;
         }
+
         .sidebar ul li {
             margin: 15px 0;
         }
+
         .sidebar ul li a,
         .sidebar ul li form button {
             color: #ced4da;
@@ -61,17 +70,13 @@
             width: 100%;
             text-align: left;
         }
-        .sidebar ul li a {
-            color: #ced4da;
-            text-decoration: none;
-            padding: 10px;
-            display: block;
-            transition: background 0.3s;
-        }
-        .sidebar ul li a:hover {
+
+        .sidebar ul li a:hover,
+        .sidebar ul li form button:hover {
             background-color: #ffc107;
             color: #343a40;
         }
+
         .footer {
             text-align: center;
             font-size: 14px;
@@ -88,82 +93,58 @@
         .footer a:hover {
             text-decoration: underline;
         }
-        /* Estilo para los botones en el sidebar */
-        .sidebar form button {
-            background-color: #343a40;
-            color: #ced4da;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            width: 100%;  /* Asegura que el botón ocupe todo el ancho */
-            text-align: center;
-            margin-top: 15px;
-        }
 
-        .sidebar form button:hover {
-            background-color: #ffc107;
-            color: #343a40;
-        }
-
-        /* Contenedor principal y formulario */
+        /* Contenido principal */
         .main-content {
-            margin-left: 250px;  /* Ajusta el margen para no superponerse al sidebar */
-            padding: 20px;
-            width: calc(100% - 250px);  /* Ajusta el ancho restando el ancho del sidebar */
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;  /* Cambié 'center' por 'flex-start' para alinear los elementos en la parte superior */
-            min-height: 100vh;
-            box-sizing: border-box;
-            flex-direction: column;
-        }
-        
-        .form-container {
-            width: 100%;
-            max-width: 900px;
-            background-color: #fff;
-            padding: 20px;
+            margin-left: 270px;
+            padding: 40px;
+            background-color: white;
             border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            text-align: center; /* Centra el título */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            max-height: 100vh;
+            width: calc(100% - 270px);
         }
+
         h1 {
+            text-align: center;
             color: #333;
-            margin-bottom: 20px;
         }
+
         fieldset {
             border: 1px solid #ccc;
             padding: 20px;
             margin-bottom: 20px;
             background: #fff;
-            border-radius: 4px;
-            overflow: visible;  /* Asegura que el contenido no esté oculto */
         }
-        
+
         legend {
             font-weight: bold;
             padding: 0 10px;
         }
+
         div {
             margin-bottom: 15px;
         }
+
         label {
             display: block;
             margin-bottom: 5px;
             color: #555;
         }
+
         input, select {
             width: 100%;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
         }
+
         .button-container {
             display: flex;
             justify-content: space-between;
-            align-items: center;
         }
+
         button {
             background-color: #007bff;
             color: white;
@@ -172,9 +153,11 @@
             border-radius: 5px;
             cursor: pointer;
         }
+
         button:hover {
             background-color: #0056b3;
         }
+
         .btn-back {
             background-color: #6c757d;
             color: white;
@@ -183,19 +166,51 @@
             border-radius: 5px;
             display: inline-block;
         }
+
         .btn-back:hover {
             background-color: #5a6268;
         }
+
+        .messages {
+        margin-bottom: 20px;
+    }
+
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+    }
+
+    .alert-success {
+        color: #155724;
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+    }
+
+    .alert-error {
+        color: #721c24;
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+    }
     </style>
-    {{ form.media }}  <!-- Incluye los archivos CSS y JS necesarios para django-select2 -->
+    {{ form.media }}
 </head>
 <body>
     <div class="sidebar">
         <h2>Menú</h2>
-        <ul>
-            <li><a href="{% url 'panel_asisAdminFinan' establecimiento.id %}">Inicio</a></li>
-            <li><a href="{% url 'asisAdmiFinan_gestion_pagos' establecimiento.id %}">Lista de Estudiantes</a></li>
-            <li>
+        <ul class="menu">
+            <li class="menu-item">
+                <a href="{% url 'panel_asisAdminFinan' establecimiento.id %}">
+                    Inicio
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="{% url 'asisAdmiFinan_gestion_pagos' establecimiento.id %}">
+                    Lista de Estudiantes
+                </a>
+            </li>
+            <li class="menu-item">
                 <form action="{% url 'logout' %}" method="post">
                     {% csrf_token %}
                     <button type="submit">Cerrar sesión</button>
@@ -217,49 +232,40 @@
                 {% endif %}
                 <fieldset>
                     <legend>Información Personal</legend>
-                    <div>
+                    <div class="form-group">
                         <label for="{{ form.nombre.id_for_label }}">{{ form.nombre.label }}</label>
                         {{ form.nombre }}
-                        {{ form.nombre.errors }}
                     </div>
-                    <div>
+                    <div class="form-group">
                         <label for="{{ form.apellido.id_for_label }}">{{ form.apellido.label }}</label>
                         {{ form.apellido }}
-                        {{ form.apellido.errors }}
                     </div>
-                    <div>
+                    <div class="form-group">
                         <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
                         {{ form.email }}
-                        {{ form.email.errors }}
                     </div>
                 </fieldset>
                 
                 <fieldset>
                     <legend>Información de Admisión</legend>
-                    <div>
+                    <div class="form-group">
                         <label for="{{ form.apoderado.id_for_label }}">{{ form.apoderado.label }}</label>
                         {{ form.apoderado }}
-                        {{ form.apoderado.errors }}
                     </div>
-                    <div>
+                    <div class="form-group">
                         <label for="{{ form.cursos.id_for_label }}">{{ form.cursos.label }}</label>
                         {{ form.cursos }}
-                        {{ form.cursos.errors }}
                     </div>
-                    <div>
+                    <div class="form-group">
                         <label for="{{ form.estado_admision.id_for_label }}">{{ form.estado_admision.label }}</label>
                         {{ form.estado_admision }}
-                        {{ form.estado_admision.errors }}
                     </div>
                     <div>
                         <label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
                         {{ form.password }}
-                        {{ form.password.errors }}
-                    </div>
-                    <div>
-                        <label for="{{ form.establecimiento_nombre.id_for_label }}">{{ form.establecimiento_nombre.label }}</label>
-                        {{ form.establecimiento_nombre }}  <!-- Mostrar el establecimiento como solo lectura -->
-                        {{ form.establecimiento_nombre.errors }}
+                        {% for error in form.password.errors %}
+                            <div class="error">{{ error }}</div>
+                        {% endfor %}
                     </div>
                 </fieldset>
         
@@ -275,7 +281,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <script>
         $(document).ready(function() {
-            $('.CursoAlumno').select2();  // Activar Select2 para los selectores de curso
+            $('.CursoAlumno').select2(); // Inicializa Select2
         });
     </script>
 </body>

@@ -1265,38 +1265,42 @@ def ver_gestion_pagos_admision(request, establecimiento_id):
 
 
 # ===================================================== VISTA de ASISTENTE DE ADMISIÓN Y FINANZAS PARA AGREGAR ALUMNO ==========================================
+
 @login_required
 def agregar_alumno_asis(request, establecimiento_id):
-    # Obtener el establecimiento por su ID
     establecimiento = get_object_or_404(Establecimiento, id=establecimiento_id)
 
     if request.method == 'POST':
         form = AlumnoForm(request.POST, establecimiento_instance=establecimiento)
-
         if form.is_valid():
             try:
-                # Guardar el alumno, incluyendo el establecimiento y los cursos seleccionados
                 form.save()
+                # Agregar un mensaje de éxito
+                messages.success(request, "Alumno agregado exitosamente.")
                 return redirect('asisAdmiFinan_gestion_pagos', establecimiento_id=establecimiento.id)
-            except IntegrityError:
-                form.add_error(None, 'Ocurrió un error al crear el usuario. Intenta nuevamente.')
             except Exception as e:
-                form.add_error(None, f'Ocurrió un error inesperado: {str(e)}')
+                form.add_error(None, f'Error inesperado: {str(e)}')
+        else:
+            print(form.errors)  # Debugging de errores de validación
     else:
         form = AlumnoForm(establecimiento_instance=establecimiento)
 
     return render(request, 'agregar_alumno_asis.html', {'form': form, 'establecimiento': establecimiento})
 
 
-
-
-
-
 # =================================================== Asistente de Admisión y Finanzas - Eliminar Alumno ===================================================
+
 @login_required
 def eliminar_alumno_asis(request, establecimiento_id, alumno_id):
     alumno = get_object_or_404(Alumno, id=alumno_id)
-    alumno.delete()  # Eliminar el alumno
+
+    try:
+        alumno.delete()  # Eliminar el alumno
+        # Agregar un mensaje de éxito
+        messages.success(request, "Alumno eliminado exitosamente.")
+    except Exception as e:
+        # Manejo de errores con un mensaje
+        messages.error(request, f"Hubo un problema al eliminar al alumno: {str(e)}")
 
     # Redirige a la lista de estudiantes del establecimiento específico
     return redirect('asisAdmiFinan_gestion_pagos', establecimiento_id=establecimiento_id)
