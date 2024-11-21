@@ -145,8 +145,6 @@ class AlumnoForm(forms.ModelForm):
         return alumno
 
 
-
-
     class Meta:
         model = Alumno
         fields = ['nombre', 'apellido', 'email', 'apoderado', 'password', 'estado_admision']
